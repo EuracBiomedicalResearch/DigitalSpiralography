@@ -47,6 +47,7 @@ class MainWindow(QtGui.QMainWindow):
         self._scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.black))
         self._ui.view.setScene(self._scene)
 
+        self.record = None
         self.reset()
 
 
@@ -280,23 +281,25 @@ class MainWindow(QtGui.QMainWindow):
                                                   Consts.APP_NAME,
                                                   Consts.APP_VERSION))
 
+    def _redraw_scene(self):
+        if self.record:
+            self._reset_scene()
+            self._load_scene(self.record)
+
 
     def on_trace(self, ev):
         self._showTraces = self._ui.actionShowTraces.isChecked()
-        self._reset_scene()
-        self._load_scene(self.record)
+        self._redraw_scene()
 
 
     def on_raw(self, ev):
         self._showRaw = self._ui.actionRAWCorr.isChecked()
-        self._reset_scene()
-        self._load_scene(self.record)
+        self._redraw_scene()
 
 
     def on_time(self, ev):
         self._showTime = self._ui.actionSpeedTime.isChecked()
-        self._reset_scene()
-        self._load_scene(self.record)
+        self._redraw_scene()
 
 
 
