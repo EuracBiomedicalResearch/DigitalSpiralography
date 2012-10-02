@@ -1,0 +1,463 @@
+# -*- coding: utf-8 -*-
+"""Drawing window"""
+
+import datetime
+import Analysis
+from PyQt4 import QtCore, QtGui
+
+
+POINT_LEN = 0.05        # diameter of calibration points (in normalized drawing units)
+BAR_LEN = 2.            # extension of the calibration bars (in normalized drawing units)
+CUR_LEN = 25.           # cursor extension (in pixels)
+MAIN_TEXT_SIZE = 20     # size of main text (in points)
+TIMER_MS = 100          # timerEvent delay in ms
+PEN_MAXWIDTH = 10       # max pen width in pixels (minimum is always 1)
+
+
+class Mode:
+    Calibrate, Record = range(2)
+
+
+class Handler:
+    def keyEvent(self, ev):
+        pass
+
+    def tabletEvent(self, ev):
+        pass
+
+    def timerEvent(self, ev):
+        pass
+
+    def terminate(self):
+        pass
+
+
+class CalibrationHandler(Handler):
+    def __init__(self, dw):
+        self.dw = dw
+        self.dw.reset_recording()
+        self.dw.reset_calibration()
+        self.dw._main_text.setText("CALIBRATION")
+        self.dw._sub_text.setText("Place the pen on the red point and press ENTER\n"
+                                  "Press TAB to restart, ESC to abort calibration")
+        self.items = None
+        self.restart()
+
+
+    def restart(self):
+        self.dw._cursor.hide()
+        self.dw._warning.setText("")
+
+        # storage for graphical items
+        if self.items is not None:
+            self.dw._scene.removeItem(self.items)
+        self.items = QtGui.QGraphicsItemGroup(self.dw._supp_group)
+
+        # initial state
+        self.cpoints = []
+        self.point = None
+        self.prepare_next_point()
+
+
+    def completed(self):
+        res, error = self.dw.setup_calibration(
+            Analysis.CalibrationData(self.cpoints))
+        if not res:
+            self.restart()
+            self.dw._warning.setText("CALIBRATION FAILED: " + error.upper() +
+                                     "!\nTry refitting the paper. Restarting calibration...")
+        else:
+            self.point = None
+            self.dw._cursor.show()
+            self.dw._set_bt_text("Previewing calibration. To accept the results press ENTER")
+
+
+    def prepare_next_point(self):
+        # update visual
+        if self.point:
+            self.dw._warning.setText("")
+            self.point.setPen(QtGui.QPen(QtCore.Qt.green))
+            self.point.setBrush(QtGui.QBrush(QtGui.QColor(0, 255, 0, 127)))
+
+        # check if we reached the last point
+        pos = len(self.cpoints)
+        pos_max = len(self.dw.drawing.cpoints)
+        if pos == pos_max:
+            return self.completed()
+
+        # prepare the next point
+        next_point = self.dw.drawing.cpoints[pos]
+        self.point = QtGui.QGraphicsEllipseItem(-POINT_LEN / 2, -POINT_LEN / 2, POINT_LEN, POINT_LEN)
+        self.point.setPen(QtGui.QPen(QtCore.Qt.red))
+        self.point.setPos(next_point[0], next_point[1])
+        self.point.setParentItem(self.items)
+
+        # update status
+        self.dw._set_bt_text("Calibrating point {}/{}".format(pos + 1, pos_max))
+
+
+    def add_point(self):
+        if not self.dw._drawing_state:
+            self.dw._warning.setText("No cursor at point!")
+        else:
+            self.cpoints.append((self.dw._drawing_pos.x(), self.dw._drawing_pos.y()))
+            self.prepare_next_point()
+
+
+    def keyPressEvent(self, ev):
+        if ev.key() == QtCore.Qt.Key_Return or \
+          ev.key() == QtCore.Qt.Key_Enter:
+            # enter pressed
+            if self.point:
+                # currently calibrating
+                self.add_point()
+            else:
+                # previewing
+                self.dw.accept()
+        elif ev.key() == QtCore.Qt.Key_Tab:
+            self.restart()
+
+
+    def keyEvent(self, ev):
+        if ev.type() == QtCore.QEvent.KeyPress and not ev.isAutoRepeat():
+            self.keyPressEvent(ev)
+
+
+    def tabletEvent(self, ev):
+        if self.point:
+            if ev.type() == QtCore.QEvent.TabletPress:
+                self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 127)))
+            elif ev.type() == QtCore.QEvent.TabletRelease:
+                self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 0)))
+
+
+    def terminate(self):
+        self.dw._scene.removeItem(self.items)
+
+
+
+class RecordingHandler(Handler):
+    def __init__(self, dw):
+        self.dw = dw
+        self.dw.reset_recording()
+        self.dw._cursor.show()
+        self.dw._main_text.setText("RECORDING")
+        self.dw._sub_text.setText("Recording starts automatically as soon as the pen touches the tablet\n"
+                                  "Press TAB to restart, ENTER to stop, ESC to abort recording")
+        self.dw._warning.setText("")
+
+        # drawing support
+        self.item = QtGui.QGraphicsPixmapItem()
+        self.item.setParentItem(self.dw._back_group)
+        self.buffer = QtGui.QPixmap(self.dw.size())
+        self.painter = QtGui.QPainter(self.buffer)
+        self.painter.setRenderHints(self.dw._view.renderHints())
+        self.pen = QtGui.QPen(QtCore.Qt.green)
+        self.pen.setCapStyle(QtCore.Qt.RoundCap)
+
+        # initial state
+        self.dw.recording = Analysis.RecordingData()
+        self.old_trans_pos = None
+        self.restart()
+
+
+    def restart(self):
+        self.dw.recording.clear()
+        self.buffer.fill(QtCore.Qt.black)
+        self.update_buffer()
+        self.dw._set_bt_text("Waiting for events...")
+
+
+    def update_buffer(self):
+        self.item.setPixmap(self.buffer)
+
+
+    def timerEvent(self, ev):
+        if self.dw.recording.events is None:
+            return
+
+        # update the indicator
+        stamp = datetime.datetime.now()
+        elapsed = stamp - self.dw.recording.events[0].stamp
+        length = (self.dw.recording.events[-1].stamp -
+                  self.dw.recording.events[0].stamp)
+        self.dw._set_bt_text(
+            "recording: {}\nstrokes: {}\nevents: {}\nlength: {}".format(
+            str(elapsed), self.dw.recording.strokes,
+            len(self.dw.recording.events), str(length)))
+
+
+    def tabletEvent(self, ev):
+        if self.dw._drawing_state:
+            # new stroke
+            self.pen.setWidthF(1 + ev.pressure() * (PEN_MAXWIDTH - 1))
+            self.painter.setPen(self.pen)
+            self.painter.drawLine(self.old_trans_pos, self.dw._trans_pos)
+            self.update_buffer()
+
+            # start recording if not already
+            if self.dw.recording.events is None:
+                self.dw.recording.events = []
+
+        # record the data
+        if self.dw.recording.events is not None:
+            # events
+            coords_drawing = self.dw._drawing_pos
+            coords_trans = self.dw._trans_pos
+            self.dw.recording.append(
+                Analysis.RecordingEvent(
+                    ev.type(),
+                    [coords_drawing.x(), coords_drawing.y()],
+                    [coords_trans.x(), coords_trans.y()],
+                    ev.pressure()))
+
+        # update the old positions
+        self.old_trans_pos = self.dw._trans_pos
+
+
+    def keyEvent(self, ev):
+        if ev.type() == QtCore.QEvent.KeyPress and not ev.isAutoRepeat():
+            if ev.key() == QtCore.Qt.Key_Return or \
+              ev.key() == QtCore.Qt.Key_Enter:
+                self.dw.accept()
+            elif ev.key() == QtCore.Qt.Key_Tab:
+                self.restart()
+
+
+    def terminate(self):
+        self.painter = None
+        self.buffer = None
+        self.dw._scene.removeItem(self.item)
+
+
+
+class DrawingWindow(QtGui.QMainWindow):
+    def __init__(self):
+        super(DrawingWindow, self).__init__()
+
+        # scene setup
+        self._scene = QtGui.QGraphicsScene()
+        self._scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.black))
+        self._view = QtGui.QGraphicsView(self._scene)
+        self._view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
+        self._view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self._view.setCacheMode(QtGui.QGraphicsView.CacheNone)
+        self._view.setOptimizationFlag(QtGui.QGraphicsView.DontSavePainterState)
+        self._view.setInteractive(False)
+        self._view.setFrameStyle(0)
+        self.setCursor(QtCore.Qt.BlankCursor)
+        self.setCentralWidget(self._view)
+        self.setWindowModality(QtCore.Qt.ApplicationModal)
+
+        # back/projected/support/transposed/screen space
+        self._back_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._drawing_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._supp_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._trans_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._screen_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+
+        # bars
+        tmp = QtGui.QPainterPath()
+        tmp.moveTo(0., -BAR_LEN)
+        tmp.lineTo(0., 0.)
+        tmp.lineTo(BAR_LEN, 0.)
+        tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
+        tmp.setPen(QtGui.QPen(QtCore.Qt.green))
+
+        tmp = QtGui.QPainterPath()
+        tmp.moveTo(-BAR_LEN, BAR_LEN)
+        tmp.lineTo(BAR_LEN, -BAR_LEN)
+        tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
+        tmp.setPen(QtGui.QPen(QtCore.Qt.yellow))
+
+        # cursor
+        tmp = QtGui.QPainterPath()
+        tmp.moveTo(0, -CUR_LEN)
+        tmp.lineTo(0, CUR_LEN)
+        tmp.moveTo(-CUR_LEN, 0)
+        tmp.lineTo(CUR_LEN, 0)
+        tmp.moveTo(-CUR_LEN / 4, -CUR_LEN / 4)
+        tmp.lineTo(CUR_LEN / 4, CUR_LEN / 4)
+        tmp.moveTo(CUR_LEN / 4, -CUR_LEN / 4)
+        tmp.lineTo(-CUR_LEN / 4, CUR_LEN / 4)
+        self._cursor = QtGui.QGraphicsPathItem(tmp, self._screen_group)
+
+        # main text
+        self._main_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
+        font = self._main_text.font()
+        font.setPointSize(MAIN_TEXT_SIZE)
+        font.setBold(True)
+        self._main_text.setFont(font)
+
+        # sub text
+        self._sub_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._sub_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
+
+        # bt text
+        self._bt_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._bt_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
+
+        # warning
+        self._warning = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._warning.setBrush(QtGui.QBrush(QtCore.Qt.yellow))
+
+        # initial state
+        self._drawing_item = None
+        self.reset_calibration()
+        self.reset_recording()
+
+
+    def reset_calibration(self):
+        self.calibration = None
+
+
+    def reset_recording(self):
+        self.recording = None
+
+
+    def setup_calibration(self, calibration):
+        # peform the actual calibration
+        res, error = self.drawing.calibrate(calibration.cpoints)
+        if res is None:
+            return False, error
+
+        # setup the transposed space
+        self.calibration = calibration
+        self._trans_group.resetTransform()
+        trans = QtGui.QTransform()
+        pos = self._drawing_group.pos()
+        trans.translate(pos.x(), pos.y())
+        scale = self._drawing_group.scale()
+        trans.scale(scale, scale)
+        self._trans_group.setTransform(res * trans)
+        return True, None
+
+
+    def timerEvent(self, ev):
+        self.handler.timerEvent(ev)
+
+
+    def closeEvent(self, ev):
+        self.reject()
+
+
+    def tabletEvent(self, ev):
+        # only consider pen events and only when visible
+        if ev.pointerType() != QtGui.QTabletEvent.Pen or \
+          self.isVisible() is False:
+            return
+
+        # screen/drawing position
+        self._screen_pos = ev.hiResGlobalPos()
+        self._drawing_pos = self._drawing_group.mapFromScene(self._screen_pos)
+        self._trans_pos = self._trans_group.mapToScene(self._drawing_pos)
+
+        # also update the cursor position within the translated space
+        self._cursor.setPos(self._trans_pos)
+
+        # update drawing state
+        if ev.type() == QtCore.QEvent.TabletPress:
+            self._cursor.setPen(QtGui.QPen(QtCore.Qt.cyan))
+            self._drawing_state = True
+        elif ev.type() == QtCore.QEvent.TabletRelease:
+            self._cursor.setPen(QtGui.QPen(QtCore.Qt.gray))
+            self._drawing_state = False
+
+        self.handler.tabletEvent(ev)
+
+
+    def keyPressEvent(self, ev):
+        if ev.key() == QtCore.Qt.Key_Escape:
+            return self.closeEvent(QtGui.QCloseEvent())
+        self.handler.keyEvent(ev)
+
+
+    def keyReleaseEvent(self, ev):
+        self.handler.keyEvent(ev)
+
+
+    def reset(self, mode):
+        self.mode = mode
+        if mode == Mode.Calibrate:
+            self.handler = CalibrationHandler(self)
+        elif mode == Mode.Record:
+            self.handler = RecordingHandler(self)
+
+
+    def resizeEvent(self, ev):
+        # resize to match current screen resolution
+        size = ev.size()
+        self._view.setSceneRect(0, 0, size.width(), size.height())
+        self._drawing_group.setPos(size.width() / 2., size.height() / 2.)
+        self._drawing_group.setScale(min(size.width(), size.height()) / 2. * 0.9)
+        self._supp_group.setPos(self._drawing_group.pos())
+        self._supp_group.setScale(self._drawing_group.scale())
+        self._layout_all_text()
+
+
+    def _layout_all_text(self):
+        # main text
+        tmp = self._view.sceneRect().topLeft()
+        self._main_text.setPos(tmp)
+        tmp.setY(tmp.y() + self._main_text.boundingRect().height())
+        self._sub_text.setPos(tmp)
+        tmp.setY(tmp.y() + self._sub_text.boundingRect().height())
+        self._warning.setPos(tmp)
+
+        # bottom text
+        self._layout_bt_text()
+
+
+    def _layout_bt_text(self):
+        tmp = self._view.sceneRect().bottomLeft()
+        tmp.setY(tmp.y() - self._bt_text.boundingRect().height())
+        self._bt_text.setPos(tmp)
+
+
+    def _set_bt_text(self, text):
+        self._bt_text.setText(text)
+        self._layout_bt_text()
+
+
+    def exec_(self):
+        self.result = None
+        self._screen_pos = None
+        self._drawing_pos = None
+        self._drawing_state = False
+        self._cursor.setPen(QtGui.QPen(QtCore.Qt.gray))
+
+        self.showFullScreen()
+        tid = self.startTimer(TIMER_MS)
+        while self.isVisible():
+            QtGui.QApplication.processEvents()
+        self.killTimer(tid)
+        return self.result
+
+
+    def set_drawing(self, drawing):
+        # reset calibration/drawing if restarting
+        if self._drawing_item is not None:
+            self.reset_calibration()
+            self.reset_recording()
+            self._scene.removeItem(self._drawing_item)
+
+        # create the graphical item
+        self.drawing = drawing
+        self._drawing_item = self.drawing.generate()
+        self._drawing_item.setPen(QtGui.QPen(QtCore.Qt.white))
+        self._drawing_item.setPos(0., 0.)
+        self._drawing_item.setParentItem(self._drawing_group)
+
+
+    def accept(self):
+        self.hide()
+        self.result = True
+        self.handler.terminate()
+
+
+    def reject(self):
+        self.hide()
+        self.result = False
+        self.handler.terminate()
