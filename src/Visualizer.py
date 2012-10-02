@@ -196,6 +196,7 @@ class MainWindow(QtGui.QMainWindow):
         low_color = QtGui.QColor(Consts.RECORDING_COLOR)
         high_color = QtGui.QColor(Consts.FAST_COLOR)
 
+        speed_repr = 1. / Consts.FAST_SPEED
         total_secs = (record.recording.events[-1].stamp -
                       record.recording.events[0].stamp).total_seconds()
 
@@ -229,8 +230,8 @@ class MainWindow(QtGui.QMainWindow):
                         sf0 = 1. - sf1
                     else:
                         ds = math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
-                        dt = (stamp - old_stamp).total_seconds()
-                        sf1 = min(1., (ds / dt) / Consts.FAST_SPEED)
+                        dt = max(speed_repr, (stamp - old_stamp).total_seconds())
+                        sf1 = min(1., (ds / dt) * speed_repr)
                         sf0 = 1. - sf1
 
                     # blend the color
