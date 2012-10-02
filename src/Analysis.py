@@ -12,6 +12,10 @@ from PyQt4 import QtCore
 
 
 # implementation
+class Drawing:
+    pass
+
+
 class CalibrationData:
     def __init__(self, cpoints, stamp=None):
         self.cpoints = cpoints
@@ -86,7 +90,8 @@ class DrawingRecord:
         return ret
 
 
-    def save(record, path):
+    @classmethod
+    def save(cls, record, path):
         # translate the event stream
         events = []
         for event in record.recording.events:
@@ -127,6 +132,9 @@ class DrawingRecord:
                 "calibration_age": record.calibration_age,
                 "recording": {
                     "session_start": record.recording.session_start,
+                    "rect_size": list(record.recording.rect_size),
+                    "rect_drawing": map(list, record.recording.rect_drawing),
+                    "rect_trans": map(list, record.recording.rect_trans),
                     "events": events,
                     "retries": record.recording.retries,
                     "strokes": record.recording.strokes},
@@ -139,3 +147,67 @@ class DrawingRecord:
         # dump
         fd = gzip.GzipFile(path, 'wb')
         yaml.dump(data, fd, default_flow_style=False)
+
+
+    @classmethod
+    def load(cls, path):
+        fd = gzip.GzipFile(path, 'rb')
+        data = yaml.load(fd)
+
+        # check version info
+        if 'format' not in data or \
+          type(data['format']) != str or \
+          int(float(data['format'])) != 1:
+            raise Exception('Invalid or unsupported file format', path)
+
+        # recover extra data
+        extra_data = data['extra_data']
+        extra_data['format'] = data['format']
+        extra_data['version'] = data['version']
+
+        # drawing (TODO: needs an instance factory)
+        drawing = Drawing()
+        drawing.str = data['drawing']['str']
+        drawing.points = map(tuple, data['drawing']['points'])
+        drawing.cpoints = map(tuple, data['drawing']['cpoints'])
+
+        # calibration
+        calibration = CalibrationData(map(tuple, data['calibration']['cpoints']),
+                                      data['calibration']['stamp'])
+
+        # event stream
+        events = []
+        for event in data['recording']['events']:
+            # event type
+            if event['type'] == 'move':
+                typ = QtCore.QEvent.TabletMove
+            elif event['type'] == 'press':
+                typ = QtCore.QEvent.TabletPress
+            elif event['type'] == 'release':
+                typ = QtCore.QEvent.TabletRelease
+            elif event['type'] == 'enter':
+                typ = QtCore.QEvent.TabletEnterProximity
+            elif event['type'] == 'leave':
+                typ = QtCore.QEvent.TabletLeaveProximity
+            else:
+                typ = event.typ
+
+            # everything else
+            events.append(RecordingEvent(typ, tuple(event['cdraw']),
+                                         tuple(event['ctrans']),
+                                         event['press'], event['stamp']))
+
+        # recording
+        recording = RecordingData(data['recording']['session_start'],
+                                  tuple(data['recording']['rect_size']),
+                                  map(tuple, data['recording']['rect_drawing']),
+                                  map(tuple, data['recording']['rect_trans']),
+                                  events,
+                                  data['recording']['retries'],
+                                  data['recording']['strokes'])
+
+        # final object
+        return DrawingRecord(data['aid'], drawing, calibration,
+                             data['calibration_age'], recording,
+                             data['pat_type'], data['pat_handedness'],
+                             data['pat_hand'], extra_data, data['comments'])
