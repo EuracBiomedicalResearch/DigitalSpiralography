@@ -48,12 +48,16 @@ class RecordingData:
 
 class DrawingRecord:
     def __init__(self, aid, drawing, calibration, calibration_age,
-                 recording, extra_data={}, comments=None):
+                 recording, pat_type, pat_handedness, pat_hand,
+                 extra_data={}, comments=None):
         self.aid = aid
         self.drawing = drawing
         self.calibration = calibration
         self.calibration_age = calibration_age
         self.recording = recording
+        self.pat_type = pat_type
+        self.pat_handedness = pat_handedness
+        self.pat_hand = pat_hand
         self.extra_data = extra_data
         self.comments = comments
 
@@ -123,6 +127,9 @@ class DrawingRecord:
                     "retries": self.recording.retries,
                     "strokes": self.recording.strokes},
                 "extra_data": self.extra_data,
+                "pat_type": self.pat_type,
+                "pat_handedness": self.pat_handedness,
+                "pat_hand": self.pat_hand,
                 "comments": self.comments}
 
         # dump

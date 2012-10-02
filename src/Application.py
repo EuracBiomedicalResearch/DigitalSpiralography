@@ -74,6 +74,15 @@ class EndRecording(QtGui.QDialog):
             self._ui.warnings.setText("-")
         self._ui.warnings.setFont(font)
 
+        self.pat_type = None
+        self._ui.pat_type.setCurrentIndex(0)
+
+        self.pat_handedness = None
+        self._ui.pat_handedness.setCurrentIndex(0)
+
+        self.pat_hand = None
+        self._ui.pat_hand.setCurrentIndex(0)
+
         self.comments = None
         self._ui.comments.clear()
         self._ui.comments.setFocus(True)
@@ -97,6 +106,12 @@ class EndRecording(QtGui.QDialog):
 
     def accept(self):
         self.aid = str(self._ui.patient_id.text())
+        self.pat_type = str(self._ui.pat_type.currentText()) \
+          if self._ui.pat_type.currentIndex() else None
+        self.pat_handedness = str(self._ui.pat_handedness.currentText()) \
+          if self._ui.pat_handedness.currentIndex() else None
+        self.pat_hand = str(self._ui.pat_hand.currentText()) \
+          if self._ui.pat_hand.currentIndex() else None
         self.comments = str(self._ui.comments.toPlainText())
         self.save_path = str(self._ui.save_path.text())
 
@@ -202,7 +217,7 @@ class MainWindow(QtGui.QMainWindow):
                                         self._drawing_window.calibration,
                                         self.calibration_age,
                                         self._drawing_window.recording,
-                                        extra_data)
+                                        None, None, None, extra_data)
 
         # guess a decent path name
         save_path = record.recording.session_start.strftime("%Y%m%d")
@@ -215,6 +230,9 @@ class MainWindow(QtGui.QMainWindow):
         self._end_recording_dialog.reset(save_path, record)
         while self._end_recording_dialog.exec_():
             record.aid = self._end_recording_dialog.aid
+            record.pat_type = self._end_recording_dialog.pat_type
+            record.pat_handedness = self._end_recording_dialog.pat_handedness
+            record.pat_hand = self._end_recording_dialog.pat_hand
             record.comments = self._end_recording_dialog.comments
             save_path = self._end_recording_dialog.save_path
             try:
