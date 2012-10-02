@@ -2,6 +2,7 @@
 """Main Drawing visualizer application"""
 
 # local modules
+import Shared
 import Analysis
 import Consts
 
@@ -9,37 +10,6 @@ import Consts
 import math
 import threading
 from PyQt4 import QtCore, QtGui, uic
-
-
-# support functions
-def poly2qpoly(poly):
-    ret = QtGui.QPolygonF()
-    for v in poly:
-        ret.append(QtCore.QPointF(v[0], v[1]))
-    return ret
-
-
-def size2qpoly(w, h):
-    return poly2qpoly([(0, 0), (w, 0), (w, h), (0, h)])
-
-
-def background_op(message, func, parent=None):
-    pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
-    pd.setWindowModality(QtCore.Qt.ApplicationModal)
-    pd.show()
-
-    ret = {}
-    fn = lambda: ret.__setitem__('ret', func())
-
-    th = threading.Thread(target=fn)
-    th.start()
-    while th.is_alive():
-        QtGui.QApplication.processEvents()
-        th.join(Consts.APP_DELAY)
-
-    pd.hide()
-    return ret['ret']
-
 
 
 # main application
@@ -140,8 +110,8 @@ class MainWindow(QtGui.QMainWindow):
 
         # setup transforms
         rect_size = record.recording.rect_size
-        scene_poly = size2qpoly(rect_size[0], rect_size[1])
-        drawing_poly = poly2qpoly(record.recording.rect_drawing)
+        scene_poly = Shared.size2qpoly(rect_size[0], rect_size[1])
+        drawing_poly = Shared.poly2qpoly(record.recording.rect_drawing)
 
         transform = QtGui.QTransform()
         QtGui.QTransform.quadToQuad(drawing_poly, scene_poly, transform)
@@ -281,8 +251,8 @@ class MainWindow(QtGui.QMainWindow):
     def load(self, path):
         try:
             # perform the loading in background thread
-            record = background_op("Loading, please wait...",
-                                   lambda: Analysis.DrawingRecord.load(path))
+            record = Shared.background_op("Loading, please wait...",
+                                          lambda: Analysis.DrawingRecord.load(path))
         except Exception as e:
             msg = "Cannot load recording {}: {}".format(path, e)
             QtGui.QMessageBox.critical(self, "Load failure", msg)

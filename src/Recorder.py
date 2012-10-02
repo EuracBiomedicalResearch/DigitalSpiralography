@@ -6,6 +6,7 @@ import AID
 import Spiral
 import Analysis
 import DrawingWindow
+import Shared
 import Consts
 
 # system modules
@@ -134,19 +135,6 @@ class EndRecording(QtGui.QDialog):
 
 
 
-def background_op(message, func, parent=None):
-    pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
-    pd.setWindowModality(QtCore.Qt.ApplicationModal)
-    pd.show()
-    th = threading.Thread(target=func)
-    th.start()
-    while th.is_alive():
-        QtGui.QApplication.processEvents()
-        th.join(Consts.APP_DELAY)
-    pd.hide()
-
-
-
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, drawing, params):
         super(MainWindow, self).__init__()
@@ -255,9 +243,9 @@ class MainWindow(QtGui.QMainWindow):
             save_path = self._end_recording_dialog.save_path
             try:
                 # put save into a background thread
-                background_op("Saving, please wait...",
-                              lambda: Analysis.DrawingRecord.save(record, save_path),
-                              self)
+                Shared.background_op("Saving, please wait...",
+                                     lambda: Analysis.DrawingRecord.save(record, save_path),
+                                     self)
             except IOError as e:
                 msg = ("Cannot save recording to {}: {}! " +
                        "Try with a different file name!").format(save_path, e.strerror)
