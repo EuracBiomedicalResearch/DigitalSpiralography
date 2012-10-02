@@ -19,7 +19,7 @@ class Handler:
     def keyEvent(self, ev):
         pass
 
-    def tabletEvent(self, ev):
+    def tabletEventTS(self, ev, stamp):
         pass
 
     def timerEvent(self, ev):
@@ -123,7 +123,7 @@ class CalibrationHandler(Handler):
             self.keyPressEvent(ev)
 
 
-    def tabletEvent(self, ev):
+    def tabletEventTS(self, ev, stamp):
         if self.point:
             if ev.type() == QtCore.QEvent.TabletPress:
                 self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 127)))
@@ -200,7 +200,7 @@ class RecordingHandler(Handler):
             len(self.dw.recording.events), str(length)))
 
 
-    def tabletEvent(self, ev):
+    def tabletEventTS(self, ev, stamp):
         if self.dw._drawing_state:
             # new stroke
             self.pen.setWidthF(1 + ev.pressure() * (Consts.PEN_MAXWIDTH - 1))
@@ -222,7 +222,7 @@ class RecordingHandler(Handler):
                     ev.type(),
                     [coords_drawing.x(), coords_drawing.y()],
                     [coords_trans.x(), coords_trans.y()],
-                    ev.pressure()))
+                    ev.pressure(), stamp))
 
         # update the old positions
         self.old_trans_pos = self.dw._trans_pos
@@ -356,7 +356,7 @@ class DrawingWindow(QtGui.QMainWindow):
         self.reject()
 
 
-    def tabletEvent(self, ev):
+    def tabletEventTS(self, ev, stamp):
         # only consider pen events and only when visible
         if ev.pointerType() != QtGui.QTabletEvent.Pen or \
           self.isVisible() is False:
@@ -378,7 +378,11 @@ class DrawingWindow(QtGui.QMainWindow):
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
             self._drawing_state = False
 
-        self.handler.tabletEvent(ev)
+        self.handler.tabletEventTS(ev, stamp)
+
+
+    def tabletEvent(self, ev):
+        self.tabletEventTS(ev, datetime.datetime.now())
 
 
     def keyPressEvent(self, ev):
