@@ -32,6 +32,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # signals and events
         self._ui.actionOpen.triggered.connect(self.on_load)
+        self._ui.actionInfo.triggered.connect(self.on_info)
         self._ui.actionShowTraces.triggered.connect(self.on_trace)
         self._ui.actionRAWCorr.triggered.connect(self.on_raw)
         self._ui.actionSpeedTime.triggered.connect(self.on_time)
@@ -269,6 +270,13 @@ class MainWindow(QtGui.QMainWindow):
                                                  "Recordings (*.yaml.gz)");
         if path:
             self.load(str(path))
+
+
+    def on_info(self, ev):
+        QtGui.QMessageBox.about(self, "About DrawingVisualizer",
+                                "{} {} {}".format(Consts.APP_ORG,
+                                                  Consts.APP_NAME,
+                                                  Consts.APP_VERSION))
 
 
     def on_trace(self, ev):

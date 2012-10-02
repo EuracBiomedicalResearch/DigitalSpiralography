@@ -104,6 +104,7 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionExit"/>
+   <addaction name="actionInfo"/>
    <addaction name="separator"/>
    <addaction name="actionRAWCorr"/>
    <addaction name="actionSpeedTime"/>
@@ -131,6 +132,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
    </property>
   </action>
   <action name="actionRAWCorr">
@@ -184,6 +188,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionInfo">
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>Informations</string>
+   </property>
+   <property name="toolTip">
+    <string>Informations</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
    </property>
   </action>
  </widget>
