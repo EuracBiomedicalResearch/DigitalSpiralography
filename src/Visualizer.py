@@ -142,6 +142,19 @@ class MainWindow(QtGui.QMainWindow):
         tmp.setPos(0., 0.)
         tmp.setParentItem(self._drawing_group)
 
+        # calibration points
+        pen = QtGui.QPen(QtGui.QColor(255, 0, 0, 127))
+        brush = QtGui.QBrush(QtGui.QColor(255, 0, 0, 64))
+        for point in record.calibration.cpoints:
+           tmp = QtGui.QGraphicsEllipseItem(-Consts.POINT_LEN / 2,
+                                            -Consts.POINT_LEN / 2,
+                                            Consts.POINT_LEN,
+                                            Consts.POINT_LEN)
+           tmp.setPen(pen)
+           tmp.setBrush(brush)
+           tmp.setPos(point[0], point[1])
+           tmp.setParentItem(self._drawing_group)
+
         # trace
         tmp = QtGui.QPainterPath()
         pen = QtGui.QPen(Consts.RECORDING_COLOR)
