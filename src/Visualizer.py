@@ -8,6 +8,7 @@ import Consts
 
 # system modules
 import math
+import platform
 import threading
 from PyQt4 import QtCore, QtGui, uic
 
@@ -298,6 +299,7 @@ class Application(QtGui.QApplication):
         self.main_window.show()
 
         # if a file was specified on the cmd-line, load it
-        args = self.arguments()
-        if len(args) > 1:
-            self.main_window.load(args[1])
+        if platform.system() != 'Windows':
+            args = self.arguments()
+            if len(args) > 1:
+                self.main_window.load(str(args[1]))
