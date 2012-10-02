@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Spiral drawing routines"""
+"""Drawing modules"""
 
 # imports
 import math
@@ -7,28 +7,33 @@ from PyQt4 import QtGui, QtCore
 
 
 # implementation
-class Params:
-    """Spiral definition"""
+class Drawing(object):
+    def __init__(self, id, str, points, cpoints):
+        self.id = id
+        self.str = str
+        self.points = points
+        self.cpoints = cpoints
 
-    def __init__(self, name=None, diameter=None, turns=None, direction=None):
-        self.name = name
+
+
+class SpiralParams:
+    def __init__(self, diameter=None, turns=None, direction=None):
         self.diameter = diameter
         self.turns = turns
         self.direction = direction
 
 
 
-class Spiral:
-    def __init__(self, params):
+class Spiral(Drawing):
+    def __init__(self, id, params):
         self.params = params
-        self.points = self._generate()
-        self.cpoints = self._cpoints()
+        super(Spiral, self).__init__(id, self._describe(),
+                                     self._generate(), self._cpoints())
 
 
-    def describe(self):
-        return u"{}: Ø{}mm {}T {}".format(
-            self.params.name, self.params.diameter,
-            self.params.turns, self.params.direction)
+    def _describe(self):
+        return u"Ø{}mm {}T {}".format(
+            self.params.diameter, self.params.turns, self.params.direction)
 
 
     def _generate(self, step=1.):

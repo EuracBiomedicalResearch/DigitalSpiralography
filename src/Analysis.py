@@ -3,6 +3,7 @@
 
 # local modules
 import Consts
+import Drawing
 
 # system modules
 import datetime
@@ -12,12 +13,9 @@ from PyQt4 import QtCore
 
 
 # implementation
-class Drawing:
-    pass
-
-
 class CalibrationData:
-    def __init__(self, cpoints, stamp=None):
+    def __init__(self, tablet_id, cpoints, stamp=None):
+        self.tablet_id = tablet_id
         self.cpoints = cpoints
         self.stamp = stamp if stamp is not None else datetime.datetime.now()
 
@@ -123,10 +121,12 @@ class DrawingRecord:
                 "version": Consts.APP_VERSION,
                 "aid": record.aid,
                 "drawing": {
-                    "str": record.drawing.describe(),
+                    "id": record.drawing.id,
+                    "str": record.drawing.str,
                     "points": map(list, record.drawing.points),
                     "cpoints": map(list, record.drawing.cpoints)},
                 "calibration": {
+                    "tablet_id": record.calibration.tablet_id,
                     "stamp": record.calibration.stamp,
                     "cpoints": map(list, record.calibration.cpoints)},
                 "calibration_age": record.calibration_age,
@@ -165,14 +165,15 @@ class DrawingRecord:
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
 
-        # drawing (TODO: needs an instance factory)
-        drawing = Drawing()
-        drawing.str = data['drawing']['str']
-        drawing.points = map(tuple, data['drawing']['points'])
-        drawing.cpoints = map(tuple, data['drawing']['cpoints'])
+        # drawing
+        drawing = Drawing.Drawing(data['drawing']['id'],
+                                  data['drawing']['str'],
+                                  map(tuple, data['drawing']['points']),
+                                  map(tuple, data['drawing']['cpoints']))
 
         # calibration
-        calibration = CalibrationData(map(tuple, data['calibration']['cpoints']),
+        calibration = CalibrationData(data['calibration']['tablet_id'],
+                                      map(tuple, data['calibration']['cpoints']),
                                       data['calibration']['stamp'])
 
         # event stream
