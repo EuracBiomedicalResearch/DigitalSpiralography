@@ -104,6 +104,10 @@
    </attribute>
    <addaction name="actionOpen"/>
    <addaction name="actionExit"/>
+   <addaction name="separator"/>
+   <addaction name="actionRAWCorr"/>
+   <addaction name="actionPressTime"/>
+   <addaction name="actionShowTraces"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -127,6 +131,59 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionRAWCorr">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/24x24/chart_ok.png</normaloff>
+     <normalon>icons/24x24/chart_edit.png</normalon>icons/24x24/chart_ok.png</iconset>
+   </property>
+   <property name="text">
+    <string>RAW/Corrected</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionPressTime">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/24x24/color_line.png</normaloff>
+     <normalon>icons/24x24/chrono.png</normalon>icons/24x24/color_line.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pressure/Time</string>
+   </property>
+   <property name="toolTip">
+    <string>Pressure/Time</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionShowTraces">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/24x24/showhide.png</normaloff>icons/24x24/showhide.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show traces</string>
+   </property>
+   <property name="toolTip">
+    <string>Show traces</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+T</string>
    </property>
   </action>
  </widget>

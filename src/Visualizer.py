@@ -50,8 +50,20 @@ class MainWindow(QtGui.QMainWindow):
         self._ui = form()
         self._ui.setupUi(self)
 
+        # defaults
+        self._showRaw = False
+        self._showTime = False
+        self._showTraces = True
+
+        self._ui.actionRAWCorr.setChecked(self._showRaw)
+        self._ui.actionPressTime.setChecked(self._showTime)
+        self._ui.actionShowTraces.setChecked(self._showTraces)
+
         # signals and events
         self._ui.actionOpen.triggered.connect(self.on_load)
+        self._ui.actionShowTraces.triggered.connect(self.on_trace)
+        self._ui.actionRAWCorr.triggered.connect(self.on_raw)
+        self._ui.actionPressTime.triggered.connect(self.on_time)
         self._ui.view.wheelEvent = self.on_wheel
 
         # props
@@ -67,11 +79,18 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def reset(self):
+        self._reset_props()
+        self._reset_scene()
+        self._ui.comments.clear()
+
+
+    def _reset_props(self):
         self._props.clear()
         self._props.setColumnCount(2)
         self._props.setHorizontalHeaderLabels(["Property", "Value"])
 
-        self._ui.comments.clear()
+
+    def _reset_scene(self):
         self._scene.clear()
 
 
@@ -119,6 +138,17 @@ class MainWindow(QtGui.QMainWindow):
         self._supp_group = QtGui.QGraphicsItemGroup(scene=self._scene)
         self._screen_group = QtGui.QGraphicsItemGroup(scene=self._scene)
 
+        # setup transforms
+        rect_size = record.recording.rect_size
+        scene_poly = size2qpoly(rect_size[0], rect_size[1])
+        drawing_poly = poly2qpoly(record.recording.rect_drawing)
+
+        transform = QtGui.QTransform()
+        QtGui.QTransform.quadToQuad(drawing_poly, scene_poly, transform)
+
+        self._drawing_group.setTransform(transform)
+        self._supp_group.setTransform(transform)
+
         # bars
         tmp = QtGui.QPainterPath()
         tmp.moveTo(0., -Consts.BAR_LEN)
@@ -133,28 +163,30 @@ class MainWindow(QtGui.QMainWindow):
         tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
         tmp.setPen(QtGui.QPen(QtCore.Qt.yellow))
 
-        # drawing
-        tmp = QtGui.QPainterPath()
-        tmp.moveTo(*record.drawing.points[0])
-        for x, y in record.drawing.points[1:]:
-            tmp.lineTo(x, y)
-        tmp = QtGui.QGraphicsPathItem(tmp)
-        tmp.setPen(QtGui.QPen(Consts.DRAWING_COLOR))
-        tmp.setPos(0., 0.)
-        tmp.setParentItem(self._drawing_group)
+        if not self._showRaw:
+            # drawing
+            tmp = QtGui.QPainterPath()
+            tmp.moveTo(*record.drawing.points[0])
+            for x, y in record.drawing.points[1:]:
+                tmp.lineTo(x, y)
+            tmp = QtGui.QGraphicsPathItem(tmp)
+            tmp.setPen(QtGui.QPen(Consts.DRAWING_COLOR))
+            tmp.setPos(0., 0.)
+            tmp.setParentItem(self._drawing_group)
 
-        # calibration points
-        pen = QtGui.QPen(QtGui.QColor(255, 0, 0, 127))
-        brush = QtGui.QBrush(QtGui.QColor(255, 0, 0, 64))
-        for point in record.calibration.cpoints:
-           tmp = QtGui.QGraphicsEllipseItem(-Consts.POINT_LEN / 2,
-                                            -Consts.POINT_LEN / 2,
-                                            Consts.POINT_LEN,
-                                            Consts.POINT_LEN)
-           tmp.setPen(pen)
-           tmp.setBrush(brush)
-           tmp.setPos(point[0], point[1])
-           tmp.setParentItem(self._drawing_group)
+        if self._showRaw:
+            # calibration points
+            pen = QtGui.QPen(QtGui.QColor(255, 0, 0, 127))
+            brush = QtGui.QBrush(QtGui.QColor(255, 0, 0, 64))
+            for point in record.calibration.cpoints:
+                tmp = QtGui.QGraphicsEllipseItem(-Consts.POINT_LEN / 2,
+                                                 -Consts.POINT_LEN / 2,
+                                                 Consts.POINT_LEN,
+                                                 Consts.POINT_LEN)
+                tmp.setPen(pen)
+                tmp.setBrush(brush)
+                tmp.setPos(point[0], point[1])
+                tmp.setParentItem(self._drawing_group)
 
         # trace
         tmp = QtGui.QPainterPath()
@@ -164,12 +196,21 @@ class MainWindow(QtGui.QMainWindow):
         low_color = QtGui.QColor(Consts.RECORDING_COLOR)
         high_color = QtGui.QColor(Consts.FAST_COLOR)
 
+        total_secs = (record.recording.events[-1].stamp -
+                      record.recording.events[0].stamp).total_seconds()
+
         old_pos = None
         old_stamp = None
         drawing = False
         for event in record.recording.events:
-            pos = event.coords_trans
             stamp = event.stamp
+            if not self._showRaw:
+                pos = event.coords_trans
+            else:
+                # reproject drawing coordinates into screen space
+                pos = event.coords_drawing
+                pos = self._screen_group.mapFromItem(self._drawing_group, QtCore.QPointF(pos[0], pos[1]))
+                pos = (pos.x(), pos.y())
 
             # set drawing status
             if event.typ == QtCore.QEvent.TabletPress:
@@ -183,38 +224,40 @@ class MainWindow(QtGui.QMainWindow):
             if old_pos:
                 if drawing:
                     # calculate speed/color
-                    ds = math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
-                    dt = (stamp - old_stamp).total_seconds()
-                    sf1 = min(1., (ds / dt) / Consts.FAST_SPEED)
-                    sf0 = 1. - sf1
+                    if self._showTime:
+                        sf1 = (stamp - record.recording.events[0].stamp).total_seconds() / total_secs
+                        sf0 = 1. - sf1
+                    else:
+                        ds = math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
+                        dt = (stamp - old_stamp).total_seconds()
+                        sf1 = min(1., (ds / dt) / Consts.FAST_SPEED)
+                        sf0 = 1. - sf1
+
+                    # blend the color
                     color = QtGui.QColor(low_color.red() * sf0 + high_color.red() * sf1,
                                          low_color.green() * sf0 + high_color.green() * sf1,
                                          low_color.blue() * sf0 + high_color.blue() * sf1)
+
+                    # pen parameters
                     pen.setColor(color)
                     pen.setWidthF(1 + event.pressure * (Consts.PEN_MAXWIDTH - 1))
                 else:
                     pen.setColor(Consts.CURSOR_INACTIVE)
                     pen.setWidthF(0.5)
 
-                # create the item
-                tmp = QtGui.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
-                tmp.setPen(pen)
-                tmp.setParentItem(self._screen_group)
+                if drawing or self._showTraces:
+                    # create the item
+                    tmp = QtGui.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
+                    tmp.setPen(pen)
+                    tmp.setParentItem(self._screen_group)
 
             # save old status
             old_pos = pos
             old_stamp = stamp
 
-        # setup transforms and view
-        rect_size = record.recording.rect_size
-        scene_poly = size2qpoly(rect_size[0], rect_size[1])
-        drawing_poly = poly2qpoly(record.recording.rect_drawing)
 
-        transform = QtGui.QTransform()
-        QtGui.QTransform.quadToQuad(drawing_poly, scene_poly, transform)
-
-        self._drawing_group.setTransform(transform)
-        self._supp_group.setTransform(transform)
+    def _fit_view(self):
+        rect_size = self.record.recording.rect_size
         self._ui.view.fitInView(0, 0, rect_size[0], rect_size[1],
                                 mode=QtCore.Qt.KeepAspectRatio)
 
@@ -224,6 +267,7 @@ class MainWindow(QtGui.QMainWindow):
         self.record = record
         self._load_props(self.record)
         self._load_scene(self.record)
+        self._fit_view()
 
 
     def on_wheel(self, ev):
@@ -253,6 +297,24 @@ class MainWindow(QtGui.QMainWindow):
                                                  "Recordings (*.yaml.gz)");
         if path:
             self.load(str(path))
+
+
+    def on_trace(self, ev):
+        self._showTraces = self._ui.actionShowTraces.isChecked()
+        self._reset_scene()
+        self._load_scene(self.record)
+
+
+    def on_raw(self, ev):
+        self._showRaw = self._ui.actionRAWCorr.isChecked()
+        self._reset_scene()
+        self._load_scene(self.record)
+
+
+    def on_time(self, ev):
+        self._showTime = self._ui.actionPressTime.isChecked()
+        self._reset_scene()
+        self._load_scene(self.record)
 
 
 
