@@ -25,3 +25,5 @@ CURSOR_ACTIVE   = QtCore.Qt.cyan        # pen in proximity
 CURSOR_INACTIVE = QtCore.Qt.gray        # pen not in proximity
 DRAWING_COLOR   = QtCore.Qt.white       # main drawing color
 RECORDING_COLOR = QtCore.Qt.green       # recorded trace color
+FAST_COLOR      = QtCore.Qt.cyan        # recorded fast trace color
+FAST_SPEED      = 1000                  # recorded fast trace speed (px/sec)

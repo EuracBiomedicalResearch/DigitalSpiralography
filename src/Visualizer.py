@@ -6,6 +6,7 @@ import Analysis
 import Consts
 
 # system modules
+import math
 import threading
 from PyQt4 import QtCore, QtGui, uic
 
@@ -112,9 +113,10 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def _load_scene(self, record):
-        # projected/support space
+        # projected/support/screen space
         self._drawing_group = QtGui.QGraphicsItemGroup(scene=self._scene)
         self._supp_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._screen_group = QtGui.QGraphicsItemGroup(scene=self._scene)
 
         # bars
         tmp = QtGui.QPainterPath()
@@ -145,31 +147,49 @@ class MainWindow(QtGui.QMainWindow):
         pen = QtGui.QPen(Consts.RECORDING_COLOR)
         pen.setCapStyle(QtCore.Qt.RoundCap)
 
-        scale = ((record.recording.rect_drawing[1][0] -
-                  record.recording.rect_drawing[0][0]) /
-                 record.recording.rect_size[0])
+        low_color = QtGui.QColor(Consts.RECORDING_COLOR)
+        high_color = QtGui.QColor(Consts.FAST_COLOR)
 
         old_pos = None
+        old_stamp = None
         drawing = False
         for event in record.recording.events:
-            pos = event.coords_drawing
+            pos = event.coords_trans
+            stamp = event.stamp
+
+            # set drawing status
             if event.typ == QtCore.QEvent.TabletPress:
                 drawing = True
             elif event.typ == QtCore.QEvent.TabletRelease:
                 drawing = False
             elif event.typ == QtCore.QEvent.TabletLeaveProximity:
+                drawing = False
                 old_pos = None
+
             if old_pos:
                 if drawing:
-                    pen.setWidthF((1 + event.pressure * (Consts.PEN_MAXWIDTH - 1)) * scale)
-                    pen.setColor(Consts.RECORDING_COLOR)
+                    # calculate speed/color
+                    ds = math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
+                    dt = (stamp - old_stamp).total_seconds()
+                    sf1 = min(1., (ds / dt) / Consts.FAST_SPEED)
+                    sf0 = 1. - sf1
+                    color = QtGui.QColor(low_color.red() * sf0 + high_color.red() * sf1,
+                                         low_color.green() * sf0 + high_color.green() * sf1,
+                                         low_color.blue() * sf0 + high_color.blue() * sf1)
+                    pen.setColor(color)
+                    pen.setWidthF(1 + event.pressure * (Consts.PEN_MAXWIDTH - 1))
                 else:
                     pen.setColor(Consts.CURSOR_INACTIVE)
-                    pen.setWidthF(scale / 2)
+                    pen.setWidthF(0.5)
+
+                # create the item
                 tmp = QtGui.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
                 tmp.setPen(pen)
-                tmp.setParentItem(self._drawing_group)
+                tmp.setParentItem(self._screen_group)
+
+            # save old status
             old_pos = pos
+            old_stamp = stamp
 
         # setup transforms and view
         rect_size = record.recording.rect_size
