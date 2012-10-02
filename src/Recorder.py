@@ -57,6 +57,12 @@ class EndRecording(QtGui.QDialog):
         self._ui.setupUi(self)
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
 
+        self._file_browser = QtGui.QFileDialog(self)
+        self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
+        self._file_browser.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
+        self._file_browser.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+        self._file_browser.setFilter("Recordings (*.yaml.gz)")
+
 
     def reset(self, save_path, record):
         self.aid = record.aid
@@ -94,10 +100,11 @@ class EndRecording(QtGui.QDialog):
 
 
     def on_save_path(self):
-        save_path = QtGui.QFileDialog.getSaveFileName(self, "Save File",
-                                                      self._ui.save_path.text(),
-                                                      "Recordings (*.yaml.gz)");
-        if save_path:
+        (dir, name) = os.path.split(str(self._ui.save_path.text()))
+        self._file_browser.setDirectory(dir)
+        self._file_browser.selectFile(name)
+        if self._file_browser.exec_():
+            save_path = os.path.relpath(str(self._file_browser.selectedFiles()[0]))
             self._ui.save_path.setText(save_path)
 
 
@@ -144,6 +151,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # signals
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
+        self._ui.save_path.editingFinished.connect(self.on_save_path_changed)
         self._ui.calibrate.clicked.connect(self.on_calibrate)
         self._ui.new_recording.clicked.connect(self.on_new_recording)
 
@@ -151,7 +159,7 @@ class MainWindow(QtGui.QMainWindow):
         self._new_recording_dialog = NewRecording()
         self._end_recording_dialog = EndRecording()
         self._drawing_window = DrawingWindow.DrawingWindow()
-        self._dir_browser = QtGui.QFileDialog()
+        self._dir_browser = QtGui.QFileDialog(self)
         self._dir_browser.setFileMode(QtGui.QFileDialog.Directory)
         self._dir_browser.setOption(QtGui.QFileDialog.ShowDirsOnly)
 
@@ -182,14 +190,19 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_save_path(self):
+        self._dir_browser.setDirectory(self.params.save_path)
         if self._dir_browser.exec_():
             save_path = os.path.relpath(str(self._dir_browser.selectedFiles()[0]))
             self.set_save_path(save_path)
 
 
+    def on_save_path_changed(self):
+        self.params.save_path = str(self._ui.save_path.text())
+
+
     def set_save_path(self, save_path):
-        self.params.save_path = save_path
         self._ui.save_path.setText(save_path)
+        self.on_save_path_changed()
 
 
     def on_calibrate(self):
