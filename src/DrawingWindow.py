@@ -157,8 +157,21 @@ class RecordingHandler(Handler):
 
         # initial state
         self.dw.recording = Analysis.RecordingData()
+        rect = self.dw._view.sceneRect()
+        self.dw.recording.rect_size = (rect.width(), rect.height())
+        self.dw.recording.rect_drawing = self.get_rect(rect, self.dw._drawing_group)
+        self.dw.recording.rect_trans = self.get_rect(rect, self.dw._trans_group)
         self.old_trans_pos = None
         self.restart()
+
+
+    def get_rect(self, rect, item):
+        ret = []
+        tmp = item.mapFromScene(rect)
+        for i in range(0, 4):
+            p = tmp.value(i)
+            ret.append((p.x(), p.y()))
+        return ret
 
 
     def restart(self):

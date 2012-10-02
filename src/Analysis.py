@@ -28,8 +28,12 @@ class RecordingEvent:
 
 
 class RecordingData:
-    def __init__(self, session_start=None, events=None, retries=0, strokes=0):
+    def __init__(self, session_start=None, rect_size=None, rect_drawing=None,
+                 rect_trans=None, events=None, retries=0, strokes=0):
         self.session_start = session_start if session_start is not None else datetime.datetime.now()
+        self.rect_size = rect_size
+        self.rect_drawing = rect_drawing
+        self.rect_trans = rect_trans
         self.events = events
         self.retries = retries
         self.strokes = strokes
