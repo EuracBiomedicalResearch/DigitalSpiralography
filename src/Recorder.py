@@ -2,9 +2,9 @@
 """Main Drawing recorder application"""
 
 # local modules
-import AID
-import Spiral
+import ID
 import Analysis
+import DrawingFactory
 import DrawingWindow
 import Shared
 import Consts
@@ -28,6 +28,39 @@ class Params:
 
 
 
+class NewCalibration(QtGui.QDialog):
+    def __init__(self):
+        super(NewCalibration, self).__init__()
+        form, _ = uic.loadUiType("ui/newcalibration.ui")
+        self._ui = form()
+        self._ui.setupUi(self)
+
+
+    def reset(self):
+        self.tablet_id = None
+        self.drawing = None
+        self._ui.tablet_id.clear()
+        self._ui.drawing_id.clear()
+        self._ui.tablet_id.setFocus(True)
+
+
+    def accept(self):
+        # validate the tablet id
+        self.tablet_id = str(self._ui.tablet_id.text())
+        if not ID.validate_tid_err(self.tablet_id):
+            return
+
+        # validate the drawing id
+        self.drawing = DrawingFactory.from_id(str(self._ui.drawing_id.text()))
+        if not self.drawing:
+            QtGui.QMessageBox.critical(None, "Invalid drawing ID",
+                                       "The specified drawing ID is invalid")
+            return
+
+        self.done(QtGui.QDialog.Accepted)
+
+
+
 class NewRecording(QtGui.QDialog):
     def __init__(self):
         super(NewRecording, self).__init__()
@@ -44,7 +77,7 @@ class NewRecording(QtGui.QDialog):
 
     def accept(self):
         self.aid = str(self._ui.patient_id.text())
-        if AID.validate_with_error(self.aid):
+        if ID.validate_aid_err(self.aid):
             self.done(QtGui.QDialog.Accepted)
 
 
@@ -128,7 +161,7 @@ class EndRecording(QtGui.QDialog):
         self.save_path = str(self._ui.save_path.text())
 
         # validate AID
-        if not AID.validate_with_error(self.aid):
+        if not ID.validate_aid_err(self.aid):
             return
 
         # check if the file already exists
@@ -143,7 +176,7 @@ class EndRecording(QtGui.QDialog):
 
 
 class MainWindow(QtGui.QMainWindow):
-    def __init__(self, drawing, params):
+    def __init__(self, params):
         super(MainWindow, self).__init__()
         form, _ = uic.loadUiType("ui/main.ui")
         self._ui = form()
@@ -152,10 +185,12 @@ class MainWindow(QtGui.QMainWindow):
         # signals
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
         self._ui.save_path.editingFinished.connect(self.on_save_path_changed)
+        self._ui.info.clicked.connect(self.on_info)
         self._ui.calibrate.clicked.connect(self.on_calibrate)
         self._ui.new_recording.clicked.connect(self.on_new_recording)
 
         # dialogs
+        self._new_calibration_dialog = NewCalibration()
         self._new_recording_dialog = NewRecording()
         self._end_recording_dialog = EndRecording()
         self._drawing_window = DrawingWindow.DrawingWindow()
@@ -163,30 +198,31 @@ class MainWindow(QtGui.QMainWindow):
         self._dir_browser.setFileMode(QtGui.QFileDialog.Directory)
         self._dir_browser.setOption(QtGui.QFileDialog.ShowDirsOnly)
 
-        # parameters
-        self.set_drawing(drawing)
+        # parameters/initial state
         self.set_params(params)
-
-        # some running statistics
+        self.reset_calibration()
         self.drawing_number = 0
-        self.calibration_age = 0
 
 
     def reset_calibration(self):
         self.calibration_age = 0
         self._ui.new_recording.setEnabled(False)
+        self._ui.tablet_id.setText("-")
+        self._ui.drawing_id.setText("-")
         self._ui.last_calibration.setText("-")
-
-
-    def set_drawing(self, drawing):
-        self._drawing_window.set_drawing(drawing)
-        self._ui.drawing_dsc.setText(drawing.describe())
-        self.reset_calibration()
 
 
     def set_params(self, params):
         self.params = params
         self._ui.save_path.setText(params.save_path)
+
+
+    def on_info(self, ev):
+        msg = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
+        msg += "\nTotal recordings: " + str(self.params.total_recordings)
+        msg += "\nInst. UUID: " + self.params.installation_uuid
+        msg += "\nInst. Date: " + self.params.installation_stamp
+        QtGui.QMessageBox.about(self, "About DrawingRecorder", msg)
 
 
     def on_save_path(self):
@@ -206,10 +242,23 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_calibrate(self):
+        # setup the tablet id/drawing
+        self._new_calibration_dialog.reset()
+        if not self._new_calibration_dialog.exec_():
+            return
+
+        # perform the actual calibration
         self.reset_calibration()
+        self._drawing_window.set_params(self._new_calibration_dialog.tablet_id,
+                                        self._new_calibration_dialog.drawing)
         self._drawing_window.reset(DrawingWindow.Mode.Calibrate)
         if self._drawing_window.exec_():
             self._ui.new_recording.setEnabled(True)
+            self._ui.tablet_id.setText(
+                self._drawing_window.calibration.tablet_id)
+            self._ui.drawing_id.setText(
+                self._drawing_window.drawing.id + ": " +
+                self._drawing_window.drawing.str)
             self._ui.last_calibration.setText(
                 self._drawing_window.calibration.stamp.strftime("%c"))
 
@@ -279,15 +328,8 @@ class Application(QtGui.QApplication):
                         str(self.settings.value("installation_uuid", uuid.getnode()).toString()),
                         str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))
 
-        # create a spiral with our only current settings
-        spiral = Spiral.Params(name = "SPR1",
-                               diameter = 65,
-                               turns = 5.,
-                               direction = "CW")
-        drawing = Spiral.Spiral(spiral)
-
         # initialize
-        self.main_window = MainWindow(drawing, params)
+        self.main_window = MainWindow(params)
         self.main_window.show()
         self.lastWindowClosed.connect(self._on_close)
 

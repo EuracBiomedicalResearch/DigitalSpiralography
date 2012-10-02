@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>458</width>
-    <height>136</height>
+    <width>471</width>
+    <height>155</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>458</width>
-    <height>136</height>
+    <width>471</width>
+    <height>155</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>458</width>
-    <height>136</height>
+    <width>471</width>
+    <height>155</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -51,39 +51,28 @@
       </item>
      </layout>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
-       <string>Drawing:</string>
+       <string>Drawing ID:</string>
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QLabel" name="drawing_dsc">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="textInteractionFlags">
-         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="drawing_cfg">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="3" column="1">
+    <item row="4" column="1">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
       <item>
        <widget class="QPushButton" name="calibrate">
         <property name="text">
@@ -110,17 +99,58 @@
       </item>
      </layout>
     </item>
-    <item row="2" column="0">
+    <item row="3" column="0">
      <widget class="QLabel" name="lastCalibrationLabel">
       <property name="text">
        <string>Last calibration:</string>
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="3" column="1">
      <widget class="QLabel" name="last_calibration">
       <property name="text">
        <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="tabletIDLabel">
+      <property name="text">
+       <string>Tablet ID</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="drawing_id">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="tablet_id">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QToolButton" name="info">
+      <property name="toolTip">
+       <string>Informations</string>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
       </property>
      </widget>
     </item>
@@ -130,7 +160,6 @@
  <tabstops>
   <tabstop>save_path</tabstop>
   <tabstop>save_path_btn</tabstop>
-  <tabstop>drawing_cfg</tabstop>
   <tabstop>calibrate</tabstop>
   <tabstop>new_recording</tabstop>
   <tabstop>pushButton</tabstop>
@@ -144,8 +173,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>426</x>
-     <y>98</y>
+     <x>460</x>
+     <y>144</y>
     </hint>
     <hint type="destinationlabel">
      <x>13</x>

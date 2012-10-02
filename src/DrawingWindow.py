@@ -15,7 +15,7 @@ class Mode:
     Calibrate, Record = range(2)
 
 
-class Handler:
+class Handler(object):
     def keyEvent(self, ev):
         pass
 
@@ -58,7 +58,7 @@ class CalibrationHandler(Handler):
 
     def completed(self):
         res, error = self.dw.setup_calibration(
-            Analysis.CalibrationData(self.cpoints))
+            Analysis.CalibrationData(self.dw.tablet_id, self.cpoints))
         if not res:
             self.restart()
             self.dw._warning.setText("CALIBRATION FAILED: " + error.upper() +
@@ -453,7 +453,7 @@ class DrawingWindow(QtGui.QMainWindow):
         return self.result
 
 
-    def set_drawing(self, drawing):
+    def set_params(self, tablet_id, drawing):
         # reset calibration/drawing if restarting
         if self._drawing_item is not None:
             self.reset_calibration()
@@ -461,6 +461,7 @@ class DrawingWindow(QtGui.QMainWindow):
             self._scene.removeItem(self._drawing_item)
 
         # create the graphical item
+        self.tablet_id = tablet_id
         self.drawing = drawing
         self._drawing_item = self.drawing.generate()
         self._drawing_item.setPen(QtGui.QPen(Consts.DRAWING_COLOR))
