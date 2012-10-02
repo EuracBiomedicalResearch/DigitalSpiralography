@@ -1,2 +1,2 @@
 #!/bin/sh
-exec python src/main.pyw
+exec python src/recorder.pyw "$@"

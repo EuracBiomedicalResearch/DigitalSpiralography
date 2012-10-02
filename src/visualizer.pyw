@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Entry point"""
+"""Entry point for Visualizer"""
 
 # imports
-import Application
+import Visualizer
 import sys
 
 
 # main module
 if __name__ == '__main__':
-    app = Application.Application(sys.argv)
+    app = Visualizer.Application(sys.argv)
     sys.exit(app.exec_())
