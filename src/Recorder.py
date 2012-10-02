@@ -41,21 +41,21 @@ class NewCalibration(QtGui.QDialog):
         self.drawing = None
         self._ui.tablet_id.clear()
         self._ui.drawing_id.clear()
-        self._ui.tablet_id.setFocus(True)
+        self._ui.tablet_id.setFocus()
 
 
     def accept(self):
         # validate the tablet id
         self.tablet_id = str(self._ui.tablet_id.text())
         if not ID.validate_tid_err(self.tablet_id):
-            return
+            return self.reset()
 
         # validate the drawing id
         self.drawing = DrawingFactory.from_id(str(self._ui.drawing_id.text()))
         if not self.drawing:
             QtGui.QMessageBox.critical(None, "Invalid drawing ID",
                                        "The specified drawing ID is invalid")
-            return
+            return self.reset()
 
         self.done(QtGui.QDialog.Accepted)
 
@@ -72,13 +72,14 @@ class NewRecording(QtGui.QDialog):
     def reset(self):
         self.aid = None
         self._ui.patient_id.clear()
-        self._ui.patient_id.setFocus(True)
+        self._ui.patient_id.setFocus()
 
 
     def accept(self):
         self.aid = str(self._ui.patient_id.text())
-        if ID.validate_aid_err(self.aid):
-            self.done(QtGui.QDialog.Accepted)
+        if not ID.validate_aid_err(self.aid):
+            return self.reset()
+        self.done(QtGui.QDialog.Accepted)
 
 
 
@@ -129,7 +130,7 @@ class EndRecording(QtGui.QDialog):
 
         self.comments = None
         self._ui.comments.clear()
-        self._ui.comments.setFocus(True)
+        self._ui.comments.setFocus()
 
 
     def on_save_path(self):
