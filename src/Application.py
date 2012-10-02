@@ -87,6 +87,14 @@ class EndRecording(QtGui.QDialog):
             self._ui.save_path.setText(save_path)
 
 
+    def reject(self):
+        ret = QtGui.QMessageBox.warning(self, "Discard recording",
+                                        "Are you sure you want to discard the acquired drawing?",
+                                        "No", "Yes, discard")
+        if ret:
+            self.done(QtGui.QDialog.Rejected)
+
+
     def accept(self):
         self.aid = str(self._ui.patient_id.text())
         self.comments = str(self._ui.comments.toPlainText())
