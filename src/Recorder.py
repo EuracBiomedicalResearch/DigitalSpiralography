@@ -11,16 +11,19 @@ import Consts
 # system modules
 import os
 import uuid
+import datetime
 import threading
 from PyQt4 import QtCore, QtGui, uic
 
 
 # implementation
 class Params:
-    def __init__(self, save_path, total_recordings, installation_uuid):
+    def __init__(self, save_path, total_recordings,
+                 installation_uuid, installation_stamp):
         self.save_path = save_path
         self.total_recordings = total_recordings
         self.installation_uuid = installation_uuid
+        self.installation_stamp = installation_stamp
 
 
 
@@ -224,7 +227,8 @@ class MainWindow(QtGui.QMainWindow):
 
         extra_data = {"drawing_number": self.drawing_number,
                       "total_recordings": self.params.total_recordings,
-                      "installation_uuid": self.params.installation_uuid}
+                      "installation_uuid": self.params.installation_uuid,
+                      "installation_stamp": self.params.installation_stamp}
         record = Analysis.DrawingRecord(self._new_recording_dialog.aid,
                                         self._drawing_window.drawing,
                                         self._drawing_window.calibration,
@@ -270,7 +274,8 @@ class Application(QtGui.QApplication):
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
         params = Params(str(self.settings.value("save_path", "recordings").toString()),
                         self.settings.value("total_recordings", 0).toInt()[0],
-                        str(self.settings.value("installation_uuid", uuid.getnode()).toString()))
+                        str(self.settings.value("installation_uuid", uuid.getnode()).toString()),
+                        str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))
 
         # create a spiral with our only current settings
         spiral = Spiral.Params(name = "SPR1",
@@ -289,3 +294,4 @@ class Application(QtGui.QApplication):
         self.settings.setValue("save_path", params.save_path)
         self.settings.setValue("total_recordings", params.total_recordings)
         self.settings.setValue("installation_uuid", params.installation_uuid)
+        self.settings.setValue("installation_stamp", params.installation_stamp)
