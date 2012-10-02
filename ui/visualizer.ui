@@ -106,7 +106,7 @@
    <addaction name="actionExit"/>
    <addaction name="separator"/>
    <addaction name="actionRAWCorr"/>
-   <addaction name="actionPressTime"/>
+   <addaction name="actionSpeedTime"/>
    <addaction name="actionShowTraces"/>
   </widget>
   <action name="actionOpen">
@@ -149,7 +149,7 @@
     <string>Ctrl+R</string>
    </property>
   </action>
-  <action name="actionPressTime">
+  <action name="actionSpeedTime">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -159,10 +159,10 @@
      <normalon>icons/24x24/chrono.png</normalon>icons/24x24/color_line.png</iconset>
    </property>
    <property name="text">
-    <string>Pressure/Time</string>
+    <string>Speed/Time</string>
    </property>
    <property name="toolTip">
-    <string>Pressure/Time</string>
+    <string>Speed/Time</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>

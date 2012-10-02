@@ -27,14 +27,14 @@ class MainWindow(QtGui.QMainWindow):
         self._showTraces = True
 
         self._ui.actionRAWCorr.setChecked(self._showRaw)
-        self._ui.actionPressTime.setChecked(self._showTime)
+        self._ui.actionSpeedTime.setChecked(self._showTime)
         self._ui.actionShowTraces.setChecked(self._showTraces)
 
         # signals and events
         self._ui.actionOpen.triggered.connect(self.on_load)
         self._ui.actionShowTraces.triggered.connect(self.on_trace)
         self._ui.actionRAWCorr.triggered.connect(self.on_raw)
-        self._ui.actionPressTime.triggered.connect(self.on_time)
+        self._ui.actionSpeedTime.triggered.connect(self.on_time)
         self._ui.view.wheelEvent = self.on_wheel
 
         # props
@@ -284,7 +284,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_time(self, ev):
-        self._showTime = self._ui.actionPressTime.isChecked()
+        self._showTime = self._ui.actionSpeedTime.isChecked()
         self._reset_scene()
         self._load_scene(self.record)
 
