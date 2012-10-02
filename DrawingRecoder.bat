@@ -1,1 +1,1 @@
-start src\recorder.pyw
+start /high src\recorder.pyw
