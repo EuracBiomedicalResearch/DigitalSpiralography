@@ -77,7 +77,8 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop("Pat. handedness", record.pat_handedness or "N/A")
         self._append_prop("Pat. hand", record.pat_hand or "N/A")
 
-        self._append_prop("Drawing type", record.drawing.str)
+        self._append_prop("Drawing ID", record.drawing.id)
+        self._append_prop("Drawing descr.", record.drawing.str)
 
         self._append_prop("Recording date", record.recording.session_start)
         self._append_prop("Recording no.", record.extra_data['drawing_number'])
@@ -88,6 +89,7 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop("Recording length", record.recording.events[-1].stamp -
                           record.recording.events[0].stamp)
 
+        self._append_prop("Calib. tablet ID", record.calibration.tablet_id)
         self._append_prop("Calib. date", record.calibration.stamp)
         self._append_prop("Calib. age", record.calibration_age)
 
