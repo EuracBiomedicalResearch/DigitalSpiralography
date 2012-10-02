@@ -10,6 +10,7 @@ APP_ORG         = "EURAC"               # application organization
 APP_NAME        = "DrawingRecorder"     # application name
 APP_VERSION     = "1.0"                 # application version
 FORMAT_VERSION  = "1.0"                 # file format version
+APP_DELAY       = 1. / 20.              # general refresh delay for lengthy operations
 
 # Drawing parameters
 POINT_LEN       = 0.05                  # diameter of calibration points (in normalized drawing units)

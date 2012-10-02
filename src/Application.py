@@ -11,6 +11,7 @@ import Consts
 # system modules
 import os
 import uuid
+import threading
 from PyQt4 import QtCore, QtGui, uic
 
 
@@ -130,6 +131,18 @@ class EndRecording(QtGui.QDialog):
 
 
 
+def background_op(message, func, parent=None):
+    pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
+    pd.open()
+    th = threading.Thread(target=func)
+    th.start()
+    while th.is_alive():
+        QtGui.QApplication.processEvents()
+        th.join(Consts.APP_DELAY)
+    pd.hide()
+
+
+
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, drawing, params):
         super(MainWindow, self).__init__()
@@ -236,7 +249,10 @@ class MainWindow(QtGui.QMainWindow):
             record.comments = self._end_recording_dialog.comments
             save_path = self._end_recording_dialog.save_path
             try:
-                record.save(save_path)
+                # put save into a background thread
+                background_op("Saving, please wait...",
+                              lambda: record.save(save_path),
+                              self)
             except IOError as e:
                 msg = ("Cannot save recording to {}: {}! " +
                        "Try with a different file name!").format(save_path, e.strerror)
