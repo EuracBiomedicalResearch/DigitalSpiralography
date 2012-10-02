@@ -82,10 +82,10 @@ class DrawingRecord:
         return ret
 
 
-    def save(self, path):
+    def save(record, path):
         # translate the event stream
         events = []
-        for event in self.recording.events:
+        for event in record.recording.events:
             # event type
             if event.typ == QtCore.QEvent.TabletMove:
                 typ = 'move'
@@ -112,25 +112,25 @@ class DrawingRecord:
         # basic data to save
         data = {"format": Consts.FORMAT_VERSION,
                 "version": Consts.APP_VERSION,
-                "aid": self.aid,
+                "aid": record.aid,
                 "drawing": {
-                    "str": self.drawing.describe(),
-                    "points": map(list, self.drawing.points),
-                    "cpoints": map(list, self.drawing.cpoints)},
+                    "str": record.drawing.describe(),
+                    "points": map(list, record.drawing.points),
+                    "cpoints": map(list, record.drawing.cpoints)},
                 "calibration": {
-                    "stamp": self.calibration.stamp,
-                    "cpoints": map(list, self.calibration.cpoints)},
-                "calibration_age": self.calibration_age,
+                    "stamp": record.calibration.stamp,
+                    "cpoints": map(list, record.calibration.cpoints)},
+                "calibration_age": record.calibration_age,
                 "recording": {
-                    "session_start": self.recording.session_start,
+                    "session_start": record.recording.session_start,
                     "events": events,
-                    "retries": self.recording.retries,
-                    "strokes": self.recording.strokes},
-                "extra_data": self.extra_data,
-                "pat_type": self.pat_type,
-                "pat_handedness": self.pat_handedness,
-                "pat_hand": self.pat_hand,
-                "comments": self.comments}
+                    "retries": record.recording.retries,
+                    "strokes": record.recording.strokes},
+                "extra_data": record.extra_data,
+                "pat_type": record.pat_type,
+                "pat_handedness": record.pat_handedness,
+                "pat_hand": record.pat_hand,
+                "comments": record.comments}
 
         # dump
         fd = gzip.GzipFile(path, 'wb')

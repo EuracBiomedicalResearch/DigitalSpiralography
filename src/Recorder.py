@@ -251,7 +251,7 @@ class MainWindow(QtGui.QMainWindow):
             try:
                 # put save into a background thread
                 background_op("Saving, please wait...",
-                              lambda: record.save(save_path),
+                              lambda: Analysis.DrawingRecord.save(record, save_path),
                               self)
             except IOError as e:
                 msg = ("Cannot save recording to {}: {}! " +
