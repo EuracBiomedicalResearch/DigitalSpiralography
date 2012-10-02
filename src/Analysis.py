@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Drawing record/analysis"""
+"""Drawing structures/analysis"""
 
+# local modules
+import Consts
+
+# system modules
 import datetime
 import yaml
 import gzip
 from PyQt4 import QtCore
 
 
+# implementation
 class CalibrationData:
     def __init__(self, cpoints, stamp=None):
         self.cpoints = cpoints
@@ -101,7 +106,9 @@ class DrawingRecord:
             events.append(buf)
 
         # basic data to save
-        data = {"aid": self.aid,
+        data = {"format": Consts.FORMAT_VERSION,
+                "version": Consts.APP_VERSION,
+                "aid": self.aid,
                 "drawing": {
                     "str": self.drawing.describe(),
                     "points": map(list, self.drawing.points),

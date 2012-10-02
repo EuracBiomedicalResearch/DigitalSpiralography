@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """Spiral drawing routines"""
 
+# imports
 import math
 from PyQt4 import QtGui, QtCore
 
 
+# implementation
 class Params:
     """Spiral definition"""
 

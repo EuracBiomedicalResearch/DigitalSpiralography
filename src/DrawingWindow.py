@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 """Drawing window"""
 
-import datetime
+# local modules
 import Analysis
+import Consts
+
+# system modules
+import datetime
 from PyQt4 import QtCore, QtGui
 
 
-POINT_LEN = 0.05        # diameter of calibration points (in normalized drawing units)
-BAR_LEN = 2.            # extension of the calibration bars (in normalized drawing units)
-CUR_LEN = 25.           # cursor extension (in pixels)
-MAIN_TEXT_SIZE = 20     # size of main text (in points)
-TIMER_MS = 100          # timerEvent delay in ms
-PEN_MAXWIDTH = 10       # max pen width in pixels (minimum is always 1)
-
-
+# implementation
 class Mode:
     Calibrate, Record = range(2)
 
@@ -87,7 +84,10 @@ class CalibrationHandler(Handler):
 
         # prepare the next point
         next_point = self.dw.drawing.cpoints[pos]
-        self.point = QtGui.QGraphicsEllipseItem(-POINT_LEN / 2, -POINT_LEN / 2, POINT_LEN, POINT_LEN)
+        self.point = QtGui.QGraphicsEllipseItem(-Consts.POINT_LEN / 2,
+                                                -Consts.POINT_LEN / 2,
+                                                Consts.POINT_LEN,
+                                                Consts.POINT_LEN)
         self.point.setPen(QtGui.QPen(QtCore.Qt.red))
         self.point.setPos(next_point[0], next_point[1])
         self.point.setParentItem(self.items)
@@ -152,7 +152,7 @@ class RecordingHandler(Handler):
         self.buffer = QtGui.QPixmap(self.dw.size())
         self.painter = QtGui.QPainter(self.buffer)
         self.painter.setRenderHints(self.dw._view.renderHints())
-        self.pen = QtGui.QPen(QtCore.Qt.green)
+        self.pen = QtGui.QPen(Consts.RECORDING_COLOR)
         self.pen.setCapStyle(QtCore.Qt.RoundCap)
 
         # initial state
@@ -190,7 +190,7 @@ class RecordingHandler(Handler):
     def tabletEvent(self, ev):
         if self.dw._drawing_state:
             # new stroke
-            self.pen.setWidthF(1 + ev.pressure() * (PEN_MAXWIDTH - 1))
+            self.pen.setWidthF(1 + ev.pressure() * (Consts.PEN_MAXWIDTH - 1))
             self.painter.setPen(self.pen)
             self.painter.drawLine(self.old_trans_pos, self.dw._trans_pos)
             self.update_buffer()
@@ -259,35 +259,35 @@ class DrawingWindow(QtGui.QMainWindow):
 
         # bars
         tmp = QtGui.QPainterPath()
-        tmp.moveTo(0., -BAR_LEN)
+        tmp.moveTo(0., -Consts.BAR_LEN)
         tmp.lineTo(0., 0.)
-        tmp.lineTo(BAR_LEN, 0.)
+        tmp.lineTo(Consts.BAR_LEN, 0.)
         tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
         tmp.setPen(QtGui.QPen(QtCore.Qt.green))
 
         tmp = QtGui.QPainterPath()
-        tmp.moveTo(-BAR_LEN, BAR_LEN)
-        tmp.lineTo(BAR_LEN, -BAR_LEN)
+        tmp.moveTo(-Consts.BAR_LEN, Consts.BAR_LEN)
+        tmp.lineTo(Consts.BAR_LEN, -Consts.BAR_LEN)
         tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
         tmp.setPen(QtGui.QPen(QtCore.Qt.yellow))
 
         # cursor
         tmp = QtGui.QPainterPath()
-        tmp.moveTo(0, -CUR_LEN)
-        tmp.lineTo(0, CUR_LEN)
-        tmp.moveTo(-CUR_LEN, 0)
-        tmp.lineTo(CUR_LEN, 0)
-        tmp.moveTo(-CUR_LEN / 4, -CUR_LEN / 4)
-        tmp.lineTo(CUR_LEN / 4, CUR_LEN / 4)
-        tmp.moveTo(CUR_LEN / 4, -CUR_LEN / 4)
-        tmp.lineTo(-CUR_LEN / 4, CUR_LEN / 4)
+        tmp.moveTo(0, -Consts.CURSOR_LEN)
+        tmp.lineTo(0, Consts.CURSOR_LEN)
+        tmp.moveTo(-Consts.CURSOR_LEN, 0)
+        tmp.lineTo(Consts.CURSOR_LEN, 0)
+        tmp.moveTo(-Consts.CURSOR_LEN / 4, -Consts.CURSOR_LEN / 4)
+        tmp.lineTo(Consts.CURSOR_LEN / 4, Consts.CURSOR_LEN / 4)
+        tmp.moveTo(Consts.CURSOR_LEN / 4, -Consts.CURSOR_LEN / 4)
+        tmp.lineTo(-Consts.CURSOR_LEN / 4, Consts.CURSOR_LEN / 4)
         self._cursor = QtGui.QGraphicsPathItem(tmp, self._screen_group)
 
         # main text
         self._main_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
         self._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         font = self._main_text.font()
-        font.setPointSize(MAIN_TEXT_SIZE)
+        font.setPointSize(Consts.MAIN_TEXT_SIZE)
         font.setBold(True)
         self._main_text.setFont(font)
 
@@ -359,10 +359,10 @@ class DrawingWindow(QtGui.QMainWindow):
 
         # update drawing state
         if ev.type() == QtCore.QEvent.TabletPress:
-            self._cursor.setPen(QtGui.QPen(QtCore.Qt.cyan))
+            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE))
             self._drawing_state = True
         elif ev.type() == QtCore.QEvent.TabletRelease:
-            self._cursor.setPen(QtGui.QPen(QtCore.Qt.gray))
+            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
             self._drawing_state = False
 
         self.handler.tabletEvent(ev)
@@ -426,10 +426,10 @@ class DrawingWindow(QtGui.QMainWindow):
         self._screen_pos = None
         self._drawing_pos = None
         self._drawing_state = False
-        self._cursor.setPen(QtGui.QPen(QtCore.Qt.gray))
+        self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
 
         self.showFullScreen()
-        tid = self.startTimer(TIMER_MS)
+        tid = self.startTimer(Consts.REFRESH_DELAY)
         while self.isVisible():
             QtGui.QApplication.processEvents()
         self.killTimer(tid)
@@ -446,7 +446,7 @@ class DrawingWindow(QtGui.QMainWindow):
         # create the graphical item
         self.drawing = drawing
         self._drawing_item = self.drawing.generate()
-        self._drawing_item.setPen(QtGui.QPen(QtCore.Qt.white))
+        self._drawing_item.setPen(QtGui.QPen(Consts.DRAWING_COLOR))
         self._drawing_item.setPos(0., 0.)
         self._drawing_item.setParentItem(self._drawing_group)
 

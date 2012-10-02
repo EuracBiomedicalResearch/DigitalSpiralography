@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """AID Validation"""
 
+# imports
 import Verhoeff
 from PyQt4 import QtGui
 

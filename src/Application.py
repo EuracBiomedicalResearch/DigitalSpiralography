@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-"""Main Drawing recorder module"""
+"""Main Drawing recorder application"""
 
 # local modules
 import AID
 import Spiral
 import Analysis
 import DrawingWindow
+import Consts
 
 # system modules
 import os
-import sys
 import uuid
 from PyQt4 import QtCore, QtGui, uic
 
 
-
+# implementation
 class Params:
     def __init__(self, save_path, total_recordings, installation_uuid):
         self.save_path = save_path
@@ -225,8 +225,7 @@ class Application(QtGui.QApplication):
         super(Application, self).__init__(args)
 
         # initialize the default settings
-        self.settings = QtCore.QSettings("settings.ini",
-                                         QtCore.QSettings.IniFormat)
+        self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
         params = Params(str(self.settings.value("save_path", "recordings").toString()),
                         self.settings.value("total_recordings", 0).toInt()[0],
                         str(self.settings.value("installation_uuid", uuid.getnode()).toString()))
@@ -248,9 +247,3 @@ class Application(QtGui.QApplication):
         self.settings.setValue("save_path", params.save_path)
         self.settings.setValue("total_recordings", params.total_recordings)
         self.settings.setValue("installation_uuid", params.installation_uuid)
-
-
-# main module
-if __name__ == '__main__':
-    app = Application(sys.argv)
-    sys.exit(app.exec_())

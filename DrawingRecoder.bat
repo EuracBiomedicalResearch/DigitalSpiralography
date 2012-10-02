@@ -1,1 +1,1 @@
-start src\main.py
+start src\main.pyw
