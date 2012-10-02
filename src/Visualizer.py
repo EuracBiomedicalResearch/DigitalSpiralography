@@ -25,7 +25,8 @@ def size2qpoly(w, h):
 
 def background_op(message, func, parent=None):
     pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
-    pd.open()
+    pd.setWindowModality(QtCore.Qt.ApplicationModal)
+    pd.show()
 
     ret = {}
     fn = lambda: ret.__setitem__('ret', func())

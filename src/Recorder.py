@@ -136,7 +136,8 @@ class EndRecording(QtGui.QDialog):
 
 def background_op(message, func, parent=None):
     pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
-    pd.open()
+    pd.setWindowModality(QtCore.Qt.ApplicationModal)
+    pd.show()
     th = threading.Thread(target=func)
     th.start()
     while th.is_alive():
