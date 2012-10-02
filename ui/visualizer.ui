@@ -16,6 +16,9 @@
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonFollowStyle</enum>
   </property>
+  <property name="animated">
+   <bool>false</bool>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="margin">
