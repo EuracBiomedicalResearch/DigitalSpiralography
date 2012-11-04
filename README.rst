@@ -13,26 +13,43 @@ After installing the Wacom drivers, you have to tune the following settings in
 a Windows 7 installation:
 
 - Control panel:
-  - Pen & touch:
+
+  + Pen & touch:
+
     - Pen options:
-      - Disable press & hold
+
+      * Disable press & hold
+
     - Flicks:
-      - Disable flicks
-  - Tablet PC settings:
+
+      * Disable flicks
+
+  + Tablet PC settings:
+
     - Other:
-      - Set left/right
-      - Input panel settings:
+
+      * Set left/right
+      * Input panel settings:
+
         - Disable "For tablet pen input, show icon next to the text box"
         - Disable "Use the Input Panel tab"
-  - Bamboo Preferences:
+
+  + Bamboo Preferences:
+
     - Tablet:
-      - Set orientation
-      - Disable all "Express Keys"
+
+      * Set orientation
+      * Disable all "Express Keys"
+
     - Pen:
-      - Disable "Pan/scroll"
-      - Mapping:
+
+      * Disable "Pan/scroll"
+      * Mapping:
+
 	- In a single-monitor setup, leave the default.
         - In a dual-monitor setup, set the pen to use the whole
 	  area of the screen used for display.
+
     - Touch options:
-      - Disable touch input
+
+      * Disable touch input
