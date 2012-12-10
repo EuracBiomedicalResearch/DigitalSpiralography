@@ -183,21 +183,28 @@ class RecordingHandler(Handler):
 
     def update_buffer(self):
         self.item.setPixmap(self.buffer)
+        self._needs_update = False
+
+
+    def sched_update_buffer(self):
+        self._needs_update = True
 
 
     def timerEvent(self, ev):
-        if self.dw.recording.events is None:
-            return
+        # update the viewport
+        if self._needs_update:
+            self.update_buffer()
 
         # update the indicator
-        stamp = datetime.datetime.now()
-        elapsed = stamp - self.dw.recording.events[0].stamp
-        length = (self.dw.recording.events[-1].stamp -
-                  self.dw.recording.events[0].stamp)
-        self.dw._set_bt_text(
-            "recording: {}\nstrokes: {}\nevents: {}\nlength: {}".format(
-            str(elapsed), self.dw.recording.strokes,
-            len(self.dw.recording.events), str(length)))
+        if self.dw.recording.events:
+            stamp = datetime.datetime.now()
+            elapsed = stamp - self.dw.recording.events[0].stamp
+            length = (self.dw.recording.events[-1].stamp -
+                      self.dw.recording.events[0].stamp)
+            self.dw._set_bt_text(
+                "recording: {}\nstrokes: {}\nevents: {}\nlength: {}".format(
+                    str(elapsed), self.dw.recording.strokes,
+                    len(self.dw.recording.events), str(length)))
 
 
     def tabletEventTS(self, ev, stamp):
@@ -206,7 +213,7 @@ class RecordingHandler(Handler):
             self.pen.setWidthF(1 + ev.pressure() * (Consts.PEN_MAXWIDTH - 1))
             self.painter.setPen(self.pen)
             self.painter.drawLine(self.old_trans_pos, self.dw._trans_pos)
-            self.update_buffer()
+            self.sched_update_buffer()
 
             # start recording if not already
             if self.dw.recording.events is None:
