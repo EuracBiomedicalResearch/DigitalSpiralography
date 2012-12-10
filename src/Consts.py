@@ -27,3 +27,12 @@ DRAWING_COLOR   = QtCore.Qt.white       # main drawing color
 RECORDING_COLOR = QtCore.Qt.green       # recorded trace color
 FAST_COLOR      = QtCore.Qt.cyan        # recorded fast trace color
 FAST_SPEED      = 1000                  # recorded fast trace speed (px/sec)
+
+# File format event/code maps
+EVENT_MAP = { QtCore.QEvent.TabletMove: 'move',
+              QtCore.QEvent.TabletPress: 'press',
+              QtCore.QEvent.TabletRelease: 'release',
+              QtCore.QEvent.TabletEnterProximity: 'enter',
+              QtCore.QEvent.TabletLeaveProximity: 'leave' }
+
+REV_EVENT_MAP = {v:k for k, v in EVENT_MAP.items()}

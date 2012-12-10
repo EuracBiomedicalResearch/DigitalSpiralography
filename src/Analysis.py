@@ -93,27 +93,11 @@ class DrawingRecord:
         # translate the event stream
         events = []
         for event in record.recording.events:
-            # event type
-            if event.typ == QtCore.QEvent.TabletMove:
-                typ = 'move'
-            elif event.typ == QtCore.QEvent.TabletPress:
-                typ = 'press'
-            elif event.typ == QtCore.QEvent.TabletRelease:
-                typ = 'release'
-            elif event.typ == QtCore.QEvent.TabletEnterProximity:
-                typ = 'enter'
-            elif event.typ == QtCore.QEvent.TabletLeaveProximity:
-                typ = 'leave'
-            else:
-                typ = event.typ
-
-            # everything else
             buf = {'stamp': event.stamp,
-                   'type': typ,
+                   'type': Consts.EVENT_MAP.get(event.typ, event.typ),
                    'cdraw': list(event.coords_drawing),
                    'ctrans': list(event.coords_trans),
                    'press': event.pressure}
-
             events.append(buf)
 
         # basic data to save
@@ -179,23 +163,8 @@ class DrawingRecord:
         # event stream
         events = []
         for event in data['recording']['events']:
-            # event type
-            if event['type'] == 'move':
-                typ = QtCore.QEvent.TabletMove
-            elif event['type'] == 'press':
-                typ = QtCore.QEvent.TabletPress
-            elif event['type'] == 'release':
-                typ = QtCore.QEvent.TabletRelease
-            elif event['type'] == 'enter':
-                typ = QtCore.QEvent.TabletEnterProximity
-            elif event['type'] == 'leave':
-                typ = QtCore.QEvent.TabletLeaveProximity
-            else:
-                typ = event.typ
-
-            # everything else
-            events.append(RecordingEvent(typ, tuple(event['cdraw']),
-                                         tuple(event['ctrans']),
+            events.append(RecordingEvent(Consts.REV_EVENT_MAP.get(event['type'], event['type']),
+                                         tuple(event['cdraw']), tuple(event['ctrans']),
                                          event['press'], event['stamp']))
 
         # recording
