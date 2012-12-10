@@ -134,11 +134,11 @@ class EndRecording(QtGui.QDialog):
 
 
     def on_save_path(self):
-        (dir, name) = os.path.split(str(self._ui.save_path.text()))
+        (dir, name) = os.path.split(unicode(self._ui.save_path.text()))
         self._file_browser.setDirectory(dir)
         self._file_browser.selectFile(name)
         if self._file_browser.exec_():
-            save_path = os.path.relpath(str(self._file_browser.selectedFiles()[0]))
+            save_path = os.path.relpath(unicode(self._file_browser.selectedFiles()[0]))
             self._ui.save_path.setText(save_path)
 
 
@@ -158,8 +158,8 @@ class EndRecording(QtGui.QDialog):
           if self._ui.pat_handedness.currentIndex() else None
         self.pat_hand = str(self._ui.pat_hand.currentText()) \
           if self._ui.pat_hand.currentIndex() else None
-        self.comments = str(self._ui.comments.toPlainText())
-        self.save_path = str(self._ui.save_path.text())
+        self.comments = unicode(self._ui.comments.toPlainText())
+        self.save_path = unicode(self._ui.save_path.text())
 
         # validate AID
         if not ID.validate_aid_err(self.aid):
@@ -167,8 +167,8 @@ class EndRecording(QtGui.QDialog):
 
         # check if the file already exists
         if os.path.exists(self.save_path):
-            msg = ("The file {} already exists. " +
-                   "Try with a different file name!").format(self.save_path)
+            msg = (u"The file {} already exists. " +
+                   u"Try with a different file name!").format(self.save_path)
             QtGui.QMessageBox.critical(self, "Save failure", msg)
             return
 
@@ -229,12 +229,12 @@ class MainWindow(QtGui.QMainWindow):
     def on_save_path(self):
         self._dir_browser.setDirectory(self.params.save_path)
         if self._dir_browser.exec_():
-            save_path = os.path.relpath(str(self._dir_browser.selectedFiles()[0]))
+            save_path = os.path.relpath(unicode(self._dir_browser.selectedFiles()[0]))
             self.set_save_path(save_path)
 
 
     def on_save_path_changed(self):
-        self.params.save_path = str(self._ui.save_path.text())
+        self.params.save_path = unicode(self._ui.save_path.text())
 
 
     def set_save_path(self, save_path):
@@ -290,9 +290,9 @@ class MainWindow(QtGui.QMainWindow):
 
         # guess a decent path name
         save_path = record.recording.session_start.strftime("%Y%m%d")
-        save_path = "{}_{}_{}.yaml.gz".format(save_path,
-                                              record.aid,
-                                              self.drawing_number)
+        save_path = u"{}_{}_{}.yaml.gz".format(save_path,
+                                               record.aid,
+                                               self.drawing_number)
         save_path = os.path.join(self.params.save_path, save_path)
 
         # keep trying until save is either aborted or succeeds
@@ -310,8 +310,8 @@ class MainWindow(QtGui.QMainWindow):
                                      lambda: Analysis.DrawingRecord.save(record, save_path),
                                      self)
             except IOError as e:
-                msg = ("Cannot save recording to {}: {}! " +
-                       "Try with a different file name!").format(save_path, e.strerror)
+                msg = (u"Cannot save recording to {}: {}! " +
+                       u"Try with a different file name!").format(save_path, e.strerror)
                 QtGui.QMessageBox.critical(self, "Save failure", msg)
             else:
                 break
@@ -324,7 +324,7 @@ class Application(QtGui.QApplication):
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
-        params = Params(str(self.settings.value("save_path", "recordings").toString()),
+        params = Params(unicode(self.settings.value("save_path", "recordings").toString()),
                         self.settings.value("total_recordings", 0).toInt()[0],
                         str(self.settings.value("installation_uuid", uuid.getnode()).toString()),
                         str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))

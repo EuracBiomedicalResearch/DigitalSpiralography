@@ -259,7 +259,7 @@ class MainWindow(QtGui.QMainWindow):
             record = Shared.background_op("Loading, please wait...",
                                           lambda: Analysis.DrawingRecord.load(path))
         except Exception as e:
-            msg = "Cannot load recording {}: {}".format(path, e)
+            msg = u"Cannot load recording {}: {}".format(path, e)
             QtGui.QMessageBox.critical(self, "Load failure", msg)
             return
 
@@ -272,7 +272,7 @@ class MainWindow(QtGui.QMainWindow):
                                                  QtCore.QString(),
                                                  "Recordings (*.yaml.gz)");
         if path:
-            self.load(str(path))
+            self.load(unicode(path))
 
 
     def on_info(self, ev):
@@ -315,4 +315,4 @@ class Application(QtGui.QApplication):
         if platform.system() != 'Windows':
             args = self.arguments()
             if len(args) > 1:
-                self.main_window.load(str(args[1]))
+                self.main_window.load(unicode(args[1]))

@@ -9,6 +9,7 @@ import Drawing
 import datetime
 import yaml
 import gzip
+import os
 from PyQt4 import QtCore
 
 
@@ -128,9 +129,11 @@ class DrawingRecord:
                 "pat_hand": record.pat_hand,
                 "comments": record.comments}
 
+        # avoid saving unicode in the FNAME header
+        fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
+
         # dump
-        fd = gzip.GzipFile(path, 'wb')
-        yaml.dump(data, fd, default_flow_style=False)
+        yaml.dump(data, fd, default_flow_style=False, encoding='utf-8')
 
 
     @classmethod
