@@ -6,6 +6,7 @@ import Analysis
 import Consts
 
 # system modules
+import math
 import datetime
 from PyQt4 import QtCore, QtGui
 
@@ -236,8 +237,8 @@ class RecordingHandler(Handler):
                     ev.type(),
                     [coords_drawing.x(), coords_drawing.y()],
                     [coords_trans.x(), coords_trans.y()],
-                    ev.pressure(), [ev.xTilt(), ev.yTilt()],
-                    stamp))
+                    ev.pressure(), self.dw._drawing_tilt,
+                    self.dw._trans_tilt, stamp))
 
         # cursor state
         self.dw._cursor.setVisible(self.dw._tracking_state)
@@ -382,6 +383,20 @@ class DrawingWindow(QtGui.QMainWindow):
         return super(DrawingWindow, self).event(ev)
 
 
+    def _mapTiltToScene(self, tilt, pos):
+        # extract absolute rotation at position (to support non-linear transforms)
+        p0 = self._trans_group.mapToScene(QtCore.QPointF(pos.x(), pos.y()))
+        p1 = self._trans_group.mapToScene(QtCore.QPointF(pos.x() + 1, pos.y()))
+        dx = p1.x() - p0.x()
+        dy = p1.y() - p0.y()
+        dl = math.hypot(dx, dy)
+        c = dx / dl
+        s = dy / dl
+        x = tilt[0] * c - tilt[1] * s
+        y = tilt[0] * s + tilt[1] * c
+        return (x, y)
+
+
     def tabletEventTS(self, ev, stamp):
         # only consider pen events and only when visible
         if ev.pointerType() != QtGui.QTabletEvent.Pen or \
@@ -392,6 +407,10 @@ class DrawingWindow(QtGui.QMainWindow):
         self._screen_pos = ev.hiResGlobalPos()
         self._drawing_pos = self._drawing_group.mapFromScene(self._screen_pos)
         self._trans_pos = self._trans_group.mapToScene(self._drawing_pos)
+
+        # screen/drawing tilt
+        self._drawing_tilt = (ev.xTilt(), ev.yTilt())
+        self._trans_tilt = self._mapTiltToScene(self._drawing_tilt, self._drawing_pos)
 
         # also update the cursor position within the translated space
         self._cursor.setPos(self._trans_pos)

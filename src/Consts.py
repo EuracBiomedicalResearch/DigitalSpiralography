@@ -19,7 +19,7 @@ CURSOR_LEN      = 25.                   # cursor extension (in pixels)
 MAIN_TEXT_SIZE  = 20                    # size of main text (in points)
 REFRESH_DELAY   = 100                   # timerEvent delay in ms
 PEN_MAXWIDTH    = 10                    # max pen width in pixels (minimum is always 1)
-TILT_MAXWIDTH   = 1./60. * 30.          # max tilt vectors width in 1/60th of pixels
+TILT_MAXLEN     = 1./60. * 20.          # max tilt vectors length in 1/60th of pixels
 
 # Drawing colors
 CURSOR_ACTIVE   = QtCore.Qt.cyan        # pen in proximity

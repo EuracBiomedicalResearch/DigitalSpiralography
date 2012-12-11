@@ -23,12 +23,13 @@ class CalibrationData:
 
 class RecordingEvent:
     def __init__(self, typ, coords_drawing, coords_trans, pressure,
-                 tilt_xy, stamp=None):
+                 tilt_drawing, tilt_trans, stamp=None):
         self.typ = typ
         self.coords_drawing = coords_drawing
         self.coords_trans = coords_trans
         self.pressure = pressure
-        self.tilt_xy = tilt_xy
+        self.tilt_drawing = tilt_drawing
+        self.tilt_trans = tilt_trans
         self.stamp = stamp if stamp is not None else datetime.datetime.now()
 
 
@@ -101,7 +102,8 @@ class DrawingRecord:
                    'cdraw': list(event.coords_drawing),
                    'ctrans': list(event.coords_trans),
                    'press': event.pressure,
-                   'tilt': list(event.tilt_xy)}
+                   'tdraw': list(event.tilt_drawing),
+                   'ttrans': list(event.tilt_trans)}
             events.append(buf)
 
         # basic data to save
@@ -170,14 +172,16 @@ class DrawingRecord:
         events = []
         for event in data['recording']['events']:
             # optional elements (format 1.1)
-            tilt_xy = event.get('tilt')
-            if tilt_xy is not None:
-                tilt_xy = tuple(tilt_xy)
+            tilt_drawing = event.get('tdraw')
+            tilt_trans = event.get('ttrans')
+            if tilt_drawing is not None:
+                tilt_drawing = tuple(tilt_drawing)
+                tilt_trans = tuple(tilt_trans)
 
             # everything else
             events.append(RecordingEvent(Consts.REV_EVENT_MAP.get(event['type'], event['type']),
                                          tuple(event['cdraw']), tuple(event['ctrans']),
-                                         event['press'], tilt_xy, event['stamp']))
+                                         event['press'], tilt_drawing, tilt_trans, event['stamp']))
 
         # recording
         recording = RecordingData(data['recording']['session_start'],

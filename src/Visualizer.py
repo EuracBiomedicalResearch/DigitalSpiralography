@@ -234,10 +234,16 @@ class MainWindow(QtGui.QMainWindow):
                     tmp.setParentItem(self._screen_group)
 
                     # tilt vector
-                    if self._showTilt and event.tilt_xy is not None:
+                    if self._showTilt and event.tilt_drawing is not None:
+                        if not self._showRaw:
+                            tilt = event.tilt_trans
+                        else:
+                            tilt = event.tilt_drawing
+
+                        # the vector itself
                         tmp = QtGui.QGraphicsLineItem(pos[0], pos[1],
-                                                      pos[0] + event.tilt_xy[0] * Consts.TILT_MAXWIDTH,
-                                                      pos[1] + event.tilt_xy[1] * Consts.TILT_MAXWIDTH)
+                                                      pos[0] + tilt[0] * Consts.TILT_MAXLEN,
+                                                      pos[1] + tilt[1] * Consts.TILT_MAXLEN)
                         tmp.setPen(tilt_pen)
                         tmp.setParentItem(self._screen_group)
 
