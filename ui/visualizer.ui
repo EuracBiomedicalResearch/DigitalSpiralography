@@ -109,6 +109,7 @@
    <addaction name="actionRAWCorr"/>
    <addaction name="actionSpeedTime"/>
    <addaction name="actionShowTraces"/>
+   <addaction name="actionShowTilt"/>
   </widget>
   <action name="actionOpen">
    <property name="icon">
@@ -188,6 +189,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionShowTilt">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/24x24/angle.png</normaloff>icons/24x24/angle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Show tilt</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
    </property>
   </action>
   <action name="actionInfo">

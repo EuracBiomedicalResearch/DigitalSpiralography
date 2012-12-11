@@ -25,10 +25,12 @@ class MainWindow(QtGui.QMainWindow):
         self._showRaw = False
         self._showTime = False
         self._showTraces = True
+        self._showTilt = True
 
         self._ui.actionRAWCorr.setChecked(self._showRaw)
         self._ui.actionSpeedTime.setChecked(self._showTime)
         self._ui.actionShowTraces.setChecked(self._showTraces)
+        self._ui.actionShowTilt.setChecked(self._showTilt)
 
         # signals and events
         self._ui.actionOpen.triggered.connect(self.on_load)
@@ -36,6 +38,7 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.actionShowTraces.triggered.connect(self.on_trace)
         self._ui.actionRAWCorr.triggered.connect(self.on_raw)
         self._ui.actionSpeedTime.triggered.connect(self.on_time)
+        self._ui.actionShowTilt.triggered.connect(self.on_tilt)
         self._ui.view.wheelEvent = self.on_wheel
 
         # props
@@ -164,9 +167,11 @@ class MainWindow(QtGui.QMainWindow):
                 tmp.setParentItem(self._drawing_group)
 
         # trace
-        tmp = QtGui.QPainterPath()
         pen = QtGui.QPen(Consts.RECORDING_COLOR)
         pen.setCapStyle(QtCore.Qt.RoundCap)
+
+        tilt_pen = QtGui.QPen(Consts.TILT_COLOR)
+        tilt_pen.setWidthF(0.1)
 
         low_color = QtGui.QColor(Consts.RECORDING_COLOR)
         high_color = QtGui.QColor(Consts.FAST_COLOR)
@@ -223,10 +228,18 @@ class MainWindow(QtGui.QMainWindow):
                     pen.setWidthF(0.5)
 
                 if pos and (drawing or self._showTraces):
-                    # create the item
+                    # the line itself
                     tmp = QtGui.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
                     tmp.setPen(pen)
                     tmp.setParentItem(self._screen_group)
+
+                    # tilt vector
+                    if self._showTilt and event.tilt_xy is not None:
+                        tmp = QtGui.QGraphicsLineItem(pos[0], pos[1],
+                                                      pos[0] + event.tilt_xy[0] * Consts.TILT_MAXWIDTH,
+                                                      pos[1] + event.tilt_xy[1] * Consts.TILT_MAXWIDTH)
+                        tmp.setPen(tilt_pen)
+                        tmp.setParentItem(self._screen_group)
 
             # save old status
             old_pos = pos
@@ -290,6 +303,11 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_trace(self, ev):
         self._showTraces = self._ui.actionShowTraces.isChecked()
+        self._redraw_scene()
+
+
+    def on_tilt(self, ev):
+        self._showTilt = self._ui.actionShowTilt.isChecked()
         self._redraw_scene()
 
 

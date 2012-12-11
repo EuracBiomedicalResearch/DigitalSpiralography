@@ -235,7 +235,8 @@ class RecordingHandler(Handler):
                     ev.type(),
                     [coords_drawing.x(), coords_drawing.y()],
                     [coords_trans.x(), coords_trans.y()],
-                    ev.pressure(), stamp))
+                    ev.pressure(), [ev.xTilt(), ev.yTilt()],
+                    stamp))
 
 
     def keyEvent(self, ev):
