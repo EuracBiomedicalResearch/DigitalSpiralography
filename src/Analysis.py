@@ -9,7 +9,6 @@ import Drawing
 import datetime
 import yaml
 import gzip
-import os
 from PyQt4 import QtCore
 
 
