@@ -208,12 +208,18 @@ class RecordingHandler(Handler):
 
 
     def tabletEventTS(self, ev, stamp):
-        if self.dw._drawing_state:
+        if not self.dw._drawing_state:
+            self.old_trans_pos = None
+        else:
             # new stroke
-            self.pen.setWidthF(1 + ev.pressure() * (Consts.PEN_MAXWIDTH - 1))
-            self.painter.setPen(self.pen)
-            self.painter.drawLine(self.old_trans_pos, self.dw._trans_pos)
-            self.sched_update_buffer()
+            if self.old_trans_pos is not None:
+                self.pen.setWidthF(1 + ev.pressure() * (Consts.PEN_MAXWIDTH - 1))
+                self.painter.setPen(self.pen)
+                self.painter.drawLine(self.old_trans_pos, self.dw._trans_pos)
+                self.sched_update_buffer()
+
+            # update the old positions
+            self.old_trans_pos = self.dw._trans_pos
 
             # start recording if not already
             if self.dw.recording.events is None:
@@ -230,9 +236,6 @@ class RecordingHandler(Handler):
                     [coords_drawing.x(), coords_drawing.y()],
                     [coords_trans.x(), coords_trans.y()],
                     ev.pressure(), stamp))
-
-        # update the old positions
-        self.old_trans_pos = self.dw._trans_pos
 
 
     def keyEvent(self, ev):
