@@ -129,6 +129,8 @@ class CalibrationHandler(Handler):
                 self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 127)))
             elif ev.type() == QtCore.QEvent.TabletRelease:
                 self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 0)))
+        else:
+            self.dw._cursor.setVisible(self.dw._tracking_state)
 
 
     def terminate(self):
@@ -140,7 +142,6 @@ class RecordingHandler(Handler):
     def __init__(self, dw):
         self.dw = dw
         self.dw.reset_recording()
-        self.dw._cursor.show()
         self.dw._main_text.setText("RECORDING")
         self.dw._sub_text.setText("Recording starts automatically as soon as the pen touches the tablet\n"
                                   "Press TAB to restart, ENTER to stop, ESC to abort recording")
@@ -237,6 +238,9 @@ class RecordingHandler(Handler):
                     [coords_trans.x(), coords_trans.y()],
                     ev.pressure(), [ev.xTilt(), ev.yTilt()],
                     stamp))
+
+        # cursor state
+        self.dw._cursor.setVisible(self.dw._tracking_state)
 
 
     def keyEvent(self, ev):
@@ -394,18 +398,18 @@ class DrawingWindow(QtGui.QMainWindow):
 
         # update drawing state
         if ev.type() == QtCore.QEvent.TabletPress:
-            self._cursor.show()
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE))
+            self._tracking_state = True
             self._drawing_state = True
         elif ev.type() == QtCore.QEvent.TabletRelease:
-            self._cursor.show()
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
+            self._tracking_state = True
             self._drawing_state = False
         elif ev.type() == QtCore.QEvent.TabletEnterProximity:
-            self._cursor.show()
+            self._tracking_state = True
             self._drawing_state = False
         elif ev.type() == QtCore.QEvent.TabletLeaveProximity:
-            self._cursor.hide()
+            self._tracking_state = False
             self._drawing_state = False
 
         self.handler.tabletEventTS(ev, stamp)
@@ -473,6 +477,7 @@ class DrawingWindow(QtGui.QMainWindow):
         self._screen_pos = None
         self._drawing_pos = None
         self._drawing_state = False
+        self._tracking_state = False
         self._cursor.hide()
         self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
 
