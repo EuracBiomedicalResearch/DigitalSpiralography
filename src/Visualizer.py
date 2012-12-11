@@ -193,9 +193,10 @@ class MainWindow(QtGui.QMainWindow):
                 drawing = True
             elif event.typ == QtCore.QEvent.TabletRelease:
                 drawing = False
-            elif event.typ == QtCore.QEvent.TabletLeaveProximity:
+            elif event.typ == QtCore.QEvent.TabletEnterProximity or \
+              event.typ == QtCore.QEvent.TabletLeaveProximity:
                 drawing = False
-                old_pos = None
+                pos = None
 
             if old_pos:
                 if drawing:
@@ -221,7 +222,7 @@ class MainWindow(QtGui.QMainWindow):
                     pen.setColor(Consts.CURSOR_INACTIVE)
                     pen.setWidthF(0.5)
 
-                if drawing or self._showTraces:
+                if pos and (drawing or self._showTraces):
                     # create the item
                     tmp = QtGui.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
                     tmp.setPen(pen)

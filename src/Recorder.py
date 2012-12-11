@@ -334,9 +334,20 @@ class Application(QtGui.QApplication):
         self.main_window.show()
         self.lastWindowClosed.connect(self._on_close)
 
+
     def _on_close(self):
         params = self.main_window.params
         self.settings.setValue("save_path", params.save_path)
         self.settings.setValue("total_recordings", params.total_recordings)
         self.settings.setValue("installation_uuid", params.installation_uuid)
         self.settings.setValue("installation_stamp", params.installation_stamp)
+
+
+    def event(self, ev):
+        # re-send tablet proximity events up the chain
+        if ev.type() == QtCore.QEvent.TabletEnterProximity or \
+          ev.type() == QtCore.QEvent.TabletLeaveProximity:
+            return self.sendEvent(self.activeWindow(), ev)
+
+        # normal handling
+        return super(Application, self).event(ev)

@@ -366,6 +366,17 @@ class DrawingWindow(QtGui.QMainWindow):
         self.reject()
 
 
+    def event(self, ev):
+        # handle proximity events like normal tablet events
+        if ev.type() == QtCore.QEvent.TabletEnterProximity or \
+          ev.type() == QtCore.QEvent.TabletLeaveProximity:
+            self.tabletEventTS(ev, datetime.datetime.now())
+            ev.accept()
+            return True
+
+        return super(DrawingWindow, self).event(ev)
+
+
     def tabletEventTS(self, ev, stamp):
         # only consider pen events and only when visible
         if ev.pointerType() != QtGui.QTabletEvent.Pen or \
@@ -382,10 +393,18 @@ class DrawingWindow(QtGui.QMainWindow):
 
         # update drawing state
         if ev.type() == QtCore.QEvent.TabletPress:
+            self._cursor.show()
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE))
             self._drawing_state = True
         elif ev.type() == QtCore.QEvent.TabletRelease:
+            self._cursor.show()
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
+            self._drawing_state = False
+        elif ev.type() == QtCore.QEvent.TabletEnterProximity:
+            self._cursor.show()
+            self._drawing_state = False
+        elif ev.type() == QtCore.QEvent.TabletLeaveProximity:
+            self._cursor.hide()
             self._drawing_state = False
 
         self.handler.tabletEventTS(ev, stamp)
@@ -453,6 +472,7 @@ class DrawingWindow(QtGui.QMainWindow):
         self._screen_pos = None
         self._drawing_pos = None
         self._drawing_state = False
+        self._cursor.hide()
         self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
 
         self.showFullScreen()
