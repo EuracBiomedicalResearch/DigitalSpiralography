@@ -282,6 +282,8 @@ A tablet ID follows the pattern ``Txxxyyyz`` where:
 * ``yyy``: incremental code
 * ``z``: Verhoeff check digit
 
+"T0" can be used for testing purposes.
+
 All drawing IDs currently begin with D have the structure ``Dxxxy``, where:
 
 * ``D``: mandatory
