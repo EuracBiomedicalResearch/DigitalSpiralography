@@ -4,8 +4,97 @@ DrawingRecorder
 .. contents::
 
 
+Overview
+--------
+
+How to use the recorder
+~~~~~~~~~~~~~~~~~~~~~~~
+
+1. Start the recorder.
+2. Properly set a "save path" that will contain all the subsequent recordings.
+3. Fit the paper onto the tablet, and ensure it doesn't move.
+4. Calibrate:
+
+   * Enter a Tablet ID and a Drawing ID (when using a barcode gun, zap the
+     tablet and the paper).
+   * Hold the pen straight.
+   * Move the pen over the red point indicated in the screen (which fills red),
+     then press ENTER.
+   * Repeat for all the points, until all points are green and the cursor
+     appears as a crossbar.
+   * Review that the pen matches the screen position/drawing by moving it over
+     intersection points.
+   * If it doesn't match properly, press TAB to reset.
+   * When satisfied, press ENTER.
+
+5. Press 'New Recording'.
+6. Enter a valid Patient ID (when using a barcode gun, zap the AID).
+7. Let the patient hold the pen straight and without touching the surface.
+8. Let the patient draw a spiral *within* the spiral (in the space between the
+   lines), starting from the center and outward.
+9. Review that the drawing has no holes and/or jerkiness.
+10. If the drawing has any problems, press TAB and repeat from step 7.
+11. When satisfied, press ENTER.
+12. Set the patient details (left/right handedness, hand used for drawing,
+    patient/case and eventually comments when needed.
+13. Save the drawing.
+14. Double-check that the paper still doesn't move. If the paper moves, repeat
+    the calibration procedure from step 3.
+15. Repeat from step 5 forcing the patient to use the other hand, or with a
+    different patient.
+
+
+Recording warnings
+~~~~~~~~~~~~~~~~~~
+
+**Multiple strokes**:
+
+  There are some holes in the drawing (the pen was lifted while drawing), which
+  might result in a recording which is more difficult to analyze. Consider
+  repeating the recording.
+
+**Short recording**:
+
+  The recording was either very quick, or contained very few events. Check for
+  potential problems.
+
+**Old calibration data**:
+
+  The last calibration was performed more than 8 hours ago and/or more than 50
+  drawings ago. Ensure that the paper is still properly fitted.
+
+
+Usage recommendation
+~~~~~~~~~~~~~~~~~~~~
+
+* Do not run concurrent applications while recording, as doing so may introduce
+  jitter in the recording!
+* Disable any feature of the tablet/pen: patients should not worry about
+  pressing buttons accidentally on the tablet, and doing so should not
+  interrupt the recording (this is described in the installation instructions).
+* If the sheet of paper moves and/or is wavy, replace it and *recalibrate*.
+* When calibrating, hold the pen straight, then review the intersection points.
+* The patient should be concentrated on the drawing, not on the screen.
+  Turn away the screen from the patient.
+* Review the drawing when the patient terminates. The drawing should consist of
+  a single line without holes (watch out for unexpected jumps of the cursor,
+  etc). If you see a problem with the drawing, reset with TAB and restart.
+
+
+Testing
+~~~~~~~
+
+Codes that can be used for testing:
+
+* AID: "0"
+* Tablet ID: "T0"
+* Drawing ID: "DSPR1"
+
+To see how codes should be constructed, see `Coding of IDs`_.
+
+
 Version changes
----------------
+~~~~~~~~~~~~~~~
 
 1.1:
 
@@ -22,7 +111,7 @@ Version changes
 
 
 Known issues
-------------
+~~~~~~~~~~~~
 
 * 1.0/1.1: Quantization of event's timestamps: the "stamp" value of the event
   stream is badly quantized due to it not coming directly from the tablet.
@@ -34,17 +123,6 @@ Known issues
   require post-processing to be detected, and doing so it not easy due to the
   quantization of event timestamps. This has been fixed in DrawingRecorder 1.1,
   but must be kept in mind for files produced by older releases.
-
-
-Usage recommendation
---------------------
-
-* Do not run concurrent applications while recording, as doing so may introduce
-  jitter in the recording currently.
-* The patient should be concentrated on the drawing, not on the screen.
-* Disable any feature of the tablet/pen: patients should not worry about
-  pressing buttons accidentally on the tablet, and doing so should not
-  interrupt the recording.
 
 
 Installation instructions
@@ -296,14 +374,6 @@ know to the recorder module.
 The blueprints for the drawings are stored in the "drw/" directory in the
 source code. Each drawing type is currently handled by a separated drawing
 module, since the module itself contains the logic for proper calibration.
-
-
-Testing
-~~~~~~~
-
-* AID: "0"
-* Tablet ID: "T0"
-* Drawing ID: "DSPR1"
 
 
 .. _YaML: http://www.yaml.org/
