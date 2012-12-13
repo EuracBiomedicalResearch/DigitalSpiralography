@@ -137,13 +137,14 @@ class DrawingRecord:
         fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
 
         # dump
-        yaml.dump(data, fd, default_flow_style=False, encoding='utf-8')
+        yaml.safe_dump(data, fd, default_flow_style=False,
+                       allow_unicode=True, encoding='utf-8')
 
 
     @classmethod
     def load(cls, path):
         fd = gzip.GzipFile(path, 'rb')
-        data = yaml.load(fd)
+        data = yaml.safe_load(fd)
 
         # check version info
         if 'format' not in data or \
