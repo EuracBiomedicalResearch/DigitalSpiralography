@@ -298,4 +298,12 @@ source code. Each drawing type is currently handled by a separated drawing
 module, since the module itself contains the logic for proper calibration.
 
 
+Testing
+~~~~~~~
+
+* AID: "0"
+* Tablet ID: "T0"
+* Drawing ID: "DSPR1"
+
+
 .. _YaML: http://www.yaml.org/
