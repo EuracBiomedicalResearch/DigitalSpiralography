@@ -376,4 +376,19 @@ source code. Each drawing type is currently handled by a separated drawing
 module, since the module itself contains the logic for proper calibration.
 
 
+Future improvements
+~~~~~~~~~~~~~~~~~~~
+
+* Either fix PyQt4 to supplement device's timestamp to the QTabletEvent class,
+  or use the pyglet's "wintab" module on Windows, which doesn't require
+  re-compiling/patching PyQt.
+* More drawing types (CCW, two spiral module, etc).
+* Multiple drawings in a single session require rethinking a bit the output
+  format (drawing/points needs to be a list of lists) and recording itself (do
+  we want to perform drawing separation ourselves, or not?).
+* Implement a batch analysis module.
+* To be able to generate a score of the digitized spiral, we also need a sample
+  of human-rated scores.
+
+
 .. _YaML: http://www.yaml.org/
