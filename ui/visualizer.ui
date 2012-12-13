@@ -216,10 +216,10 @@
      <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
    </property>
    <property name="text">
-    <string>Information</string>
+    <string>About</string>
    </property>
    <property name="toolTip">
-    <string>Information</string>
+    <string>About</string>
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
