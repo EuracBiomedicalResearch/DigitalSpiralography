@@ -84,13 +84,13 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop("Drawing ID", record.drawing.id)
         self._append_prop("Drawing descr.", record.drawing.str)
 
-        self._append_prop("Recording date", record.recording.session_start)
-        self._append_prop("Recording no.", record.extra_data['drawing_number'])
-        self._append_prop("Recording retries", record.recording.retries)
-        self._append_prop("Recording strokes", record.recording.strokes)
-        self._append_prop("Recording events", len(record.recording.events))
-        self._append_prop("Recording start", record.recording.events[0].stamp)
-        self._append_prop("Recording length", record.recording.events[-1].stamp -
+        self._append_prop("Rec. date", record.recording.session_start)
+        self._append_prop("Rec. no.", record.extra_data['drawing_number'])
+        self._append_prop("Rec. retries", record.recording.retries)
+        self._append_prop("Rec. strokes", record.recording.strokes)
+        self._append_prop("Rec. events", len(record.recording.events))
+        self._append_prop("Rec. start", record.recording.events[0].stamp)
+        self._append_prop("Rec. length", record.recording.events[-1].stamp -
                           record.recording.events[0].stamp)
 
         self._append_prop("Calib. tablet ID", record.calibration.tablet_id)

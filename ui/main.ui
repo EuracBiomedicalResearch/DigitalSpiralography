@@ -146,7 +146,7 @@
     <item row="4" column="0">
      <widget class="QToolButton" name="info">
       <property name="toolTip">
-       <string>Informations</string>
+       <string>Information</string>
       </property>
       <property name="icon">
        <iconset>
