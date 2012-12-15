@@ -5,12 +5,15 @@
 import Shared
 import Analysis
 import Consts
+import Intl
+from Intl import translate
 
 # system modules
 import math
 import platform
 import threading
 from PyQt4 import QtCore, QtGui, uic
+from PyQt4.QtGui import QApplication
 
 
 # main application
@@ -63,7 +66,9 @@ class MainWindow(QtGui.QMainWindow):
     def _reset_props(self):
         self._props.clear()
         self._props.setColumnCount(2)
-        self._props.setHorizontalHeaderLabels(["Property", "Value"])
+        self._props.setHorizontalHeaderLabels(
+            [translate("visualizer", "Property"),
+             translate("visualizer", "Value")])
 
 
     def _reset_scene(self):
@@ -276,11 +281,14 @@ class MainWindow(QtGui.QMainWindow):
     def load(self, path):
         try:
             # perform the loading in background thread
-            record = Shared.background_op("Loading, please wait...",
-                                          lambda: Analysis.DrawingRecord.load(path))
+            record = Shared.background_op(
+                translate("visualizer", "Loading, please wait..."),
+                lambda: Analysis.DrawingRecord.load(path))
         except Exception as e:
-            msg = u"Cannot load recording {}: {}".format(path, e)
-            QtGui.QMessageBox.critical(self, "Load failure", msg)
+            msg = translate("visualizer", "Cannot load recording {}: {}")
+            QtGui.QMessageBox.critical(
+                self, translate("visualizer", "Load failure"),
+                msg.format(path, e))
             return
 
         # only update the view on success
@@ -288,18 +296,17 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_load(self, ev):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Load recording",
-                                                 QtCore.QString(),
-                                                 "Recordings (*.yaml.gz)");
+        path = QtGui.QFileDialog.getOpenFileName(
+            self, QApplication.translate("visualizer", "Load recording"), QtCore.QString(),
+            QApplication.translate("visualizer", "Recordings") + " (*.yaml.gz)")
         if path:
             self.load(unicode(path))
 
 
     def on_info(self, ev):
-        QtGui.QMessageBox.about(self, "About DrawingVisualizer",
-                                "{} {} {}".format(Consts.APP_ORG,
-                                                  Consts.APP_NAME,
-                                                  Consts.APP_VERSION))
+        QtGui.QMessageBox.about(
+            self, QApplication.translate("visualizer", "About DrawingVisualizer"),
+            "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION))
 
     def _redraw_scene(self):
         if self.record:
@@ -332,7 +339,9 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
+        Intl.initialize("visualizer")
 
+        # initialize
         self.main_window = MainWindow()
         self.main_window.show()
 

@@ -8,6 +8,8 @@ import DrawingFactory
 import DrawingWindow
 import Shared
 import Consts
+import Intl
+from Intl import translate
 
 # system modules
 import os
@@ -321,6 +323,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
+        Intl.initialize("recorder")
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)

@@ -4,6 +4,7 @@
 # local modules
 import Consts
 import Drawing
+from Intl import translate
 
 # system modules
 import datetime
@@ -75,18 +76,18 @@ class DrawingRecord:
         ret = []
 
         if self.recording.strokes > 1:
-            ret.append("Multiple strokes")
+            ret.append(translate("analysis", "Multiple strokes"))
 
         length = (self.recording.events[-1].stamp -
                   self.recording.events[0].stamp)
         if length < datetime.timedelta(seconds=1) or \
           len(self.recording.events) < 100:
-            ret.append("Short recording")
+            ret.append(translate("analysis", "Short recording"))
 
         stamp = datetime.datetime.now()
         if (stamp - self.calibration.stamp) > datetime.timedelta(hours=8) or \
           self.calibration_age > 50:
-            ret.append("Old calibration data")
+            ret.append(translate("analysis", "Old calibration data"))
 
         return ret
 
@@ -150,7 +151,8 @@ class DrawingRecord:
         if 'format' not in data or \
           type(data['format']) != str or \
           int(float(data['format'])) != 1:
-            raise Exception('Invalid or unsupported file format', path)
+            msg = translate("analysis", 'Invalid or unsupported file format')
+            raise Exception(msg, path)
 
         # recover extra data
         extra_data = data['extra_data']
