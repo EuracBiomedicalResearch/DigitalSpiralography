@@ -323,14 +323,23 @@ class DrawingWindow(QtGui.QMainWindow):
         # sub text
         self._sub_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
         self._sub_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
+        font = self._sub_text.font()
+        font.setPointSize(Consts.NORM_TEXT_SIZE)
+        self._sub_text.setFont(font)
 
         # bt text
         self._bt_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
         self._bt_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
+        font = self._bt_text.font()
+        font.setPointSize(Consts.NORM_TEXT_SIZE)
+        self._bt_text.setFont(font)
 
         # warning
         self._warning = QtGui.QGraphicsSimpleTextItem(self._screen_group)
         self._warning.setBrush(QtGui.QBrush(QtCore.Qt.yellow))
+        font = self._warning.font()
+        font.setPointSize(Consts.WARN_TEXT_SIZE)
+        self._warning.setFont(font)
 
         # initial state
         self._drawing_item = None
