@@ -36,7 +36,7 @@ How to use the recorder
 10. If the drawing has any problems, press TAB and repeat from step 7.
 11. When satisfied, press ENTER.
 12. Set the patient details (left/right handedness, hand used for drawing,
-    patient/case and eventually comments when needed.
+    patient/case) and eventually comments when needed.
 13. Save the drawing.
 14. Double-check that the paper still doesn't move. If the paper moves, repeat
     the calibration procedure from step 3.
@@ -389,6 +389,10 @@ Future improvements
 * Implement a batch analysis module.
 * To be able to generate a score of the digitized spiral, we also need a sample
   of human-rated scores.
+* Record the actual tablet serial/details in the file instead of relying on the
+  user scanning a barcode.
+* Pressure has currently no reference value. Introducing pressure calibration
+  would allow us to compare pressure among different tablets.
 
 
 .. _YaML: http://www.yaml.org/
