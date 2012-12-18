@@ -37,10 +37,10 @@ class CalibrationHandler(Handler):
         self.dw.reset_recording()
         self.dw.reset_calibration()
         self.dw._main_text.setText(translate("calib", "CALIBRATION"))
-        self.dw._sub_text.setText(translate(
-            "calib",
-            "Place the pen on the red point and press ENTER\n"
-            "Press TAB to restart, ESC to abort calibration"))
+        self.dw._sub_text.setText(
+            translate("calib",
+                      "Place the pen on the red point and press ENTER\n"
+                      "Press TAB to restart, ESC to abort calibration"))
         self.items = None
         self.restart()
 
@@ -64,18 +64,19 @@ class CalibrationHandler(Handler):
         res, error = self.dw.setup_calibration(
             Analysis.CalibrationData(self.dw.tablet_id, self.cpoints))
         if not res:
-            msg = translate(
-                "calib",
-                "CALIBRATION FAILED: {}!\n"
-                "Try refitting the paper. Restarting calibration...")
+            msg = translate("calib",
+                            "CALIBRATION FAILED: {}!\n"
+                            "Try refitting the paper. Restarting calibration...")
+            msg = msg.format(error.upper())
             self.restart()
-            self.dw._warning.setText(msg.format(error.upper()))
+            self.dw._warning.setText(msg)
         else:
             self.point = None
             self.dw._cursor.show()
-            self.dw._set_bt_text(translate(
-                "calib",
-                "Previewing calibration. To accept the results press ENTER"))
+            self.dw._set_bt_text(
+                translate("calib",
+                          "Previewing calibration. "
+                          "To accept the results press ENTER"))
 
 
     def prepare_next_point(self):
@@ -153,10 +154,10 @@ class RecordingHandler(Handler):
         self.dw = dw
         self.dw.reset_recording()
         self.dw._main_text.setText(translate("rec", "RECORDING"))
-        self.dw._sub_text.setText(translate(
-            "rec",
-            "Recording starts automatically as soon as the pen touches the tablet\n"
-            "Press TAB to restart, ENTER to stop, ESC to abort recording"))
+        self.dw._sub_text.setText(
+            translate("rec",
+                      "Recording starts automatically as soon as the pen touches the tablet\n"
+                      "Press TAB to restart, ENTER to stop, ESC to abort recording"))
         self.dw._warning.setText("")
 
         # drawing support
@@ -215,9 +216,9 @@ class RecordingHandler(Handler):
             length = (self.dw.recording.events[-1].stamp -
                       self.dw.recording.events[0].stamp)
             msg = translate("rec", "recording: {}\nstrokes: {}\nevents: {}\nlength: {}")
-            self.dw._set_bt_text(
-                msg.format(str(elapsed), self.dw.recording.strokes,
-                           len(self.dw.recording.events), str(length)))
+            msg = msg.format(str(elapsed), self.dw.recording.strokes,
+                             len(self.dw.recording.events), str(length))
+            self.dw._set_bt_text(msg)
 
 
     def tabletEventTS(self, ev, stamp):

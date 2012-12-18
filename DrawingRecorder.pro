@@ -7,4 +7,4 @@ FORMS		= ui/main.ui \
 		  ui/newcalibration.ui \
 		  ui/newrecording.ui \
 		  ui/endrecording.ui
-TRANSLATIONS    = intl/recorder_de.ts
+TRANSLATIONS    = intl/recorder.de.ts
