@@ -175,9 +175,9 @@ class EndRecording(QtGui.QDialog):
         if os.path.exists(self.save_path):
             title = translate("recorder", "Save failure")
             msg = translate("recorder",
-                            "The file {} already exists. "
+                            "The file {path} already exists. "
                             "Try with a different file name!")
-            msg = msg.format(self.save_path)
+            msg = msg.format(path=self.save_path)
             QtGui.QMessageBox.critical(self, title, msg)
             return
 
@@ -231,12 +231,12 @@ class MainWindow(QtGui.QMainWindow):
         title = translate("recorder", "About DrawingRecorder")
         ver = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
         about = translate("recorder",
-                          "Total recordings: {}\n"
-                          "Inst. UUID: {}\n"
-                          "Inst. Date: {}")
-        about = about.format(str(self.params.total_recordings),
-                             self.params.installation_uuid,
-                             self.params.installation_stamp)
+                          "Total recordings: {total}\n"
+                          "Inst. UUID: {uuid}\n"
+                          "Inst. Date: {date}")
+        about = about.format(total=str(self.params.total_recordings),
+                             uuid=self.params.installation_uuid,
+                             date=self.params.installation_stamp)
         QtGui.QMessageBox.about(self, title, ver + "\n" + about)
 
 
@@ -325,9 +325,9 @@ class MainWindow(QtGui.QMainWindow):
                                      self)
             except IOError as e:
                 msg = translate("recorder",
-                                "Cannot save recording to {}: {}! "
+                                "Cannot save recording to {path}: {reason}! "
                                 "Try with a different file name!")
-                msg = msg.format(save_path, e.strerror)
+                msg = msg.format(path=save_path, reason=e.strerror)
                 title = translate("recorder", "Save failure")
                 QtGui.QMessageBox.critical(self, title, msg)
             else:

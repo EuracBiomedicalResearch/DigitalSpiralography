@@ -307,8 +307,9 @@ class MainWindow(QtGui.QMainWindow):
                 translate("visualizer", "Loading, please wait..."),
                 lambda: Analysis.DrawingRecord.load(path))
         except Exception as e:
-            msg = translate("visualizer", "Cannot load recording {}: {}")
-            msg = msg.format(path, e)
+            msg = translate("visualizer",
+                            "Cannot load recording {path}: {reason}")
+            msg = msg.format(path=path, reason=e)
             title = translate("visualizer", "Load failure")
             QtGui.QMessageBox.critical(self, title, msg)
             return

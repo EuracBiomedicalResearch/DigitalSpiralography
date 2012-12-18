@@ -65,9 +65,9 @@ class CalibrationHandler(Handler):
             Analysis.CalibrationData(self.dw.tablet_id, self.cpoints))
         if not res:
             msg = translate("calib",
-                            "CALIBRATION FAILED: {}!\n"
+                            "CALIBRATION FAILED: {reason}!\n"
                             "Try refitting the paper. Restarting calibration...")
-            msg = msg.format(error.upper())
+            msg = msg.format(reason=error.upper())
             self.restart()
             self.dw._warning.setText(msg)
         else:
@@ -103,8 +103,8 @@ class CalibrationHandler(Handler):
         self.point.setParentItem(self.items)
 
         # update status
-        msg = translate("calib", "Calibrating point {}/{}")
-        self.dw._set_bt_text(msg.format(pos + 1, pos_max))
+        msg = translate("calib", "Calibrating point {cur}/{tot}")
+        self.dw._set_bt_text(msg.format(cur=pos+1, tot=pos_max))
 
 
     def add_point(self):
@@ -215,9 +215,15 @@ class RecordingHandler(Handler):
             elapsed = stamp - self.dw.recording.events[0].stamp
             length = (self.dw.recording.events[-1].stamp -
                       self.dw.recording.events[0].stamp)
-            msg = translate("rec", "recording: {}\nstrokes: {}\nevents: {}\nlength: {}")
-            msg = msg.format(str(elapsed), self.dw.recording.strokes,
-                             len(self.dw.recording.events), str(length))
+            msg = translate("rec",
+                            "recording: {recording}\n"
+                            "strokes: {strokes}\n"
+                            "events: {events}\n"
+                            "length: {length}")
+            msg = msg.format(recording=str(elapsed),
+                             strokes=self.dw.recording.strokes,
+                             events=len(self.dw.recording.events),
+                             length=str(length))
             self.dw._set_bt_text(msg)
 
 
