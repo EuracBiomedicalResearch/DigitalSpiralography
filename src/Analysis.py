@@ -78,11 +78,14 @@ class DrawingRecord:
         if self.recording.strokes > 1:
             ret.append(translate("analysis", "Multiple strokes"))
 
-        length = (self.recording.events[-1].stamp -
-                  self.recording.events[0].stamp)
-        if length < datetime.timedelta(seconds=1) or \
-          len(self.recording.events) < 100:
-            ret.append(translate("analysis", "Short recording"))
+        if not self.recording.events:
+            ret.append(translate("analysis", "No data!"))
+        else:
+            length = (self.recording.events[-1].stamp -
+                      self.recording.events[0].stamp)
+            if length < datetime.timedelta(seconds=1) or \
+              len(self.recording.events) < 100:
+                ret.append(translate("analysis", "Short recording"))
 
         stamp = datetime.datetime.now()
         if (stamp - self.calibration.stamp) > datetime.timedelta(hours=8) or \

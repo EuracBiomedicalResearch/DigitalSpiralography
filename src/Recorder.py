@@ -110,7 +110,10 @@ class EndRecording(QtGui.QDialog):
         self._ui.save_path.setText(self.save_path)
 
         self._ui.date_time.setText(record.recording.session_start.strftime("%c"))
-        self._ui.length.setText(str(record.recording.events[-1].stamp -
+        if not record.recording.events:
+            self._ui.length.setText("-")
+        else:
+            self._ui.length.setText(str(record.recording.events[-1].stamp -
                                     record.recording.events[0].stamp))
 
         warn = record.check_warnings()
