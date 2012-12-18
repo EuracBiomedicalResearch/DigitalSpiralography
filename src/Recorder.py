@@ -8,6 +8,8 @@ import DrawingFactory
 import DrawingWindow
 import Shared
 import Consts
+import Intl
+from Intl import translate
 
 # system modules
 import os
@@ -53,8 +55,9 @@ class NewCalibration(QtGui.QDialog):
         # validate the drawing id
         self.drawing = DrawingFactory.from_id(str(self._ui.drawing_id.text()))
         if not self.drawing:
-            QtGui.QMessageBox.critical(None, "Invalid drawing ID",
-                                       "The specified drawing ID is invalid")
+            title = translate("recorder", "Invalid drawing ID")
+            msg = translate("recorder", "The specified drawing ID is invalid")
+            QtGui.QMessageBox.critical(None, title, msg)
             return self.reset()
 
         self.done(QtGui.QDialog.Accepted)
@@ -95,7 +98,8 @@ class EndRecording(QtGui.QDialog):
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
         self._file_browser.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
         self._file_browser.setAcceptMode(QtGui.QFileDialog.AcceptSave)
-        self._file_browser.setFilter("Recordings (*.yaml.gz)")
+        ext_name = translate("recorder", "Recordings")
+        self._file_browser.setFilter(ext_name + " (*.yaml.gz)")
 
 
     def reset(self, save_path, record):
@@ -106,7 +110,10 @@ class EndRecording(QtGui.QDialog):
         self._ui.save_path.setText(self.save_path)
 
         self._ui.date_time.setText(record.recording.session_start.strftime("%c"))
-        self._ui.length.setText(str(record.recording.events[-1].stamp -
+        if not record.recording.events:
+            self._ui.length.setText("-")
+        else:
+            self._ui.length.setText(str(record.recording.events[-1].stamp -
                                     record.recording.events[0].stamp))
 
         warn = record.check_warnings()
@@ -143,9 +150,11 @@ class EndRecording(QtGui.QDialog):
 
 
     def reject(self):
-        ret = QtGui.QMessageBox.warning(self, "Discard recording",
-                                        "Are you sure you want to discard the acquired drawing?",
-                                        "No", "Yes, discard")
+        title = translate("recorder", "Discard recording")
+        msg = translate("recorder", "Are you sure you want to discard the acquired drawing?")
+        ret = QtGui.QMessageBox.warning(self, title, msg,
+                                        translate("recorder", "No"),
+                                        translate("recorder", "Yes, discard"))
         if ret:
             self.done(QtGui.QDialog.Rejected)
 
@@ -167,9 +176,12 @@ class EndRecording(QtGui.QDialog):
 
         # check if the file already exists
         if os.path.exists(self.save_path):
-            msg = (u"The file {} already exists. " +
-                   u"Try with a different file name!").format(self.save_path)
-            QtGui.QMessageBox.critical(self, "Save failure", msg)
+            title = translate("recorder", "Save failure")
+            msg = translate("recorder",
+                            "The file {path} already exists. "
+                            "Try with a different file name!")
+            msg = msg.format(path=self.save_path)
+            QtGui.QMessageBox.critical(self, title, msg)
             return
 
         self.done(QtGui.QDialog.Accepted)
@@ -219,11 +231,16 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_info(self, ev):
-        msg = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
-        msg += "\nTotal recordings: " + str(self.params.total_recordings)
-        msg += "\nInst. UUID: " + self.params.installation_uuid
-        msg += "\nInst. Date: " + self.params.installation_stamp
-        QtGui.QMessageBox.about(self, "About DrawingRecorder", msg)
+        title = translate("recorder", "About DrawingRecorder")
+        ver = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
+        about = translate("recorder",
+                          "Total recordings: {total}\n"
+                          "Inst. UUID: {uuid}\n"
+                          "Inst. Date: {date}")
+        about = about.format(total=str(self.params.total_recordings),
+                             uuid=self.params.installation_uuid,
+                             date=self.params.installation_stamp)
+        QtGui.QMessageBox.about(self, title, ver + "\n" + about)
 
 
     def on_save_path(self):
@@ -306,13 +323,16 @@ class MainWindow(QtGui.QMainWindow):
             save_path = self._end_recording_dialog.save_path
             try:
                 # put save into a background thread
-                Shared.background_op("Saving, please wait...",
+                Shared.background_op(translate("recorder", "Saving, please wait..."),
                                      lambda: Analysis.DrawingRecord.save(record, save_path),
                                      self)
             except IOError as e:
-                msg = (u"Cannot save recording to {}: {}! " +
-                       u"Try with a different file name!").format(save_path, e.strerror)
-                QtGui.QMessageBox.critical(self, "Save failure", msg)
+                msg = translate("recorder",
+                                "Cannot save recording to {path}: {reason}! "
+                                "Try with a different file name!")
+                msg = msg.format(path=save_path, reason=e.strerror)
+                title = translate("recorder", "Save failure")
+                QtGui.QMessageBox.critical(self, title, msg)
             else:
                 break
 
@@ -321,6 +341,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
+        Intl.initialize("recorder")
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)

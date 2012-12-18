@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 """Various ID validation functions"""
 
-# imports
+# local modules
 import Verhoeff
+from Intl import translate
+
+# system modules
 from PyQt4 import QtGui
 
 
@@ -13,8 +16,9 @@ def validate_aid(buf):
 def validate_aid_err(buf):
     ret = validate_aid(buf)
     if not ret:
-        QtGui.QMessageBox.critical(None, "Invalid Patient ID",
-                                   "The specified patient ID is invalid")
+        title = translate("ID", "Invalid Patient ID")
+        msg = translate("ID", "The specified patient ID is invalid")
+        QtGui.QMessageBox.critical(None, title, msg)
     return ret
 
 def validate_tid(buf):
@@ -26,6 +30,7 @@ def validate_tid(buf):
 def validate_tid_err(buf):
     ret = validate_tid(buf)
     if not ret:
-        QtGui.QMessageBox.critical(None, "Invalid Tablet ID",
-                                   "The specified tablet ID is invalid")
+        title = translate("ID", "Invalid Tablet ID")
+        msg = translate("ID", "The specified tablet ID is invalid")
+        QtGui.QMessageBox.critical(None, title, msg)
     return ret

@@ -5,6 +5,8 @@
 import Shared
 import Analysis
 import Consts
+import Intl
+from Intl import translate
 
 # system modules
 import math
@@ -63,7 +65,9 @@ class MainWindow(QtGui.QMainWindow):
     def _reset_props(self):
         self._props.clear()
         self._props.setColumnCount(2)
-        self._props.setHorizontalHeaderLabels(["Property", "Value"])
+        self._props.setHorizontalHeaderLabels(
+            [translate("visualizer", "Property"),
+             translate("visualizer", "Value")])
 
 
     def _reset_scene(self):
@@ -76,36 +80,59 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def _load_props(self, record):
-        self._append_prop("Pat. ID", record.aid)
-        self._append_prop("Pat. type", record.pat_type or "N/A")
-        self._append_prop("Pat. handedness", record.pat_handedness or "N/A")
-        self._append_prop("Pat. hand", record.pat_hand or "N/A")
+        name = translate("visualizer", "Pat. ID")
+        self._append_prop(name, record.aid)
+        name = translate("visualizer", "Pat. type")
+        self._append_prop(name, record.pat_type or "N/A")
+        name = translate("visualizer", "Pat. handedness")
+        self._append_prop(name, record.pat_handedness or "N/A")
+        name = translate("visualizer", "Pat. hand")
+        self._append_prop(name, record.pat_hand or "N/A")
 
-        self._append_prop("Drawing ID", record.drawing.id)
-        self._append_prop("Drawing descr.", record.drawing.str)
+        name = translate("visualizer", "Drawing ID")
+        self._append_prop(name, record.drawing.id)
+        name = translate("visualizer", "Drawing descr.")
+        self._append_prop(name, record.drawing.str)
 
-        self._append_prop("Rec. date", record.recording.session_start)
-        self._append_prop("Rec. no.", record.extra_data['drawing_number'])
-        self._append_prop("Rec. retries", record.recording.retries)
-        self._append_prop("Rec. strokes", record.recording.strokes)
-        self._append_prop("Rec. events", len(record.recording.events))
-        self._append_prop("Rec. start", record.recording.events[0].stamp)
-        self._append_prop("Rec. length", record.recording.events[-1].stamp -
+        name = translate("visualizer", "Rec. date")
+        self._append_prop(name, record.recording.session_start)
+        name = translate("visualizer", "Rec. no.")
+        self._append_prop(name, record.extra_data['drawing_number'])
+        name = translate("visualizer", "Rec. retries")
+        self._append_prop(name, record.recording.retries)
+        name = translate("visualizer", "Rec. strokes")
+        self._append_prop(name, record.recording.strokes)
+        name = translate("visualizer", "Rec. events")
+        self._append_prop(name, len(record.recording.events))
+        name = translate("visualizer", "Rec. start")
+        self._append_prop(name, record.recording.events[0].stamp)
+        name = translate("visualizer", "Rec. length")
+        self._append_prop(name, record.recording.events[-1].stamp -
                           record.recording.events[0].stamp)
 
-        self._append_prop("Calib. tablet ID", record.calibration.tablet_id)
-        self._append_prop("Calib. date", record.calibration.stamp)
-        self._append_prop("Calib. age", record.calibration_age)
+        name = translate("visualizer", "Calib. tablet ID")
+        self._append_prop(name, record.calibration.tablet_id)
+        name = translate("visualizer", "Calib. date")
+        self._append_prop(name, record.calibration.stamp)
+        name = translate("visualizer", "Calib. age")
+        self._append_prop(name, record.calibration_age)
 
-        self._append_prop("Screen width", int(record.recording.rect_size[0]))
-        self._append_prop("Screen height", int(record.recording.rect_size[1]))
+        name = translate("visualizer", "Screen width")
+        self._append_prop(name, int(record.recording.rect_size[0]))
+        name = translate("visualizer", "Screen height")
+        self._append_prop(name, int(record.recording.rect_size[1]))
 
-        self._append_prop("Software version", record.extra_data['version'])
-        self._append_prop("Format version", record.extra_data['format'])
+        name = translate("visualizer", "Software version")
+        self._append_prop(name, record.extra_data['version'])
+        name = translate("visualizer", "Format version")
+        self._append_prop(name, record.extra_data['format'])
 
-        self._append_prop("Inst. UUID", record.extra_data['installation_uuid'])
-        self._append_prop("Inst. date", record.extra_data['installation_stamp'])
-        self._append_prop("Inst. recordings", record.extra_data['total_recordings'])
+        name = translate("visualizer", "Inst. UUID")
+        self._append_prop(name, record.extra_data['installation_uuid'])
+        name = translate("visualizer", "Inst. date")
+        self._append_prop(name, record.extra_data['installation_stamp'])
+        name = translate("visualizer", "Inst. recordings")
+        self._append_prop(name, record.extra_data['total_recordings'])
 
         self._ui.comments.setPlainText(record.comments)
 
@@ -276,11 +303,15 @@ class MainWindow(QtGui.QMainWindow):
     def load(self, path):
         try:
             # perform the loading in background thread
-            record = Shared.background_op("Loading, please wait...",
-                                          lambda: Analysis.DrawingRecord.load(path))
+            record = Shared.background_op(
+                translate("visualizer", "Loading, please wait..."),
+                lambda: Analysis.DrawingRecord.load(path))
         except Exception as e:
-            msg = u"Cannot load recording {}: {}".format(path, e)
-            QtGui.QMessageBox.critical(self, "Load failure", msg)
+            msg = translate("visualizer",
+                            "Cannot load recording {path}: {reason}")
+            msg = msg.format(path=path, reason=e)
+            title = translate("visualizer", "Load failure")
+            QtGui.QMessageBox.critical(self, title, msg)
             return
 
         # only update the view on success
@@ -288,18 +319,19 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_load(self, ev):
-        path = QtGui.QFileDialog.getOpenFileName(self, "Load recording",
-                                                 QtCore.QString(),
-                                                 "Recordings (*.yaml.gz)");
+        title = translate("visualizer", "Load recording")
+        ext_name = translate("visualizer", "Recordings")
+        path = QtGui.QFileDialog.getOpenFileName(
+            self, title, QtCore.QString(), ext_name + " (*.yaml.gz)")
         if path:
             self.load(unicode(path))
 
 
     def on_info(self, ev):
-        QtGui.QMessageBox.about(self, "About DrawingVisualizer",
-                                "{} {} {}".format(Consts.APP_ORG,
-                                                  Consts.APP_NAME,
-                                                  Consts.APP_VERSION))
+        ver = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
+        title = translate("visualizer", "About DrawingVisualizer")
+        QtGui.QMessageBox.about(self, title, ver)
+
 
     def _redraw_scene(self):
         if self.record:
@@ -332,7 +364,9 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
+        Intl.initialize("visualizer")
 
+        # initialize
         self.main_window = MainWindow()
         self.main_window.show()
 

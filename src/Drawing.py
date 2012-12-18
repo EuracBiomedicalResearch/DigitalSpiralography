@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """Drawing modules"""
 
-# imports
+# local modules
+from Intl import translate
+
+# system modules
 import math
 from PyQt4 import QtGui, QtCore
 
@@ -65,7 +68,7 @@ class Spiral(Drawing):
         # check for straightness
         a = math.atan2(dx1, dx0)
         if abs(a) > math.pi / 16:
-            return None, "excessive rotation"
+            return None, translate("drawing", "excessive rotation")
 
         # check for excessive deformations (the calibration points should have the same ratio,
         # but we need some breathing space for the different x/y DPI ratios of the device)
@@ -73,7 +76,7 @@ class Spiral(Drawing):
               math.hypot(self.cpoints[self._cpoint_maxy][0], self.cpoints[self._cpoint_maxy][1]))
         pr_ = math.hypot(dx0, dx1) / math.hypot(dy0, dy1)
         if abs(pr - pr_) > 0.25:
-            return None, "excessive deformation"
+            return None, translate("drawing", "excessive deformation")
 
         # calibrate by calculating a simple affine matrix
         src = QtGui.QPolygonF()
@@ -97,7 +100,7 @@ class Spiral(Drawing):
                                   self.cpoints[self._cpoint_maxx][1]))
 
         if not QtGui.QTransform.quadToQuad(src, dst, transform):
-            return None, "cannot remap coordinates"
+            return None, translate("drawing", "cannot remap coordinates")
 
         return transform, None
 
