@@ -96,6 +96,11 @@ To see how codes should be constructed, see `Coding of IDs`_.
 Version changes
 ~~~~~~~~~~~~~~~
 
+1.2:
+
+* An exception caused by empty recordings was fixed.
+* Internationalization of the Recorder/Visualizer interface.
+
 1.1:
 
 * Locale issues under Windows were fixed (notably, DrawingRecorder would refuse
