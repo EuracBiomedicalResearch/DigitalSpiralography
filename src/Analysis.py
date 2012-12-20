@@ -13,7 +13,19 @@ import gzip
 from PyQt4 import QtCore
 
 
-# implementation
+# types
+class PatType:
+    case, control = range(2)
+
+
+class PatHandedness:
+    left, right, ambidextrous = range(3)
+
+
+class PatHand:
+    left, right = range(2)
+
+
 class CalibrationData:
     def __init__(self, tablet_id, cpoints, stamp=None):
         self.tablet_id = tablet_id
@@ -56,6 +68,50 @@ class RecordingData:
 
 
 
+# helpers
+def _from_type(type_map, value):
+    if value in type_map:
+        return type_map[value]
+    return value
+
+
+def _to_type(type_map, value):
+    for k, v in type_map.iteritems():
+        if value == v:
+            return k
+    return value
+
+
+# File format event/code maps
+EVENT_MAP = {QtCore.QEvent.TabletMove: 'move',
+             QtCore.QEvent.TabletPress: 'press',
+             QtCore.QEvent.TabletRelease: 'release',
+             QtCore.QEvent.TabletEnterProximity: 'enter',
+             QtCore.QEvent.TabletLeaveProximity: 'leave'}
+
+PAT_TYPE = {PatType.case: 'Case',
+            PatType.control: 'Control'}
+
+PAT_TYPE_DSC = {PatType.case: translate('types', 'Case'),
+                PatType.control: translate('types', 'Control')}
+
+PAT_HANDEDNESS = {PatHandedness.left: 'Left-handed',
+                  PatHandedness.right: 'Right-handed',
+                  PatHandedness.ambidextrous: 'Ambidextrous'}
+
+PAT_HANDEDNESS_DSC = {PatHandedness.left: translate('types', 'Left-handed'),
+                      PatHandedness.right: translate('types', 'Right-handed'),
+                      PatHandedness.ambidextrous: translate('types', 'Ambidextrous')}
+
+PAT_HAND = {PatHand.left: 'Left',
+            PatHand.right: 'Right'}
+
+PAT_HAND_DSC = {PatHand.left: translate('types', 'Left'),
+                PatHand.right: translate('types', 'Right')}
+
+
+
+# implementation
 class DrawingRecord:
     def __init__(self, aid, drawing, calibration, calibration_age,
                  recording, pat_type, pat_handedness, pat_hand,
@@ -101,7 +157,7 @@ class DrawingRecord:
         events = []
         for event in record.recording.events:
             buf = {'stamp': event.stamp,
-                   'type': Consts.EVENT_MAP.get(event.typ, event.typ),
+                   'type': _from_type(EVENT_MAP, event.typ),
                    'cdraw': list(event.coords_drawing),
                    'ctrans': list(event.coords_trans),
                    'press': event.pressure,
@@ -132,9 +188,9 @@ class DrawingRecord:
                     "retries": record.recording.retries,
                     "strokes": record.recording.strokes},
                 "extra_data": record.extra_data,
-                "pat_type": record.pat_type,
-                "pat_handedness": record.pat_handedness,
-                "pat_hand": record.pat_hand,
+                "pat_type": _from_type(PAT_TYPE, record.pat_type),
+                "pat_handedness": _from_type(PAT_HANDEDNESS, record.pat_handedness),
+                "pat_hand": _from_type(PAT_HAND, record.pat_hand),
                 "comments": record.comments}
 
         # avoid saving unicode in the FNAME header
@@ -184,7 +240,7 @@ class DrawingRecord:
                 tilt_trans = tuple(tilt_trans)
 
             # everything else
-            events.append(RecordingEvent(Consts.REV_EVENT_MAP.get(event['type'], event['type']),
+            events.append(RecordingEvent(_to_type(EVENT_MAP, event['type']),
                                          tuple(event['cdraw']), tuple(event['ctrans']),
                                          event['press'], tilt_drawing, tilt_trans, event['stamp']))
 
@@ -200,5 +256,7 @@ class DrawingRecord:
         # final object
         return DrawingRecord(data['aid'], drawing, calibration,
                              data['calibration_age'], recording,
-                             data['pat_type'], data['pat_handedness'],
-                             data['pat_hand'], extra_data, data['comments'])
+                             _to_type(PAT_TYPE, data['pat_type']),
+                             _to_type(PAT_HANDEDNESS, data['pat_handedness']),
+                             _to_type(PAT_HAND, data['pat_hand']),
+                             extra_data, data['comments'])

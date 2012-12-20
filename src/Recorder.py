@@ -19,6 +19,18 @@ import threading
 from PyQt4 import QtCore, QtGui, uic
 
 
+# helpers
+def _from_type(cb, type_map_dsc):
+    cb.clear()
+    cb.addItem(translate("types", "N/A"))
+    for k, v in type_map_dsc.iteritems():
+        cb.addItem(v, k)
+
+
+def _to_type(cb):
+    return cb.itemData(cb.currentIndex()).toPyObject()
+
+
 # implementation
 class Params:
     def __init__(self, save_path, total_recordings,
@@ -94,6 +106,10 @@ class EndRecording(QtGui.QDialog):
         self._ui.setupUi(self)
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
 
+        _from_type(self._ui.pat_type, Analysis.PAT_TYPE_DSC)
+        _from_type(self._ui.pat_handedness, Analysis.PAT_HANDEDNESS_DSC)
+        _from_type(self._ui.pat_hand, Analysis.PAT_HAND_DSC)
+
         self._file_browser = QtGui.QFileDialog(self)
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
         self._file_browser.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
@@ -161,12 +177,11 @@ class EndRecording(QtGui.QDialog):
 
     def accept(self):
         self.aid = str(self._ui.patient_id.text())
-        self.pat_type = str(self._ui.pat_type.currentText()) \
-          if self._ui.pat_type.currentIndex() else None
-        self.pat_handedness = str(self._ui.pat_handedness.currentText()) \
-          if self._ui.pat_handedness.currentIndex() else None
-        self.pat_hand = str(self._ui.pat_hand.currentText()) \
-          if self._ui.pat_hand.currentIndex() else None
+
+        self.pat_type = _to_type(self._ui.pat_type)
+        self.pat_handedness = _to_type(self._ui.pat_handedness)
+        self.pat_hand = _to_type(self._ui.pat_hand)
+
         self.comments = unicode(self._ui.comments.toPlainText())
         self.save_path = unicode(self._ui.save_path.text())
 

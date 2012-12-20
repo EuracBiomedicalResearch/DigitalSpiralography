@@ -79,15 +79,24 @@ class MainWindow(QtGui.QMainWindow):
                                QtGui.QStandardItem(unicode(value))])
 
 
+    def _append_prop_map(self, name, type_map, value):
+        if value is None:
+            self._append_prop(name, translate("types", "N/A"))
+        elif value in type_map:
+            self._append_prop(name, type_map[value])
+        else:
+            self._append_prop(name, value)
+
+
     def _load_props(self, record):
         name = translate("visualizer", "Pat. ID")
         self._append_prop(name, record.aid)
         name = translate("visualizer", "Pat. type")
-        self._append_prop(name, record.pat_type or "N/A")
+        self._append_prop_map(name, Analysis.PAT_TYPE_DSC, record.pat_type)
         name = translate("visualizer", "Pat. handedness")
-        self._append_prop(name, record.pat_handedness or "N/A")
+        self._append_prop_map(name, Analysis.PAT_HANDEDNESS_DSC, record.pat_handedness)
         name = translate("visualizer", "Pat. hand")
-        self._append_prop(name, record.pat_hand or "N/A")
+        self._append_prop_map(name, Analysis.PAT_HAND_DSC, record.pat_hand)
 
         name = translate("visualizer", "Drawing ID")
         self._append_prop(name, record.drawing.id)
