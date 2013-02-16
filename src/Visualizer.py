@@ -83,7 +83,7 @@ class MainWindow(QtGui.QMainWindow):
         if value is None:
             self._append_prop(name, translate("types", "N/A"))
         elif value in type_map:
-            self._append_prop(name, type_map[value])
+            self._append_prop(name, translate("types", type_map[value]))
         else:
             self._append_prop(name, value)
 

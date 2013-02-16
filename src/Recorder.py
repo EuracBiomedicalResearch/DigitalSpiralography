@@ -106,9 +106,9 @@ class EndRecording(QtGui.QDialog):
         self._ui.setupUi(self)
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
 
-        _from_type(self._ui.pat_type, Analysis.PAT_TYPE)
-        _from_type(self._ui.pat_handedness, Analysis.PAT_HANDEDNESS)
-        _from_type(self._ui.pat_hand, Analysis.PAT_HAND)
+        _from_type(self._ui.pat_type, Analysis.PAT_TYPE_DSC)
+        _from_type(self._ui.pat_handedness, Analysis.PAT_HANDEDNESS_DSC)
+        _from_type(self._ui.pat_hand, Analysis.PAT_HAND_DSC)
 
         self._file_browser = QtGui.QFileDialog(self)
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
