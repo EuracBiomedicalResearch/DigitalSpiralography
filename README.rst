@@ -93,6 +93,25 @@ Codes that can be used for testing:
 To see how codes should be constructed, see `Coding of IDs`_.
 
 
+Troubleshooting
+~~~~~~~~~~~~~~~
+
+* Windows 7/Wacom Intuos: During calibration, when pressing the pen onto the
+  tablet, the point never fills red:
+
+  The tablet might not be working correctly, or might not yet be ready. It
+  seems that the Wacom drivers require up to 60 seconds after login to work.
+  You can verify this problem by going to the control panel and clicking on the
+  Wacom preferences link just after logging in (an error message will appear
+  mentioning that there are no Wacom tablets connected).
+
+  Wait at least 60 seconds after login before starting the Recorder
+  application. Quit and restart the Recorder if necessary.
+
+  If the Recorder still fails to recognize any pressure on the tablet, check in
+  the Wacom preferences that the pen is working correctly.
+
+
 Version changes
 ~~~~~~~~~~~~~~~
 
