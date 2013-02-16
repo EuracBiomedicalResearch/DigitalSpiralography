@@ -396,6 +396,7 @@ Future improvements
   of human-rated scores.
 * Record the actual tablet serial/details in the file instead of relying on the
   user scanning a barcode.
+* Add a pressure indicator during the calibration.
 * Pressure has currently no reference value. Introducing pressure calibration
   would allow us to compare pressure among different tablets.
 

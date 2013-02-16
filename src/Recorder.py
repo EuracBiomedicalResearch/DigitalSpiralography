@@ -20,11 +20,11 @@ from PyQt4 import QtCore, QtGui, uic
 
 
 # helpers
-def _from_type(cb, type_map_dsc):
+def _from_type(cb, type_map):
     cb.clear()
     cb.addItem(translate("types", "N/A"))
-    for k, v in type_map_dsc.iteritems():
-        cb.addItem(v, k)
+    for k, v in type_map.iteritems():
+        cb.addItem(translate("types", v), k)
 
 
 def _to_type(cb):
@@ -106,9 +106,9 @@ class EndRecording(QtGui.QDialog):
         self._ui.setupUi(self)
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
 
-        _from_type(self._ui.pat_type, Analysis.PAT_TYPE_DSC)
-        _from_type(self._ui.pat_handedness, Analysis.PAT_HANDEDNESS_DSC)
-        _from_type(self._ui.pat_hand, Analysis.PAT_HAND_DSC)
+        _from_type(self._ui.pat_type, Analysis.PAT_TYPE)
+        _from_type(self._ui.pat_handedness, Analysis.PAT_HANDEDNESS)
+        _from_type(self._ui.pat_hand, Analysis.PAT_HAND)
 
         self._file_browser = QtGui.QFileDialog(self)
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
