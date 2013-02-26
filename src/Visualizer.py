@@ -49,7 +49,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # scene
         self._scene = QtGui.QGraphicsScene()
-        self._scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.black))
+        self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
         self._ui.view.setScene(self._scene)
 
         self.record = None

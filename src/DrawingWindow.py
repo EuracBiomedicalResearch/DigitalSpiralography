@@ -190,7 +190,7 @@ class RecordingHandler(Handler):
 
     def restart(self):
         self.dw.recording.clear()
-        self.buffer.fill(QtCore.Qt.black)
+        self.buffer.fill(Consts.FILL_COLOR)
         self.update_buffer()
         self.dw._set_bt_text(translate("rec", "Waiting for events..."))
 
@@ -284,7 +284,7 @@ class DrawingWindow(QtGui.QMainWindow):
 
         # scene setup
         self._scene = QtGui.QGraphicsScene()
-        self._scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.black))
+        self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
         self._view = QtGui.QGraphicsView(self._scene)
         self._view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
         self._view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
