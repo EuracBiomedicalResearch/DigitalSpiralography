@@ -273,7 +273,6 @@ class RecordingHandler(Handler):
 
     def terminate(self):
         self.painter = None
-        self.buffer = None
         self.dw._scene.removeItem(self.item)
 
 

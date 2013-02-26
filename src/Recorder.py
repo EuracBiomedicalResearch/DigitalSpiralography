@@ -117,8 +117,12 @@ class EndRecording(QtGui.QDialog):
         ext_name = translate("recorder", "Recordings")
         self._file_browser.setFilter(ext_name + " (*.yaml.gz)")
 
+        pal = self._ui.preview.palette()
+        pal.setColor(self._ui.preview.backgroundRole(), Consts.FILL_COLOR)
+        self._ui.preview.setPalette(pal)
 
-    def reset(self, save_path, record):
+
+    def reset(self, save_path, record, preview):
         self.aid = record.aid
         self._ui.patient_id.setText(self.aid)
 
@@ -155,6 +159,10 @@ class EndRecording(QtGui.QDialog):
         self.comments = None
         self._ui.comments.clear()
         self._ui.comments.setFocus()
+
+        size = self._ui.preview.size()
+        preview = preview.scaled(size, QtCore.Qt.KeepAspectRatio)
+        self._ui.preview.setPixmap(preview)
 
 
     def on_save_path(self):
@@ -310,6 +318,7 @@ class MainWindow(QtGui.QMainWindow):
         self.drawing_number += 1
         self.calibration_age += 1
         self.params.total_recordings += 1
+        preview = self._drawing_window.handler.buffer
 
         extra_data = {"drawing_number": self.drawing_number,
                       "total_recordings": self.params.total_recordings,
@@ -330,7 +339,7 @@ class MainWindow(QtGui.QMainWindow):
         save_path = os.path.join(self.params.save_path, save_path)
 
         # keep trying until save is either aborted or succeeds
-        self._end_recording_dialog.reset(save_path, record)
+        self._end_recording_dialog.reset(save_path, record, preview)
         while self._end_recording_dialog.exec_():
             record.aid = self._end_recording_dialog.aid
             record.pat_type = self._end_recording_dialog.pat_type

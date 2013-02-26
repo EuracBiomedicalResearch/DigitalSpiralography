@@ -121,6 +121,7 @@ Version changes
 * Internationalization of the Recorder/Visualizer interface.
 * Add a new checkbox "Blood drawn on drawing arm" after finishing the recording
   and in the recorded data to reflect our new workflow.
+* An image of the spiral is now shown after performing a recording.
 
 1.1:
 
