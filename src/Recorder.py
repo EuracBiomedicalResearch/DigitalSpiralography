@@ -151,6 +151,7 @@ class EndRecording(QtGui.QDialog):
         self.pat_hand = None
         self._ui.pat_hand.setCurrentIndex(0)
 
+        self._ui.blood_drawn.setChecked(False)
         self.comments = None
         self._ui.comments.clear()
         self._ui.comments.setFocus()
@@ -182,6 +183,7 @@ class EndRecording(QtGui.QDialog):
         self.pat_handedness = _to_type(self._ui.pat_handedness)
         self.pat_hand = _to_type(self._ui.pat_hand)
 
+        self.blood_drawn = self._ui.blood_drawn.isChecked()
         self.comments = unicode(self._ui.comments.toPlainText())
         self.save_path = unicode(self._ui.save_path.text())
 
@@ -334,6 +336,7 @@ class MainWindow(QtGui.QMainWindow):
             record.pat_type = self._end_recording_dialog.pat_type
             record.pat_handedness = self._end_recording_dialog.pat_handedness
             record.pat_hand = self._end_recording_dialog.pat_hand
+            record.extra_data['blood_drawn'] = self._end_recording_dialog.blood_drawn
             record.comments = self._end_recording_dialog.comments
             save_path = self._end_recording_dialog.save_path
             try:

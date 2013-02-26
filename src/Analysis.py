@@ -109,6 +109,8 @@ PAT_HAND = {PatHand.left: 'Left',
 PAT_HAND_DSC = {PatHand.left: translate('types', 'Left'),
                 PatHand.right: translate('types', 'Right')}
 
+BOOL_MAP_DSC = {True: translate('types', 'Yes'),
+                False: translate('types', 'No')}
 
 
 # implementation

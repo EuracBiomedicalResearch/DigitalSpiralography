@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS><TS version="2.0" language="de" sourcelanguage="">
+<!DOCTYPE TS>
+<TS version="2.0" language="de">
 <context>
     <name>EndRecordingDialog</name>
     <message>
@@ -38,34 +39,44 @@
         <translation>Warnugen:</translation>
     </message>
     <message>
-        <location filename="ui/endrecording.ui" line="120"/>
+        <location filename="ui/endrecording.ui" line="150"/>
         <source>Comments:</source>
         <translation>Kommentare:</translation>
     </message>
     <message>
-        <location filename="ui/endrecording.ui" line="155"/>
+        <location filename="ui/endrecording.ui" line="185"/>
         <source>Discard recording</source>
         <translation>Aufnahme verwerfen</translation>
     </message>
     <message>
-        <location filename="ui/endrecording.ui" line="165"/>
+        <location filename="ui/endrecording.ui" line="195"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="ui/endrecording.ui" line="180"/>
+        <location filename="ui/endrecording.ui" line="120"/>
         <source>Patient type:</source>
         <translation>Patiententyp:</translation>
     </message>
     <message>
-        <location filename="ui/endrecording.ui" line="187"/>
+        <location filename="ui/endrecording.ui" line="140"/>
         <source>Drawing hand:</source>
         <translation>Aufnahme Hand:</translation>
     </message>
     <message>
-        <location filename="ui/endrecording.ui" line="200"/>
+        <location filename="ui/endrecording.ui" line="130"/>
         <source>Handedness:</source>
         <translation>Händigkeit:</translation>
+    </message>
+    <message>
+        <location filename="ui/endrecording.ui" line="210"/>
+        <source>General:</source>
+        <translation>Allgemein:</translation>
+    </message>
+    <message>
+        <location filename="ui/endrecording.ui" line="217"/>
+        <source>Blood drawn on drawing arm</source>
+        <translation>Blutabnahme an Zeichenhand</translation>
     </message>
 </context>
 <context>
@@ -135,27 +146,27 @@
 <context>
     <name>analysis</name>
     <message>
-        <location filename="src/Analysis.py" line="135"/>
+        <location filename="src/Analysis.py" line="137"/>
         <source>Multiple strokes</source>
         <translation>Mehrere Linien</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="144"/>
+        <location filename="src/Analysis.py" line="146"/>
         <source>Short recording</source>
         <translation>Kurze Aufnahme</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="149"/>
+        <location filename="src/Analysis.py" line="151"/>
         <source>Old calibration data</source>
         <translation>Kalibration veraltet</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="213"/>
+        <location filename="src/Analysis.py" line="215"/>
         <source>Invalid or unsupported file format</source>
         <translation>Ungültiges oder nicht unterstütztes Dateiformat</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="138"/>
+        <location filename="src/Analysis.py" line="140"/>
         <source>No data!</source>
         <translation>Keine Daten!</translation>
     </message>
@@ -322,47 +333,47 @@ Länge: {length}</translation>
         <translation>Aufnahmen</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="169"/>
+        <location filename="src/Recorder.py" line="170"/>
         <source>Discard recording</source>
         <translation>Aufnahme verwerfen</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="170"/>
+        <location filename="src/Recorder.py" line="171"/>
         <source>Are you sure you want to discard the acquired drawing?</source>
         <translation>Sind Sie sicher, dass Sie die Aufnahme verwerfen möchten?</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="171"/>
+        <location filename="src/Recorder.py" line="172"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="171"/>
+        <location filename="src/Recorder.py" line="172"/>
         <source>Yes, discard</source>
         <translation>Ja, verwerfen</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="349"/>
+        <location filename="src/Recorder.py" line="356"/>
         <source>Save failure</source>
         <translation>Speichern fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="249"/>
+        <location filename="src/Recorder.py" line="251"/>
         <source>About DrawingRecorder</source>
         <translation>Über DrawingRecorder</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="341"/>
+        <location filename="src/Recorder.py" line="348"/>
         <source>Saving, please wait...</source>
         <translation>Speichern, bitte warten...</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="195"/>
+        <location filename="src/Recorder.py" line="197"/>
         <source>The file {path} already exists. Try with a different file name!</source>
         <translation>Die Datei {path} existiert bereits. Geben Sie einen anderen Dateinamen an!</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="251"/>
+        <location filename="src/Recorder.py" line="253"/>
         <source>Total recordings: {total}
 Inst. UUID: {uuid}
 Inst. Date: {date}</source>
@@ -371,7 +382,7 @@ Inst. UUID: {uuid}
 Inst. Datum: {date}</translation>
     </message>
     <message>
-        <location filename="src/Recorder.py" line="345"/>
+        <location filename="src/Recorder.py" line="352"/>
         <source>Cannot save recording to {path}: {reason}! Try with a different file name!</source>
         <translation>Kann Aufnahme nicht in {path} abspeichern: {reason}. Geben Sie einen anderen Dateinamen an!</translation>
     </message>
@@ -417,6 +428,16 @@ Inst. Datum: {date}</translation>
         <location filename="src/Recorder.py" line="25"/>
         <source>N/A</source>
         <translation>k.A.</translation>
+    </message>
+    <message>
+        <location filename="src/Analysis.py" line="112"/>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <location filename="src/Analysis.py" line="113"/>
+        <source>No</source>
+        <translation>Nein</translation>
     </message>
 </context>
 </TS>

@@ -119,6 +119,8 @@ Version changes
 
 * An exception caused by empty recordings was fixed.
 * Internationalization of the Recorder/Visualizer interface.
+* Add a new checkbox "Blood drawn on drawing arm" after finishing the recording
+  and in the recorded data to reflect our new workflow.
 
 1.1:
 
@@ -317,9 +319,14 @@ Chunks introduced with format 1.1:
 
 * ``recording/events``:
 
-  + ``tdraw``: *uncorrected* x/y tilt information expressed in +/- 0-60 degrees
-    for each axis.
-  + ``ttrans``: rotation-adjusted x/y tilt information
+  + ``tdraw`` (optional): *uncorrected* x/y tilt information expressed in +/-
+    0-60 degrees for each axis.
+  + ``ttrans`` (optional): rotation-adjusted x/y tilt information
+
+* ``extra_data``:
+
+  + ``blood_drawn`` (optional): reflects the new "Blood drawn on drawing arm"
+    introduced in DrawingRecorder 1.2.
 
 
 Coordinate projection types
