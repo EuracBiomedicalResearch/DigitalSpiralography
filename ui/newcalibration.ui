@@ -93,6 +93,9 @@
  </widget>
  <tabstops>
   <tabstop>tablet_id</tabstop>
+  <tabstop>drawing_id</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>

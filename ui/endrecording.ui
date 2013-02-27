@@ -249,9 +249,13 @@
   <tabstop>patient_id</tabstop>
   <tabstop>save_path</tabstop>
   <tabstop>save_path_btn</tabstop>
+  <tabstop>pat_type</tabstop>
+  <tabstop>pat_handedness</tabstop>
+  <tabstop>pat_hand</tabstop>
+  <tabstop>blood_drawn</tabstop>
   <tabstop>comments</tabstop>
-  <tabstop>pushButton</tabstop>
   <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
