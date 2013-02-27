@@ -75,14 +75,18 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def _append_prop(self, name, value):
-        self._props.appendRow([QtGui.QStandardItem(unicode(name)),
-                               QtGui.QStandardItem(unicode(value))])
+        name = unicode(name)
+        if value is not None:
+            value = unicode(value)
+        else:
+            value = translate("types", "N/A")
+
+        self._props.appendRow([QtGui.QStandardItem(name),
+                               QtGui.QStandardItem(value)])
 
 
     def _append_prop_map(self, name, type_map, value):
-        if value is None:
-            self._append_prop(name, translate("types", "N/A"))
-        elif value in type_map:
+        if value in type_map:
             self._append_prop(name, translate("types", type_map[value]))
         else:
             self._append_prop(name, value)
@@ -98,6 +102,8 @@ class MainWindow(QtGui.QMainWindow):
         name = translate("visualizer", "Pat. hand")
         self._append_prop_map(name, Analysis.PAT_HAND_DSC, record.pat_hand)
 
+        name = translate("visualizer", "Operator")
+        self._append_prop(name, record.extra_data.get('operator'))
         name = translate("visualizer", "Blood drawn")
         self._append_prop_map(name, Analysis.BOOL_MAP_DSC,
                               record.extra_data.get('blood_drawn'))

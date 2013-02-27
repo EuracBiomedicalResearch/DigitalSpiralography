@@ -110,7 +110,7 @@
 <context>
     <name>types</name>
     <message>
-        <location filename="src/Visualizer.py" line="84"/>
+        <location filename="src/Visualizer.py" line="82"/>
         <source>N/A</source>
         <translation>k.A.</translation>
     </message>
@@ -173,154 +173,159 @@
         <translation>Wert</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="92"/>
+        <location filename="src/Visualizer.py" line="96"/>
         <source>Pat. ID</source>
         <translation>Pat. ID</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="94"/>
+        <location filename="src/Visualizer.py" line="98"/>
         <source>Pat. type</source>
         <translation>Pat. Typ</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="96"/>
+        <location filename="src/Visualizer.py" line="100"/>
         <source>Pat. handedness</source>
         <translation>Pat. Händigkeit</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="98"/>
+        <location filename="src/Visualizer.py" line="102"/>
         <source>Pat. hand</source>
         <translation>Pat. Hand</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="105"/>
+        <location filename="src/Visualizer.py" line="111"/>
         <source>Drawing ID</source>
         <translation>Aufbahme ID</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="107"/>
+        <location filename="src/Visualizer.py" line="113"/>
         <source>Drawing descr.</source>
         <translation>Aufnahme Besch.</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="110"/>
+        <location filename="src/Visualizer.py" line="116"/>
         <source>Rec. date</source>
         <translation>Aufnahmedatum</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="112"/>
+        <location filename="src/Visualizer.py" line="118"/>
         <source>Rec. no.</source>
         <translation>Aufnahmenr.</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="114"/>
+        <location filename="src/Visualizer.py" line="120"/>
         <source>Rec. retries</source>
         <translation>Aufnahme Wiederholungen</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="116"/>
+        <location filename="src/Visualizer.py" line="122"/>
         <source>Rec. strokes</source>
         <translation>Aufnahme Linien</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="118"/>
+        <location filename="src/Visualizer.py" line="124"/>
         <source>Rec. events</source>
         <translation>Aufnahme Ereignisse</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="120"/>
+        <location filename="src/Visualizer.py" line="126"/>
         <source>Rec. start</source>
         <translation>Aufnahme Start</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="122"/>
+        <location filename="src/Visualizer.py" line="128"/>
         <source>Rec. length</source>
         <translation>Aufnahme Länge</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="126"/>
+        <location filename="src/Visualizer.py" line="132"/>
         <source>Calib. tablet ID</source>
         <translation>Kalib. Tablet ID</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="128"/>
+        <location filename="src/Visualizer.py" line="134"/>
         <source>Calib. date</source>
         <translation>Kalib. Datum</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="130"/>
+        <location filename="src/Visualizer.py" line="136"/>
         <source>Calib. age</source>
         <translation>Kalib. Nutzungsdauer</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="133"/>
+        <location filename="src/Visualizer.py" line="139"/>
         <source>Screen width</source>
         <translation>Bildschirmbreite</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="135"/>
+        <location filename="src/Visualizer.py" line="141"/>
         <source>Screen height</source>
         <translation>Bildschirmhöhe</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="138"/>
+        <location filename="src/Visualizer.py" line="144"/>
         <source>Software version</source>
         <translation>Softwareversion</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="140"/>
+        <location filename="src/Visualizer.py" line="146"/>
         <source>Format version</source>
         <translation>Formatversion</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="143"/>
+        <location filename="src/Visualizer.py" line="149"/>
         <source>Inst. UUID</source>
         <translation>Inst. UUID</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="145"/>
+        <location filename="src/Visualizer.py" line="151"/>
         <source>Inst. date</source>
         <translation>Inst. Datum</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="147"/>
+        <location filename="src/Visualizer.py" line="153"/>
         <source>Inst. recordings</source>
         <translation>Inst. Aufnahmen</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="319"/>
+        <location filename="src/Visualizer.py" line="325"/>
         <source>Loading, please wait...</source>
         <translation>Ladevorgang, bitte warten...</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="326"/>
+        <location filename="src/Visualizer.py" line="332"/>
         <source>Load failure</source>
         <translation>Fehler beim Laden</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="335"/>
+        <location filename="src/Visualizer.py" line="341"/>
         <source>Load recording</source>
         <translation>Lade Aufnahme</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="336"/>
+        <location filename="src/Visualizer.py" line="342"/>
         <source>Recordings</source>
         <translation>Aufnahmen</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="345"/>
+        <location filename="src/Visualizer.py" line="351"/>
         <source>About DrawingVisualizer</source>
         <translation>Über DrawingVisualizer</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="323"/>
+        <location filename="src/Visualizer.py" line="329"/>
         <source>Cannot load recording {path}: {reason}</source>
         <translation>Kann Aufnahme nicht laden {path}: {reason}</translation>
     </message>
     <message>
-        <location filename="src/Visualizer.py" line="101"/>
+        <location filename="src/Visualizer.py" line="107"/>
         <source>Blood drawn</source>
         <translation>Blutabnahme</translation>
+    </message>
+    <message>
+        <location filename="src/Visualizer.py" line="105"/>
+        <source>Operator</source>
+        <translation>Betreiber</translation>
     </message>
 </context>
 </TS>

@@ -122,6 +122,7 @@ Version changes
 * Add a new checkbox "Blood drawn on drawing arm" after finishing the recording
   and in the recorded data to reflect our new workflow.
 * An image of the spiral is now shown after performing a recording.
+* The name/id of the operator is now requested for each recording.
 
 1.1:
 
@@ -328,6 +329,9 @@ Chunks introduced with format 1.1:
 
   + ``blood_drawn`` (optional): reflects the new "Blood drawn on drawing arm"
     introduced in DrawingRecorder 1.2.
+
+  + ``operator`` (optional): the name of the operator assisting during the
+    recording (introduced in 1.2).
 
 
 Coordinate projection types

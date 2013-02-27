@@ -86,12 +86,23 @@ class NewRecording(QtGui.QDialog):
 
     def reset(self):
         self.aid = None
+        self._ui.operator_id.clear()
         self._ui.patient_id.clear()
-        self._ui.patient_id.setFocus()
+        self._ui.operator_id.setFocus()
 
 
     def accept(self):
+        self.oid = str(self._ui.operator_id.text())
         self.aid = str(self._ui.patient_id.text())
+
+        # validate the operator
+        if not self.oid:
+            title = translate("recorder", "Invalid operator")
+            msg = translate("recorder", "The specified operator is invalid")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return self.reset()
+
+        # validate the AID
         if not ID.validate_aid_err(self.aid):
             return self.reset()
         self.done(QtGui.QDialog.Accepted)
@@ -320,7 +331,8 @@ class MainWindow(QtGui.QMainWindow):
         self.params.total_recordings += 1
         preview = self._drawing_window.handler.buffer
 
-        extra_data = {"drawing_number": self.drawing_number,
+        extra_data = {"operator": self._new_recording_dialog.oid,
+                      "drawing_number": self.drawing_number,
                       "total_recordings": self.params.total_recordings,
                       "installation_uuid": self.params.installation_uuid,
                       "installation_stamp": self.params.installation_stamp}
