@@ -67,7 +67,7 @@ def recordStats(record):
 
     return {"PAT_ID": record.aid,
             "PAT_TYPE": remap(Analysis.PAT_TYPE, record.pat_type),
-            "PAT_HANDEDNESS": remap(Analysis.PAT_HANDEDNESS, record.pat_hand),
+            "PAT_HANDEDNESS": remap(Analysis.PAT_HANDEDNESS, record.pat_handedness),
             "PAT_HAND": remap(Analysis.PAT_HAND, record.pat_hand),
             "OPERATOR": record.extra_data.get('operator'),
             "BLOOD_DRAWN": record.extra_data.get('blood_drawn'),
