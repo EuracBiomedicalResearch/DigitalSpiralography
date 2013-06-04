@@ -7,11 +7,15 @@ from __future__ import print_function
 # local modules
 import Analysis
 
+# Qt
+from PyQt4 import QtCore
+
 # system modules
 import time
 import sys
 import codecs
 import argparse
+import math
 
 
 def remap(vmap, value):
@@ -24,7 +28,43 @@ def dtts(dt):
     return int(time.mktime(dt.timetuple()))
 
 
+def spiralLength(record):
+    total_len = 0
+    total_secs = 0
+
+    # track drawing status to recover actual tracing length/time
+    old_pos = None
+    old_stamp = None
+    drawing = False
+    for event in record.recording.events:
+        stamp = event.stamp
+        pos = event.coords_drawing
+
+        # set drawing status
+        if event.typ == QtCore.QEvent.TabletPress:
+            drawing = True
+        elif event.typ == QtCore.QEvent.TabletRelease:
+            drawing = False
+        elif event.typ == QtCore.QEvent.TabletEnterProximity or \
+          event.typ == QtCore.QEvent.TabletLeaveProximity:
+            drawing = False
+            pos = None
+
+        if old_pos:
+            if drawing:
+                total_len += math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
+                total_secs += (stamp - old_stamp).total_seconds()
+
+        # save old status
+        old_pos = pos
+        old_stamp = stamp
+
+    return (total_len, total_secs)
+
+
 def recordStats(record):
+    spr_len, spr_secs = spiralLength(record)
+
     return {"PAT_ID": record.aid,
             "PAT_TYPE": remap(Analysis.PAT_TYPE, record.pat_type),
             "PAT_HANDEDNESS": remap(Analysis.PAT_HANDEDNESS, record.pat_hand),
@@ -38,11 +78,13 @@ def recordStats(record):
             "REC_NO": record.extra_data['drawing_number'],
             "REC_TRIALS": record.recording.retries,
             "REC_EVENTS": len(record.recording.events),
-            "REC_LEN": (record.recording.events[-1].stamp - record.recording.events[0].stamp).total_seconds(),
+            "REC_SECS": (record.recording.events[-1].stamp - record.recording.events[0].stamp).total_seconds(),
             "CAL_TID": record.calibration.tablet_id,
             "CAL_DATE": record.calibration.stamp,
             "CAL_TS": dtts(record.calibration.stamp),
-            "CAL_AGE": record.calibration_age};
+            "CAL_AGE": record.calibration_age,
+            "SPR_LEN": spr_len,
+            "SPR_SECS": spr_secs};
 
 
 def __main__():
