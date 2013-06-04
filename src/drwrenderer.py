@@ -26,8 +26,9 @@ from matplotlib.patches import PathPatch
 from matplotlib.gridspec import GridSpec
 
 # constants
-SHADOW_LW = 0.1
-MAX_LW = 3
+MIN_LW = 0.1
+SHA_LW = 0.5
+MAX_LW = 4
 EXP_LEVEL = 2
 
 
@@ -60,12 +61,12 @@ def renderSpiral(record, output):
         if old_pos:
             if drawing:
                 verts = [old_pos, pos]
-                p = SHADOW_LW + math.pow(event.pressure, EXP_LEVEL) * MAX_LW
+                p = MIN_LW + math.pow(event.pressure, EXP_LEVEL) * MAX_LW
                 patch = PathPatch(Path(verts, codes), lw=p)
                 ax.add_patch(patch)
             elif pos:
                 verts = [old_pos, pos]
-                patch = PathPatch(Path(verts, codes), lw=SHADOW_LW, edgecolor='red')
+                patch = PathPatch(Path(verts, codes), lw=SHA_LW, edgecolor='red')
                 ax.add_patch(patch)
 
         # save old status
@@ -81,6 +82,7 @@ def renderSpiral(record, output):
     ax = fig.add_subplot(gs[1])
     ax.plot([x.pressure for x in record.recording.events])
     ax.yaxis.grid(True)
+    ax.set_ylim(0,1)
     ax.yaxis.set_label_text('pressure')
 
     fig.tight_layout()
