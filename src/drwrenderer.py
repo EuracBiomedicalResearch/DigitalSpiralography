@@ -32,6 +32,12 @@ MAX_LW = 4
 EXP_LEVEL = 2
 
 
+def remap(vmap, value):
+    if value not in vmap:
+        return "N/A"
+    return vmap[value]
+
+
 def renderSpiral(record, output):
     fig = plt.figure()
     fig.set_size_inches((7,9))
@@ -73,7 +79,13 @@ def renderSpiral(record, output):
         old_pos = pos
         old_stamp = stamp
 
-    ax.set_title(str(record.aid))
+    # compose a title
+    p_aid = record.aid
+    p_type = remap(Analysis.PAT_TYPE, record.pat_type)
+    p_hand = remap(Analysis.PAT_HAND, record.pat_hand)
+    p_hdn = remap(Analysis.PAT_HANDEDNESS, record.pat_handedness)
+    ax.set_title("{} {} ({} hand, {})".format(p_aid, p_type, p_hand, p_hdn))
+
     ax.set_xlim(-1,1)
     ax.set_ylim(-1,1)
     ax.grid(True)
