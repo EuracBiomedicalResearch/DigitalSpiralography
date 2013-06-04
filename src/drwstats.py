@@ -92,11 +92,15 @@ def __main__():
     sys.stdout = codecs.getwriter('UTF-8')(sys.stdout)
 
     ap = argparse.ArgumentParser(description='Print drawing statistics in parseable format')
+    ap.add_argument('-x', dest='xtra', action='store_true',
+                    help='Include extra FILE attribute to the output')
     ap.add_argument('file', help='drawing file')
     args = ap.parse_args()
 
     record = Analysis.DrawingRecord.load(args.file)
     stats = recordStats(record)
+    if args.xtra:
+        stats['FILE'] = args.file
 
     print('\t'.join(map(unicode, stats.keys())))
     print('\t'.join(map(unicode, stats.values())))
