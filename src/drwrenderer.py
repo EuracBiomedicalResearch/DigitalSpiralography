@@ -32,6 +32,10 @@ MAX_LW = 4
 EXP_LEVEL = 2
 
 
+def flip_y(vert):
+    return (vert[0], -vert[1])
+
+
 def remap(vmap, value):
     if value not in vmap:
         return "N/A"
@@ -52,20 +56,22 @@ def renderSpiral(record, output):
     drawing = False
     for event in record.recording.events:
         stamp = event.stamp
-        pos = event.coords_drawing
+        pos = flip_y(event.coords_drawing)
 
         # set drawing status
         if event.typ == QtCore.QEvent.TabletPress:
             drawing = True
         elif event.typ == QtCore.QEvent.TabletRelease:
             drawing = False
-        elif event.typ == QtCore.QEvent.TabletEnterProximity or \
-          event.typ == QtCore.QEvent.TabletLeaveProximity:
+        elif event.typ == QtCore.QEvent.TabletEnterProximity:
+            old_pos = None
+            drawing = False
+        elif event.typ == QtCore.QEvent.TabletLeaveProximity:
             drawing = False
             pos = None
 
         if old_pos:
-            if drawing:
+            if drawing and pos:
                 verts = [old_pos, pos]
                 p = MIN_LW + math.pow(event.pressure, EXP_LEVEL) * MAX_LW
                 patch = PathPatch(Path(verts, codes), lw=p)
