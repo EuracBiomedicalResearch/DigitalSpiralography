@@ -103,11 +103,13 @@ def renderSpiral(record, output):
 
 def __main__():
     ap = argparse.ArgumentParser(description='Batch drawing renderer')
+    ap.add_argument('-f', dest='fast', action='store_true',
+                    help='Enable fast loading')
     ap.add_argument('file', help='drawing file')
     ap.add_argument('output', help='output file')
     args = ap.parse_args()
 
-    record = Analysis.DrawingRecord.load(args.file)
+    record = Analysis.DrawingRecord.load(args.file, args.fast)
     renderSpiral(record, args.output)
 
 

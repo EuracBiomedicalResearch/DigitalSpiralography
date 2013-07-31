@@ -11,6 +11,7 @@ import datetime
 import yaml
 import gzip
 from PyQt4 import QtCore
+import cPickle
 
 
 # types
@@ -154,6 +155,12 @@ class DrawingRecord:
 
 
     @classmethod
+    def dump(cls, record, path):
+        with open(path, 'wb') as fd:
+            cPickle.dump(record, fd, cPickle.HIGHEST_PROTOCOL)
+
+
+    @classmethod
     def save(cls, record, path):
         # translate the event stream
         events = []
@@ -204,12 +211,25 @@ class DrawingRecord:
 
 
     @classmethod
-    def load(cls, path):
-        fd = gzip.GzipFile(path, 'rb')
-        data = yaml.safe_load(fd)
+    def load(cls, path, fast=False):
+        # fast loading
+        if fast:
+            with open(path, "rb") as fd:
+                try:
+                    return cPickle.load(fd)
+                except cPickle.UnpicklingError:
+                    pass
+
+        # normal (safe) fallback
+        data = None
+        try:
+            fd = gzip.GzipFile(path, 'rb')
+            data = yaml.safe_load(fd)
+        except:
+            pass
 
         # check version info
-        if 'format' not in data or \
+        if not data or 'format' not in data or \
           type(data['format']) != str or \
           int(float(data['format'])) != 1:
             msg = translate("analysis", 'Invalid or unsupported file format')
