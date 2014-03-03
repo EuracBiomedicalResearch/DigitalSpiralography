@@ -15,6 +15,26 @@ import threading
 from PyQt4 import QtCore, QtGui, uic
 
 
+# support functions
+def speedAtPoint(events, stamp, window):
+    w_events = []
+    for w_event in events:
+        if abs((w_event.stamp - stamp).total_seconds()) < window:
+            w_events.append(w_event)
+    w_secs = (w_events[-1].stamp - w_events[0].stamp).total_seconds()
+    if not w_secs:
+        return -1
+
+    w_len = 0
+    for i in range(1, len(w_events) - 1):
+        old_pos = w_events[i - 1].coords_drawing
+        pos = w_events[i].coords_drawing
+        w_len += math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
+
+    return w_len / w_secs
+
+
+
 # main application
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
@@ -256,9 +276,8 @@ class MainWindow(QtGui.QMainWindow):
                         sf1 = (stamp - record.recording.events[0].stamp).total_seconds() / total_secs
                         sf0 = 1. - sf1
                     else:
-                        ds = math.hypot(old_pos[0] - pos[0], old_pos[1] - pos[1])
-                        dt = max(speed_repr, (stamp - old_stamp).total_seconds())
-                        sf1 = min(1., (ds / dt) * speed_repr)
+                        speed = speedAtPoint(record.recording.events, stamp, 0.05)
+                        sf1 = min(1., max(0., speed * speed_repr))
                         sf0 = 1. - sf1
 
                     # blend the color
