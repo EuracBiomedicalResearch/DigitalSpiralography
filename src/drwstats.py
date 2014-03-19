@@ -196,7 +196,9 @@ def recordStats(record):
     spr_speed = -1 if spr_secs < 1 else spr_len / spr_secs
 
     pressures = spiralPressure(record, traces, lambda x: x['drawing'])
-    speeds = spiralSpeed(record, traces, 1., lambda x: x['drawing'])
+    speedsW1 = spiralSpeed(record, traces, 1., lambda x: x['drawing'])
+    speedsW01 = spiralSpeed(record, traces, 0.1, lambda x: x['drawing'])
+    speedsW005 = spiralSpeed(record, traces, 0.05, lambda x: x['drawing'])
 
     return {"PAT_ID": record.aid,
             "PAT_TYPE": remap(Analysis.PAT_TYPE, record.pat_type),
@@ -226,10 +228,18 @@ def recordStats(record):
             "SPR_DRW_MED_PRESS_T1": pressures['med'],
             "SPR_DRW_AVG_PRESS_T1": pressures['avg'],
             "SPR_DRW_MAX_PRESS_T1": pressures['max'],
-            "SPR_DRW_MIN_SPEED_W1": speeds['min'],
-            "SPR_DRW_MED_SPEED_W1": speeds['med'],
-            "SPR_DRW_AVG_SPEED_W1": speeds['avg'],
-            "SPR_DRW_MAX_SPEED_W1": speeds['max'],
+            "SPR_DRW_MIN_SPEED_W1": speedsW1['min'],
+            "SPR_DRW_MED_SPEED_W1": speedsW1['med'],
+            "SPR_DRW_AVG_SPEED_W1": speedsW1['avg'],
+            "SPR_DRW_MAX_SPEED_W1": speedsW1['max'],
+            "SPR_DRW_MIN_SPEED_W01": speedsW01['min'],
+            "SPR_DRW_MED_SPEED_W01": speedsW01['med'],
+            "SPR_DRW_AVG_SPEED_W01": speedsW01['avg'],
+            "SPR_DRW_MAX_SPEED_W01": speedsW01['max'],
+            "SPR_DRW_MIN_SPEED_W005": speedsW005['min'],
+            "SPR_DRW_MED_SPEED_W005": speedsW005['med'],
+            "SPR_DRW_AVG_SPEED_W005": speedsW005['avg'],
+            "SPR_DRW_MAX_SPEED_W005": speedsW005['max'],
             "SPR_AIR_LEN": spr_air_len,
             "SPR_AIR_SECS": spr_air_secs}
 
