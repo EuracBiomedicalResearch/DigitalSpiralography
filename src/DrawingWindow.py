@@ -145,7 +145,8 @@ class CalibrationHandler(Handler):
 
 
     def terminate(self):
-        self.dw._scene.removeItem(self.items)
+        if self.items is not None:
+            self.dw._scene.removeItem(self.items)
 
 
 
