@@ -338,6 +338,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="next_hand_btn">
+       <property name="text">
+        <string>Next hand</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
         <string>Save</string>
@@ -426,8 +433,8 @@
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="hand_grp"/>
   <buttongroup name="blood_grp"/>
+  <buttongroup name="hand_grp"/>
   <buttongroup name="handedness_grp"/>
  </buttongroups>
 </ui>

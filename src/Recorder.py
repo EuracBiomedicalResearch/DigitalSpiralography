@@ -32,6 +32,13 @@ def _to_type(cb):
     return cb.itemData(cb.currentIndex()).toPyObject()
 
 
+def _set_type(cb, val):
+    if val is None:
+        cb.setCurrentIndex(0)
+    else:
+        cb.setCurrentIndex(cb.findData(val))
+
+
 def _reset_grp_state(group):
     group.setExclusive(False)
     for button in group.buttons():
@@ -126,6 +133,7 @@ class EndRecording(QtGui.QDialog):
         self._ui = form()
         self._ui.setupUi(self)
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
+        self._ui.next_hand_btn.clicked.connect(self.on_next_hand)
 
         _from_type(self._ui.pat_type, Analysis.PAT_TYPE_DSC)
 
@@ -141,7 +149,7 @@ class EndRecording(QtGui.QDialog):
         self._ui.preview.setPalette(pal)
 
 
-    def reset(self, save_path, record, preview):
+    def reset(self, save_path, record, preview, allow_next):
         self.oid = record.extra_data["operator"]
         self._ui.operator_id.setText(self.oid)
 
@@ -168,17 +176,34 @@ class EndRecording(QtGui.QDialog):
             self._ui.warnings.setText("-")
         self._ui.warnings.setFont(font)
 
-        self.pat_type = None
-        self._ui.pat_type.setCurrentIndex(0)
+        self.pat_type = record.pat_type
+        _set_type(self._ui.pat_type, self.pat_type)
 
-        self.pat_handedness = None
-        _reset_grp_state(self._ui.handedness_grp)
+        self.pat_handedness = record.pat_handedness
+        if self.pat_handedness == PatHandedness.left:
+            self._ui.handedness_left.setChecked(True)
+        elif self.pat_handedness == PatHandedness.right:
+            self._ui.handedness_right.setChecked(True)
+        elif self.pat_handedness == PatHandedness.ambidextrous:
+            self._ui.handedness_ambidextrous.setChecked(True)
+        else:
+            _reset_grp_state(self._ui.handedness_grp)
 
-        self.pat_hand = None
-        _reset_grp_state(self._ui.hand_grp)
+        self.pat_hand = record.pat_hand
+        if self.pat_hand == PatHand.left:
+            self._ui.hand_left.setChecked(True)
+        elif self.pat_hand == PatHand.right:
+            self._ui.hand_right.setChecked(True)
+        else:
+            _reset_grp_state(self._ui.hand_grp)
 
-        self.blood_drawn = None
-        _reset_grp_state(self._ui.blood_grp)
+        self.blood_drawn = record.extra_data.get("blood_drawn", None)
+        if self.blood_drawn == True:
+            self._ui.blood_drawn.setChecked(True)
+        elif self.blood_drawn == False:
+            self._ui.blood_drawn.setChecked(False)
+        else:
+            _reset_grp_state(self._ui.blood_grp)
 
         self.comments = None
         self._ui.comments.clear()
@@ -188,6 +213,9 @@ class EndRecording(QtGui.QDialog):
         preview = preview.scaled(size, QtCore.Qt.KeepAspectRatio)
         self._ui.preview.setPixmap(preview)
 
+        self.next_hand = None
+        self._ui.next_hand_btn.setEnabled(allow_next)
+
 
     def on_save_path(self):
         (dir, name) = os.path.split(unicode(self._ui.save_path.text()))
@@ -196,6 +224,10 @@ class EndRecording(QtGui.QDialog):
         if self._file_browser.exec_():
             save_path = os.path.relpath(unicode(self._file_browser.selectedFiles()[0]))
             self._ui.save_path.setText(save_path)
+
+
+    def on_next_hand(self):
+        self.accept(next_hand=True)
 
 
     def reject(self):
@@ -208,7 +240,7 @@ class EndRecording(QtGui.QDialog):
             self.done(QtGui.QDialog.Rejected)
 
 
-    def accept(self):
+    def accept(self, next_hand=False):
         self.oid = str(self._ui.operator_id.text())
         self.aid = str(self._ui.patient_id.text())
 
@@ -269,6 +301,7 @@ class EndRecording(QtGui.QDialog):
             QtGui.QMessageBox.critical(self, title, msg)
             return
 
+        self.next_hand = next_hand
         self.done(QtGui.QDialog.Accepted)
 
 
@@ -366,10 +399,8 @@ class MainWindow(QtGui.QMainWindow):
                 self._drawing_window.calibration.stamp.strftime("%c"))
 
 
-    def on_new_recording(self):
-        self._new_recording_dialog.reset()
-        if not self._new_recording_dialog.exec_():
-            return
+    def new_recording(self, oid, aid, pat_type=None, pat_handedness=None, pat_hand=None, allow_next=True):
+        # use the current calibration to take a new recording
         self._drawing_window.reset(DrawingWindow.Mode.Record)
         if not self._drawing_window.exec_():
             return
@@ -380,17 +411,18 @@ class MainWindow(QtGui.QMainWindow):
         self.params.total_recordings += 1
         preview = self._drawing_window.handler.buffer
 
-        extra_data = {"operator": self._new_recording_dialog.oid,
+        extra_data = {"operator": oid,
                       "drawing_number": self.drawing_number,
                       "total_recordings": self.params.total_recordings,
                       "installation_uuid": self.params.installation_uuid,
                       "installation_stamp": self.params.installation_stamp}
-        record = Analysis.DrawingRecord(self._new_recording_dialog.aid,
+        record = Analysis.DrawingRecord(aid,
                                         self._drawing_window.drawing,
                                         self._drawing_window.calibration,
                                         self.calibration_age,
                                         self._drawing_window.recording,
-                                        None, None, None, extra_data)
+                                        pat_type, pat_handedness, pat_hand,
+                                        extra_data)
 
         # guess a decent path name
         save_path = record.recording.session_start.strftime("%Y%m%d")
@@ -400,7 +432,7 @@ class MainWindow(QtGui.QMainWindow):
         save_path = os.path.join(self.params.save_path, save_path)
 
         # keep trying until save is either aborted or succeeds
-        self._end_recording_dialog.reset(save_path, record, preview)
+        self._end_recording_dialog.reset(save_path, record, preview, allow_next)
         while self._end_recording_dialog.exec_():
             record.aid = self._end_recording_dialog.aid
             record.pat_type = self._end_recording_dialog.pat_type
@@ -423,7 +455,32 @@ class MainWindow(QtGui.QMainWindow):
                 title = translate("recorder", "Save failure")
                 QtGui.QMessageBox.critical(self, title, msg)
             else:
-                break
+                return record
+
+        # save aborted
+        return None
+
+
+    def on_new_recording(self):
+        # fetch operator/AID immediately
+        self._new_recording_dialog.reset()
+        if not self._new_recording_dialog.exec_():
+            return
+
+        # first attempt
+        record = self.new_recording(self._new_recording_dialog.oid,
+                                    self._new_recording_dialog.aid)
+        if record is None or self._end_recording_dialog.next_hand != True:
+            return
+
+        # next hand was requested
+        other_hand = PatHand.left if record.pat_hand == PatHand.right else PatHand.right
+        self.new_recording(record.extra_data["operator"],
+                           record.aid,
+                           pat_type=record.pat_type,
+                           pat_handedness=record.pat_handedness,
+                           pat_hand=other_hand,
+                           allow_next=False)
 
 
 # main application
