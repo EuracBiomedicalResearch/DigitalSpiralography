@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>801</width>
-    <height>410</height>
+    <width>965</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>801</width>
-    <height>410</height>
+    <width>965</width>
+    <height>480</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -22,32 +22,62 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0">
-   <item row="1" column="0">
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Operator:</string>
+     </property>
+     <property name="buddy">
+      <cstring>operator_id</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <widget class="QLabel" name="fileLabel">
      <property name="text">
       <string>File:</string>
      </property>
+     <property name="buddy">
+      <cstring>save_path</cstring>
+     </property>
     </widget>
    </item>
-   <item row="8" column="1">
-    <widget class="QCheckBox" name="blood_drawn">
+   <item row="2" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="save_path"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="save_path_btn">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Blood drawn on drawing arm</string>
+      <string>Date/Time:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QLabel" name="length">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string/>
+      <string>Patient ID:</string>
      </property>
-     <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+     <property name="buddy">
+      <cstring>patient_id</cstring>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="patient_id"/>
+   </item>
+   <item row="5" column="1">
     <widget class="QLabel" name="warnings">
      <property name="font">
       <font>
@@ -63,17 +93,188 @@
      </property>
     </widget>
    </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Patient type:</string>
+     </property>
+     <property name="buddy">
+      <cstring>pat_type</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QComboBox" name="pat_type"/>
+   </item>
+   <item row="10" column="1">
+    <widget class="QPlainTextEdit" name="comments">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="plainText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QRadioButton" name="handedness_left">
+       <property name="text">
+        <string>Left-handed</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">handedness_grp</string>
+       </attribute>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="handedness_right">
+       <property name="text">
+        <string>Right-handed</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">handedness_grp</string>
+       </attribute>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QRadioButton" name="handedness_ambidextrous">
+       <property name="text">
+        <string>Ambidextrous</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">handedness_grp</string>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Drawing hand:</string>
+     </property>
+     <property name="buddy">
+      <cstring>hand_left</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <item>
+      <widget class="QRadioButton" name="hand_left">
+       <property name="text">
+        <string>Left hand</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">hand_grp</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="hand_right">
+       <property name="text">
+        <string>Right hand</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">hand_grp</string>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="date_time">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+     </property>
+    </widget>
+   </item>
    <item row="4" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Length:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="length">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
     <widget class="QLabel" name="label_9">
      <property name="text">
       <string>Warnings:</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
-    <widget class="QComboBox" name="pat_hand"/>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Blood drawn:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>blood_drawn</cstring>
+     </property>
+    </widget>
    </item>
-   <item row="0" column="2" rowspan="10">
+   <item row="9" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="blood_drawn">
+       <property name="text">
+        <string>Yes, blood was drawn on this arm</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">blood_grp</string>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="blood_not_drawn">
+       <property name="text">
+        <string>No blood taken</string>
+       </property>
+       <attribute name="buttonGroup">
+        <string notr="true">blood_grp</string>
+       </attribute>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Comments:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>comments</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="operator_id"/>
+   </item>
+   <item row="0" column="2" rowspan="11">
     <widget class="QLabel" name="preview">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -98,112 +299,20 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Date/Time:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="patient_id"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Length:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLineEdit" name="save_path"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="save_path_btn">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="9" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Comments:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Drawing hand:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QComboBox" name="pat_type"/>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="date_time">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="textInteractionFlags">
-      <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="QComboBox" name="pat_handedness"/>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Patient type:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Patient ID:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Handedness:</string>
      </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string>General:</string>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>handedness_left</cstring>
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
-    <widget class="QPlainTextEdit" name="comments">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="plainText">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0" colspan="3">
+   <item row="11" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -244,37 +353,45 @@
     </layout>
    </item>
   </layout>
+  <zorder>fileLabel</zorder>
+  <zorder>length</zorder>
+  <zorder>warnings</zorder>
+  <zorder>label_9</zorder>
+  <zorder>preview</zorder>
+  <zorder>label_3</zorder>
+  <zorder>patient_id</zorder>
+  <zorder>label_4</zorder>
+  <zorder>label_2</zorder>
+  <zorder>label_6</zorder>
+  <zorder>pat_type</zorder>
+  <zorder>date_time</zorder>
+  <zorder>label_5</zorder>
+  <zorder>label</zorder>
+  <zorder>label_7</zorder>
+  <zorder>comments</zorder>
+  <zorder>operator_id</zorder>
+  <zorder>label_8</zorder>
+  <zorder>label_10</zorder>
  </widget>
  <tabstops>
+  <tabstop>operator_id</tabstop>
   <tabstop>patient_id</tabstop>
   <tabstop>save_path</tabstop>
   <tabstop>save_path_btn</tabstop>
   <tabstop>pat_type</tabstop>
-  <tabstop>pat_handedness</tabstop>
-  <tabstop>pat_hand</tabstop>
+  <tabstop>handedness_left</tabstop>
+  <tabstop>handedness_right</tabstop>
+  <tabstop>handedness_ambidextrous</tabstop>
+  <tabstop>hand_left</tabstop>
+  <tabstop>hand_right</tabstop>
   <tabstop>blood_drawn</tabstop>
+  <tabstop>blood_not_drawn</tabstop>
   <tabstop>comments</tabstop>
-  <tabstop>pushButton_2</tabstop>
   <tabstop>pushButton</tabstop>
+  <tabstop>pushButton_2</tabstop>
  </tabstops>
  <resources/>
  <connections>
-  <connection>
-   <sender>patient_id</sender>
-   <signal>returnPressed()</signal>
-   <receiver>comments</receiver>
-   <slot>setFocus()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>186</x>
-     <y>28</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>186</x>
-     <y>175</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>pushButton</sender>
    <signal>clicked()</signal>
@@ -282,8 +399,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>361</x>
-     <y>255</y>
+     <x>772</x>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel">
      <x>13</x>
@@ -298,8 +415,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>452</x>
-     <y>255</y>
+     <x>954</x>
+     <y>469</y>
     </hint>
     <hint type="destinationlabel">
      <x>40</x>
@@ -308,4 +425,9 @@
    </hints>
   </connection>
  </connections>
+ <buttongroups>
+  <buttongroup name="hand_grp"/>
+  <buttongroup name="blood_grp"/>
+  <buttongroup name="handedness_grp"/>
+ </buttongroups>
 </ui>

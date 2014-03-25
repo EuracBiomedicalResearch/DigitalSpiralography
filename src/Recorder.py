@@ -4,6 +4,7 @@
 # local modules
 import ID
 import Analysis
+from Analysis import PatHand, PatHandedness
 import DrawingFactory
 import DrawingWindow
 import Shared
@@ -29,6 +30,14 @@ def _from_type(cb, type_map):
 
 def _to_type(cb):
     return cb.itemData(cb.currentIndex()).toPyObject()
+
+
+def _reset_grp_state(group):
+    group.setExclusive(False)
+    for button in group.buttons():
+        if button.isChecked():
+            button.setChecked(False)
+    group.setExclusive(True)
 
 
 # implementation
@@ -85,6 +94,7 @@ class NewRecording(QtGui.QDialog):
 
 
     def reset(self):
+        self.oid = None
         self.aid = None
         self._ui.operator_id.clear()
         self._ui.patient_id.clear()
@@ -118,8 +128,6 @@ class EndRecording(QtGui.QDialog):
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
 
         _from_type(self._ui.pat_type, Analysis.PAT_TYPE_DSC)
-        _from_type(self._ui.pat_handedness, Analysis.PAT_HANDEDNESS_DSC)
-        _from_type(self._ui.pat_hand, Analysis.PAT_HAND_DSC)
 
         self._file_browser = QtGui.QFileDialog(self)
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
@@ -134,6 +142,9 @@ class EndRecording(QtGui.QDialog):
 
 
     def reset(self, save_path, record, preview):
+        self.oid = record.extra_data["operator"]
+        self._ui.operator_id.setText(self.oid)
+
         self.aid = record.aid
         self._ui.patient_id.setText(self.aid)
 
@@ -161,12 +172,14 @@ class EndRecording(QtGui.QDialog):
         self._ui.pat_type.setCurrentIndex(0)
 
         self.pat_handedness = None
-        self._ui.pat_handedness.setCurrentIndex(0)
+        _reset_grp_state(self._ui.handedness_grp)
 
         self.pat_hand = None
-        self._ui.pat_hand.setCurrentIndex(0)
+        _reset_grp_state(self._ui.hand_grp)
 
-        self._ui.blood_drawn.setChecked(False)
+        self.blood_drawn = None
+        _reset_grp_state(self._ui.blood_grp)
+
         self.comments = None
         self._ui.comments.clear()
         self._ui.comments.setFocus()
@@ -196,18 +209,54 @@ class EndRecording(QtGui.QDialog):
 
 
     def accept(self):
+        self.oid = str(self._ui.operator_id.text())
         self.aid = str(self._ui.patient_id.text())
 
         self.pat_type = _to_type(self._ui.pat_type)
-        self.pat_handedness = _to_type(self._ui.pat_handedness)
-        self.pat_hand = _to_type(self._ui.pat_hand)
 
-        self.blood_drawn = self._ui.blood_drawn.isChecked()
+        self.pat_handedness = PatHandedness.left if self._ui.handedness_left.isChecked() else \
+          PatHandedness.right if self._ui.handedness_right.isChecked() else \
+          PatHandedness.ambidextrous if self._ui.handedness_ambidextrous.isChecked() else \
+          None
+
+        self.pat_hand = PatHand.left if self._ui.hand_left.isChecked() else \
+          PatHand.right if self._ui.hand_right.isChecked() else \
+          None
+
+        self.blood_drawn = True if self._ui.blood_drawn.isChecked() else \
+          False if self._ui.blood_not_drawn.isChecked() else \
+          None
+
         self.comments = unicode(self._ui.comments.toPlainText())
         self.save_path = unicode(self._ui.save_path.text())
 
         # validate AID
         if not ID.validate_aid_err(self.aid):
+            return
+
+        # other mandatory fields
+        if not self.oid:
+            title = translate("recorder", "Invalid operator")
+            msg = translate("recorder", "The specified operator is invalid")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return
+
+        if self.pat_handedness is None:
+            title = translate("recorder", "Handedness not set")
+            msg = translate("recorder", "Patient handedness must be specified")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return
+
+        if self.pat_hand is None:
+            title = translate("recorder", "Hand not set")
+            msg = translate("recorder", "Drawing hand must be specified")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return
+
+        if self.blood_drawn is None:
+            title = translate("recorder", "Blood drawn not set")
+            msg = translate("recorder", "Blood drawn state must be specified")
+            QtGui.QMessageBox.critical(None, title, msg)
             return
 
         # check if the file already exists
@@ -357,7 +406,8 @@ class MainWindow(QtGui.QMainWindow):
             record.pat_type = self._end_recording_dialog.pat_type
             record.pat_handedness = self._end_recording_dialog.pat_handedness
             record.pat_hand = self._end_recording_dialog.pat_hand
-            record.extra_data['blood_drawn'] = self._end_recording_dialog.blood_drawn
+            record.extra_data["operator"] = self._end_recording_dialog.oid
+            record.extra_data["blood_drawn"] = self._end_recording_dialog.blood_drawn
             record.comments = self._end_recording_dialog.comments
             save_path = self._end_recording_dialog.save_path
             try:
