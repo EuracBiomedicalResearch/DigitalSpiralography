@@ -118,7 +118,21 @@ Version changes
 
 1.3:
 
-* TODO
+* Several tools for data analysis have been added (``drwstats``,
+  ``drwrenderer``, ``drwstackrenderer``, ``drwconvert``).
+* A simple tool to generate and check IDs with a Verhoeff check digit
+  (patient/table/stylus ID) has been added (``genverhoeff``).
+* In DrawingVisualizer, the speed is now sampled to give more accurate results.
+* An exception caused by an aborted calibration has been fixed.
+* During calibration, the stylus id is now being requested as well.
+* The prompt dialog at the end of a recording has been extensively revised:
+
+  + The operator id is now also included.
+  + Patient handedness, drawing hand and blood drawn status are now mandatory
+    (the user needs to check the appropriate option in all cases)
+  + A new option "Next hand" has been added to preserve the patient data and
+    automatically create a recording for the other hand.
+  + Quality of the preview has been improved.
 
 1.2:
 
