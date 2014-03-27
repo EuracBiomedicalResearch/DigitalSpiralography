@@ -124,7 +124,7 @@ Version changes
   (patient/table/stylus ID) has been added (``genverhoeff``).
 * In DrawingVisualizer, the speed is now sampled to give more accurate results.
 * An exception caused by an aborted calibration has been fixed.
-* During calibration, the stylus id is now being requested as well.
+* During calibration, the operator and stylus id are now being requested.
 * The prompt dialog at the end of a recording has been extensively revised:
 
   + The operator id is now also included.
@@ -375,6 +375,8 @@ Chunks introduced with format 1.1:
 Chunks introduced with format 1.2:
 
 * ``calibration/stylus_id``: stylus ID (introduced in DrawingRecorder 1.3)
+* ``calibration/operator``: operator performing the calibration (introduced in
+  DrawingRecorder 1.3)
 
 
 Coordinate projection types

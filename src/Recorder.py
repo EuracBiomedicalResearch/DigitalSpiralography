@@ -67,17 +67,27 @@ class NewCalibration(QtGui.QDialog):
 
 
     def reset(self):
+        self.oid = None
         self.tablet_id = None
         self.stylus_id = None
         self.drawing = None
+        self._ui.operator_id.clear()
         self._ui.tablet_id.clear()
         self._ui.stylus_id.clear()
         self._ui.drawing_id.clear()
-        self._ui.tablet_id.setFocus()
+        self._ui.operator_id.setFocus()
 
 
     def accept(self):
-        # validate the tablet id
+        # validate the operator
+        self.oid = str(self._ui.operator_id.text())
+        if not self.oid:
+            title = translate("recorder", "Invalid operator")
+            msg = translate("recorder", "The specified operator is invalid")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return self.reset()
+
+        # ... tablet id
         self.tablet_id = str(self._ui.tablet_id.text())
         if not ID.validate_tid_err(self.tablet_id):
             return self.reset()
@@ -393,7 +403,8 @@ class MainWindow(QtGui.QMainWindow):
 
         # perform the actual calibration
         self.reset_calibration()
-        self._drawing_window.set_params(self._new_calibration_dialog.tablet_id,
+        self._drawing_window.set_params(self._new_calibration_dialog.oid,
+                                        self._new_calibration_dialog.tablet_id,
                                         self._new_calibration_dialog.stylus_id,
                                         self._new_calibration_dialog.drawing)
         self._drawing_window.reset(DrawingWindow.Mode.Calibrate)

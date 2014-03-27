@@ -149,6 +149,8 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop(name, record.recording.events[-1].stamp -
                           record.recording.events[0].stamp)
 
+        name = translate("visualizer", "Calib. operator")
+        self._append_prop(name, record.calibration.oid)
         name = translate("visualizer", "Calib. tablet ID")
         self._append_prop(name, record.calibration.tablet_id)
         name = translate("visualizer", "Calib. stylus ID")
