@@ -151,6 +151,8 @@ class MainWindow(QtGui.QMainWindow):
 
         name = translate("visualizer", "Calib. tablet ID")
         self._append_prop(name, record.calibration.tablet_id)
+        name = translate("visualizer", "Calib. stylus ID")
+        self._append_prop(name, record.calibration.stylus_id)
         name = translate("visualizer", "Calib. date")
         self._append_prop(name, record.calibration.stamp)
         name = translate("visualizer", "Calib. age")

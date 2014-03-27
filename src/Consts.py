@@ -8,8 +8,8 @@ from PyQt4 import QtGui, QtCore
 # Basic versioning
 APP_ORG         = "EURAC"               # application organization
 APP_NAME        = "DrawingRecorder"     # application name
-APP_VERSION     = "1.2"                 # application version
-FORMAT_VERSION  = "1.1"                 # file format version
+APP_VERSION     = "1.3"                 # application version
+FORMAT_VERSION  = "1.2"                 # file format version
 APP_DELAY       = 1. / 20.              # general refresh delay for lengthy operations
 
 # Drawing parameters

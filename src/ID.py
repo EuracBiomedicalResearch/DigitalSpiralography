@@ -34,3 +34,17 @@ def validate_tid_err(buf):
         msg = translate("ID", "The specified tablet ID is invalid")
         QtGui.QMessageBox.critical(None, title, msg)
     return ret
+
+def validate_sid(buf):
+    return (len(buf) > 1 and
+            buf[0] == 'S' and
+            buf[1:].isdigit() and
+            Verhoeff.validate(buf[1:]))
+
+def validate_sid_err(buf):
+    ret = validate_sid(buf)
+    if not ret:
+        title = translate("ID", "Invalid Pen ID")
+        msg = translate("ID", "The specified pen ID is invalid")
+        QtGui.QMessageBox.critical(None, title, msg)
+    return ret

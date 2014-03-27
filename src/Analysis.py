@@ -28,8 +28,9 @@ class PatHand:
 
 
 class CalibrationData:
-    def __init__(self, tablet_id, cpoints, stamp=None):
+    def __init__(self, tablet_id, stylus_id, cpoints, stamp=None):
         self.tablet_id = tablet_id
+        self.stylus_id = stylus_id
         self.cpoints = cpoints
         self.stamp = stamp if stamp is not None else datetime.datetime.now()
 
@@ -185,6 +186,7 @@ class DrawingRecord:
                     "cpoints": map(list, record.drawing.cpoints)},
                 "calibration": {
                     "tablet_id": record.calibration.tablet_id,
+                    "stylus_id": record.calibration.stylus_id,
                     "stamp": record.calibration.stamp,
                     "cpoints": map(list, record.calibration.cpoints)},
                 "calibration_age": record.calibration_age,
@@ -248,6 +250,7 @@ class DrawingRecord:
 
         # calibration
         calibration = CalibrationData(data['calibration']['tablet_id'],
+                                      data['calibration'].get('stylus_id', None), # optional (fmt 1.2)
                                       map(tuple, data['calibration']['cpoints']),
                                       data['calibration']['stamp'])
 

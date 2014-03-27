@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>356</width>
-    <height>109</height>
+    <width>314</width>
+    <height>134</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>356</width>
-    <height>109</height>
+    <width>314</width>
+    <height>134</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>356</width>
-    <height>109</height>
+    <width>16777215</width>
+    <height>137</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -28,11 +28,14 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QFormLayout" name="formLayout">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Tablet ID:</string>
+     </property>
+     <property name="buddy">
+      <cstring>tablet_id</cstring>
      </property>
     </widget>
    </item>
@@ -40,16 +43,32 @@
     <widget class="QLineEdit" name="tablet_id"/>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="fileLabel">
+    <widget class="QLabel" name="fileLabel_2">
      <property name="text">
-      <string>Drawing ID:</string>
+      <string>Pen ID:</string>
+     </property>
+     <property name="buddy">
+      <cstring>stylus_id</cstring>
      </property>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QLineEdit" name="drawing_id"/>
+    <widget class="QLineEdit" name="stylus_id"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="fileLabel">
+     <property name="text">
+      <string>Drawing ID:</string>
+     </property>
+     <property name="buddy">
+      <cstring>drawing_id</cstring>
+     </property>
+    </widget>
    </item>
    <item row="2" column="1">
+    <widget class="QLineEdit" name="drawing_id"/>
+   </item>
+   <item row="3" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -93,6 +112,7 @@
  </widget>
  <tabstops>
   <tabstop>tablet_id</tabstop>
+  <tabstop>stylus_id</tabstop>
   <tabstop>drawing_id</tabstop>
   <tabstop>pushButton_2</tabstop>
   <tabstop>pushButton</tabstop>
@@ -102,7 +122,7 @@
   <connection>
    <sender>tablet_id</sender>
    <signal>returnPressed()</signal>
-   <receiver>drawing_id</receiver>
+   <receiver>stylus_id</receiver>
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -110,8 +130,8 @@
      <y>22</y>
     </hint>
     <hint type="destinationlabel">
-     <x>118</x>
-     <y>47</y>
+     <x>199</x>
+     <y>50</y>
     </hint>
    </hints>
   </connection>
@@ -122,12 +142,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>242</x>
-     <y>57</y>
+     <x>304</x>
+     <y>92</y>
     </hint>
     <hint type="destinationlabel">
-     <x>225</x>
-     <y>83</y>
+     <x>303</x>
+     <y>123</y>
     </hint>
    </hints>
   </connection>
@@ -138,12 +158,12 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>291</x>
-     <y>83</y>
+     <x>303</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel">
      <x>12</x>
-     <y>-8</y>
+     <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -154,12 +174,28 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>165</x>
-     <y>84</y>
+     <x>178</x>
+     <y>123</y>
     </hint>
     <hint type="destinationlabel">
      <x>31</x>
-     <y>-4</y>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>stylus_id</sender>
+   <signal>returnPressed()</signal>
+   <receiver>drawing_id</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>229</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>80</y>
     </hint>
    </hints>
   </connection>

@@ -68,8 +68,10 @@ class NewCalibration(QtGui.QDialog):
 
     def reset(self):
         self.tablet_id = None
+        self.stylus_id = None
         self.drawing = None
         self._ui.tablet_id.clear()
+        self._ui.stylus_id.clear()
         self._ui.drawing_id.clear()
         self._ui.tablet_id.setFocus()
 
@@ -80,7 +82,12 @@ class NewCalibration(QtGui.QDialog):
         if not ID.validate_tid_err(self.tablet_id):
             return self.reset()
 
-        # validate the drawing id
+        # ... stylus id
+        self.stylus_id = str(self._ui.stylus_id.text())
+        if not ID.validate_sid_err(self.stylus_id):
+            return self.reset()
+
+        # ... drawing id
         self.drawing = DrawingFactory.from_id(str(self._ui.drawing_id.text()))
         if not self.drawing:
             title = translate("recorder", "Invalid drawing ID")
@@ -339,6 +346,7 @@ class MainWindow(QtGui.QMainWindow):
         self.calibration_age = 0
         self._ui.new_recording.setEnabled(False)
         self._ui.tablet_id.setText("-")
+        self._ui.stylus_id.setText("-")
         self._ui.drawing_id.setText("-")
         self._ui.last_calibration.setText("-")
 
@@ -386,12 +394,15 @@ class MainWindow(QtGui.QMainWindow):
         # perform the actual calibration
         self.reset_calibration()
         self._drawing_window.set_params(self._new_calibration_dialog.tablet_id,
+                                        self._new_calibration_dialog.stylus_id,
                                         self._new_calibration_dialog.drawing)
         self._drawing_window.reset(DrawingWindow.Mode.Calibrate)
         if self._drawing_window.exec_():
             self._ui.new_recording.setEnabled(True)
             self._ui.tablet_id.setText(
                 self._drawing_window.calibration.tablet_id)
+            self._ui.stylus_id.setText(
+                self._drawing_window.calibration.stylus_id)
             self._ui.drawing_id.setText(
                 self._drawing_window.drawing.id + ": " +
                 self._drawing_window.drawing.str)

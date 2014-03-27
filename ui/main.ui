@@ -7,33 +7,33 @@
     <x>0</x>
     <y>0</y>
     <width>471</width>
-    <height>155</height>
+    <height>176</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>471</width>
-    <height>155</height>
+    <height>176</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>471</width>
-    <height>155</height>
+    <height>176</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Drawing recorder</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QFormLayout" name="formLayout">
-    <property name="fieldGrowthPolicy">
-     <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-    </property>
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
        <string>Save path:</string>
+      </property>
+      <property name="buddy">
+       <cstring>save_path</cstring>
       </property>
      </widget>
     </item>
@@ -51,15 +51,87 @@
       </item>
      </layout>
     </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="tabletIDLabel">
+      <property name="text">
+       <string>Tablet ID</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="tablet_id">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
     <item row="2" column="0">
+     <widget class="QLabel" name="tabletIDLabel_2">
+      <property name="text">
+       <string>Pen ID</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="stylus_id">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Drawing ID:</string>
       </property>
      </widget>
     </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="drawing_id">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="lastCalibrationLabel">
+      <property name="text">
+       <string>Last calibration:</string>
+      </property>
+     </widget>
+    </item>
     <item row="4" column="1">
+     <widget class="QLabel" name="last_calibration">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QToolButton" name="info">
+        <property name="toolTip">
+         <string>Information</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
+        </property>
+       </widget>
+      </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -98,61 +170,6 @@
        </widget>
       </item>
      </layout>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="lastCalibrationLabel">
-      <property name="text">
-       <string>Last calibration:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLabel" name="last_calibration">
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="tabletIDLabel">
-      <property name="text">
-       <string>Tablet ID</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="drawing_id">
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="tablet_id">
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QToolButton" name="info">
-      <property name="toolTip">
-       <string>Information</string>
-      </property>
-      <property name="icon">
-       <iconset>
-        <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
-      </property>
-     </widget>
     </item>
    </layout>
   </widget>

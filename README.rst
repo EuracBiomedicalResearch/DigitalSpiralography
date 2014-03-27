@@ -15,8 +15,8 @@ How to use the recorder
 3. Fit the paper onto the tablet, and ensure it doesn't move.
 4. Calibrate:
 
-   * Enter a Tablet ID and a Drawing ID (when using a barcode gun, zap the
-     tablet and the paper).
+   * Enter a Tablet ID, Pen ID and a Drawing ID (when using a barcode gun, zap
+     the tablet, pen and the paper).
    * Hold the pen straight.
    * Move the pen over the red point indicated in the screen (which fills red),
      then press ENTER.
@@ -88,6 +88,7 @@ Codes that can be used for testing:
 
 * AID: "0"
 * Tablet ID: "T0"
+* Pen ID: "S0"
 * Drawing ID: "DSPR1"
 
 To see how codes should be constructed, see `Coding of IDs`_.
@@ -114,6 +115,10 @@ Troubleshooting
 
 Version changes
 ~~~~~~~~~~~~~~~
+
+1.3:
+
+* TODO
 
 1.2:
 
@@ -284,13 +289,13 @@ Customize the tablet preferences as follows:
 Technical informations
 ----------------------
 
-File format notes
-~~~~~~~~~~~~~~~~~
+File format
+~~~~~~~~~~~
 
 The file format is self-descriptive GZip-compressed YaML_. GZip is used both to
 conserve space (YaML is quite inefficient) and for check-summing purposes.
 
-The dictionary structure of the file has several important chunks:
+Keys related to drawing/calibration (all keys are mandatory):
 
 * ``drawing/points``: contains a list of coordinate pairs (from now on: points)
   in "normalized drawing space" that represent the the drawing to be reproduced
@@ -317,6 +322,26 @@ The dictionary structure of the file has several important chunks:
   drawing-normalized" coordinates.
 * ``recording/rect_size``: the size of the screen during the recording.
 
+Ancillary data (all keys are mandatory):
+
+* ``format``: file format version (1.* describes this format)
+* ``version``: application version
+* ``aid``: patient AID
+* ``drawing/id``: drawing ID
+* ``drawing/str``: drawing description (redundant for human readability)
+* ``calibration/tablet_id``: tablet ID used for calibration
+* ``calibration/stamp``: timestamp of the last calibration
+* ``calibration_age``: number of drawings since the last calibration
+* ``recording/session_start``: timestamp of the start of the session (when the
+  recording window is initially shown)
+* ``recording/retries``: number of times RESET has been issued when recording
+* ``recording/strokes``: number of strokes in the recording (redundant for
+  human readability)
+* ``pat_type``: patient type
+* ``pat_handedness``: patient handedness
+* ``pat_hand``: patient hand
+* ``comments``: free text comment for the recording
+
 Chunks introduced with format 1.1:
 
 * ``recording/events``:
@@ -331,7 +356,11 @@ Chunks introduced with format 1.1:
     introduced in DrawingRecorder 1.2.
 
   + ``operator`` (optional): the name of the operator assisting during the
-    recording (introduced in 1.2).
+    recording (introduced in DrawingRecorder 1.2).
+
+Chunks introduced with format 1.2:
+
+* ``calibration/stylus_id``: stylus ID (introduced in DrawingRecorder 1.3)
 
 
 Coordinate projection types
@@ -397,6 +426,15 @@ A tablet ID follows the pattern ``Txxxyyyz`` where:
 * ``z``: Verhoeff check digit
 
 "T0" can be used for testing purposes.
+
+A pen/stylus ID follows the pattern ``Sxxxyyyz`` where:
+
+* ``S``: mandatory
+* ``xxx``: study code
+* ``yyy``: incremental code
+* ``z``: Verhoeff check digit
+
+"S0" can be used for testing purposes.
 
 All drawing IDs currently begin with D have the structure ``Dxxxy``, where:
 
