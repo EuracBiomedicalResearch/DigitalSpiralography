@@ -210,7 +210,7 @@ class EndRecording(QtGui.QDialog):
         self._ui.comments.setFocus()
 
         size = self._ui.preview.size()
-        preview = preview.scaled(size, QtCore.Qt.KeepAspectRatio)
+        preview = preview.scaled(size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self._ui.preview.setPixmap(preview)
 
         self.next_hand = None
