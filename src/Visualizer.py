@@ -138,7 +138,7 @@ class MainWindow(QtGui.QMainWindow):
         name = translate("visualizer", "Rec. no.")
         self._append_prop(name, record.extra_data['drawing_number'])
         name = translate("visualizer", "Rec. retries")
-        self._append_prop(name, record.recording.retries)
+        self._append_prop(name, len(record.recording.retries) + 1)
         name = translate("visualizer", "Rec. strokes")
         self._append_prop(name, record.recording.strokes)
         name = translate("visualizer", "Rec. events")

@@ -229,6 +229,17 @@ class RecordingHandler(Handler):
 
 
     def tabletEventTS(self, ev, stamp):
+        # record the data
+        coords_drawing = self.dw._drawing_pos
+        coords_trans = self.dw._trans_pos
+        self.dw.recording.append(
+            Analysis.RecordingEvent(
+                ev.type(),
+                [coords_drawing.x(), coords_drawing.y()],
+                [coords_trans.x(), coords_trans.y()],
+                ev.pressure(), self.dw._drawing_tilt,
+                self.dw._trans_tilt, stamp))
+
         if not self.dw._drawing_state:
             self.old_trans_pos = None
         else:
@@ -241,23 +252,6 @@ class RecordingHandler(Handler):
 
             # update the old positions
             self.old_trans_pos = self.dw._trans_pos
-
-            # start recording if not already
-            if self.dw.recording.events is None:
-                self.dw.recording.events = []
-
-        # record the data
-        if self.dw.recording.events is not None:
-            # events
-            coords_drawing = self.dw._drawing_pos
-            coords_trans = self.dw._trans_pos
-            self.dw.recording.append(
-                Analysis.RecordingEvent(
-                    ev.type(),
-                    [coords_drawing.x(), coords_drawing.y()],
-                    [coords_trans.x(), coords_trans.y()],
-                    ev.pressure(), self.dw._drawing_tilt,
-                    self.dw._trans_tilt, stamp))
 
         # cursor state
         self.dw._cursor.setVisible(self.dw._tracking_state)

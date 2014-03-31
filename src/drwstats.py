@@ -211,7 +211,7 @@ def recordStats(record):
             "REC_DATE": record.recording.session_start,
             "REC_TS": dtts(record.recording.session_start),
             "REC_NO": record.extra_data['drawing_number'],
-            "REC_TRIALS": record.recording.retries,
+            "REC_TRIALS": len(record.recording.retries) + 1,
             "REC_EVENTS": len(record.recording.events),
             "REC_SECS": (record.recording.events[-1].stamp - record.recording.events[0].stamp).total_seconds(),
             "CAL_TID": record.calibration.tablet_id,

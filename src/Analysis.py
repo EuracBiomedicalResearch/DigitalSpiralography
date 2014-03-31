@@ -50,18 +50,19 @@ class RecordingEvent:
 
 class RecordingData:
     def __init__(self, session_start=None, rect_size=None, rect_drawing=None,
-                 rect_trans=None, events=None, retries=0, strokes=0):
+                 rect_trans=None, events=None, retries=None, strokes=0):
         self.session_start = session_start if session_start is not None else datetime.datetime.now()
         self.rect_size = rect_size
         self.rect_drawing = rect_drawing
         self.rect_trans = rect_trans
-        self.events = events
-        self.retries = retries
+        self.events = events if events is not None else []
+        self.retries = retries if retries is not None else []
         self.strokes = strokes
 
     def clear(self):
-        self.events = None
-        self.retries += 1
+        if self.events:
+            self.retries.append(self.events)
+        self.events = []
         self.strokes = 0
 
     def append(self, event):
@@ -83,6 +84,34 @@ def _to_type(type_map, value):
         if value == v:
             return k
     return value
+
+
+def _serialize_event(event):
+    return {'stamp': event.stamp,
+            'type': _from_type(EVENT_MAP, event.typ),
+            'cdraw': list(event.coords_drawing),
+            'ctrans': list(event.coords_trans),
+            'press': event.pressure,
+            'tdraw': list(event.tilt_drawing),
+            'ttrans': list(event.tilt_trans)}
+
+
+def _deserialize_event(event):
+    typ = _to_type(EVENT_MAP, event['type'])
+    coords_drawing = tuple(event['cdraw'])
+    coords_trans = tuple(event['ctrans'])
+    pressure = event['press']
+    stamp = event['stamp']
+
+    # optional elements (format 1.1)
+    tilt_drawing = event.get('tdraw')
+    tilt_trans = event.get('ttrans')
+    if tilt_drawing is not None:
+        tilt_drawing = tuple(tilt_drawing)
+        tilt_trans = tuple(tilt_trans)
+
+    return RecordingEvent(typ, coords_drawing, coords_trans, pressure,
+                          tilt_drawing, tilt_trans, stamp)
 
 
 # File format event/code maps
@@ -164,18 +193,6 @@ class DrawingRecord:
 
     @classmethod
     def save(cls, record, path):
-        # translate the event stream
-        events = []
-        for event in record.recording.events:
-            buf = {'stamp': event.stamp,
-                   'type': _from_type(EVENT_MAP, event.typ),
-                   'cdraw': list(event.coords_drawing),
-                   'ctrans': list(event.coords_trans),
-                   'press': event.pressure,
-                   'tdraw': list(event.tilt_drawing),
-                   'ttrans': list(event.tilt_trans)}
-            events.append(buf)
-
         # basic data to save
         data = {"format": Consts.FORMAT_VERSION,
                 "version": Consts.APP_VERSION,
@@ -197,8 +214,9 @@ class DrawingRecord:
                     "rect_size": list(record.recording.rect_size),
                     "rect_drawing": map(list, record.recording.rect_drawing),
                     "rect_trans": map(list, record.recording.rect_trans),
-                    "events": events,
-                    "retries": record.recording.retries,
+                    "events": map(_serialize_event, record.recording.events),
+                    "retries": len(record.recording.retries) + 1,
+                    "retries_events": [map(_serialize_event, el) for el in record.recording.retries],
                     "strokes": record.recording.strokes},
                 "extra_data": record.extra_data,
                 "pat_type": _from_type(PAT_TYPE, record.pat_type),
@@ -257,29 +275,20 @@ class DrawingRecord:
                                       map(tuple, data['calibration']['cpoints']),
                                       data['calibration']['stamp'])
 
-        # event stream
-        events = []
-        for event in data['recording']['events']:
-            # optional elements (format 1.1)
-            tilt_drawing = event.get('tdraw')
-            tilt_trans = event.get('ttrans')
-            if tilt_drawing is not None:
-                tilt_drawing = tuple(tilt_drawing)
-                tilt_trans = tuple(tilt_trans)
-
-            # everything else
-            events.append(RecordingEvent(_to_type(EVENT_MAP, event['type']),
-                                         tuple(event['cdraw']), tuple(event['ctrans']),
-                                         event['press'], tilt_drawing, tilt_trans, event['stamp']))
+        # past retries (optional, fmt 1.2)
+        retries_events = data['recording'].get('retries_events')
+        if retries_events is None:
+            retries_events = [[]] * (data['recording']['retries'] - 1)
+        else:
+            retries_events = [map(_deserialize_event, el) for el in retries_events]
 
         # recording
         recording = RecordingData(data['recording']['session_start'],
                                   tuple(data['recording']['rect_size']),
                                   map(tuple, data['recording']['rect_drawing']),
                                   map(tuple, data['recording']['rect_trans']),
-                                  events,
-                                  data['recording']['retries'],
-                                  data['recording']['strokes'])
+                                  map(_deserialize_event, data['recording']['events']),
+                                  retries_events, data['recording']['strokes'])
 
         # final object
         return DrawingRecord(data['aid'], drawing, calibration,

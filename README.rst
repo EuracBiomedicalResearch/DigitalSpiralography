@@ -125,6 +125,7 @@ Version changes
 * In DrawingVisualizer, the speed is now sampled to give more accurate results.
 * An exception caused by an aborted calibration has been fixed.
 * During calibration, the operator and stylus id are now being requested.
+* All recorded trials (caused by pressing RESET while recording) are now saved.
 * The prompt dialog at the end of a recording has been extensively revised:
 
   + The operator id is now also included.
@@ -348,7 +349,7 @@ Ancillary data (all keys are mandatory):
 * ``calibration_age``: number of drawings since the last calibration
 * ``recording/session_start``: timestamp of the start of the session (when the
   recording window is initially shown)
-* ``recording/retries``: number of times RESET has been issued when recording
+* ``recording/retries``: number of attempts required for a correct recording
 * ``recording/strokes``: number of strokes in the recording (redundant for
   human readability)
 * ``pat_type``: patient type
@@ -377,6 +378,10 @@ Chunks introduced with format 1.2:
 * ``calibration/stylus_id``: stylus ID (introduced in DrawingRecorder 1.3)
 * ``calibration/operator``: operator performing the calibration (introduced in
   DrawingRecorder 1.3)
+* ``recording/retries_events``: An ''array'' of events with the same data and
+  format as ``recording/events``, one for each trial during the recording.
+  ``recording/retries`` is just the length of this array + 1 (for backward
+  compatibility).
 
 
 Coordinate projection types
