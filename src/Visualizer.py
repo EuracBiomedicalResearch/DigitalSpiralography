@@ -34,6 +34,17 @@ def speedAtPoint(events, stamp, window):
     return w_len / w_secs
 
 
+class blocked_signals(object):
+    def __init__(self, widget):
+        self.widget = widget
+
+    def __enter__(self):
+        self.orig = self.widget.signalsBlocked()
+        self.widget.blockSignals(True)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.widget.blockSignals(self.orig)
+
 
 # main application
 class MainWindow(QtGui.QMainWindow):
@@ -63,6 +74,12 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.actionShowTilt.triggered.connect(self.on_tilt)
         self._ui.view.wheelEvent = self.on_wheel
 
+        # trial selector
+        ts = self._ui.trialSelector = QtGui.QComboBox()
+        ts.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        ts.currentIndexChanged.connect(self.on_trial)
+        self._ui.toolBar.insertWidget(self._ui.actionRAWCorr, ts)
+
         # props
         self._props = QtGui.QStandardItemModel()
         self._ui.props.setModel(self._props)
@@ -77,9 +94,17 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def reset(self):
+        self._reset_trials()
         self._reset_props()
         self._reset_scene()
         self._ui.comments.clear()
+
+
+    def _reset_trials(self):
+        self._curTrial = 0
+        with blocked_signals(self._ui.trialSelector):
+            self._ui.trialSelector.clear()
+            self._ui.trialSelector.setDisabled(True)
 
 
     def _reset_props(self):
@@ -110,6 +135,20 @@ class MainWindow(QtGui.QMainWindow):
             self._append_prop(name, translate("types", type_map[value]))
         else:
             self._append_prop(name, value)
+
+
+    def _load_trials(self, record):
+        ts = self._ui.trialSelector
+        with blocked_signals(ts):
+            ts.addItem(translate("visualizer", "Main recording"), 0)
+            if record.recording.retries:
+                for i in range(len(record.recording.retries)):
+                    if record.recording.retries[i]:
+                        msg = translate("visualizer", "Attempt {attempt}")
+                    else:
+                        msg = translate("visualizer", "Attempt {attempt} (no data)")
+                    ts.addItem(msg.format(attempt=i + 1), i + 1)
+                ts.setDisabled(False)
 
 
     def _load_props(self, record):
@@ -236,6 +275,10 @@ class MainWindow(QtGui.QMainWindow):
                 tmp.setPos(point[0], point[1])
                 tmp.setParentItem(self._drawing_group)
 
+        # select the event trace
+        events = record.recording.events if self._curTrial == 0 \
+            else record.recording.retries[self._curTrial - 1]
+
         # trace
         pen = QtGui.QPen(Consts.RECORDING_COLOR)
         pen.setCapStyle(QtCore.Qt.RoundCap)
@@ -247,13 +290,12 @@ class MainWindow(QtGui.QMainWindow):
         high_color = QtGui.QColor(Consts.FAST_COLOR)
 
         speed_repr = 1. / Consts.FAST_SPEED
-        total_secs = (record.recording.events[-1].stamp -
-                      record.recording.events[0].stamp).total_seconds()
+        total_secs = (events[-1].stamp - events[0].stamp).total_seconds()
 
         old_pos = None
         old_stamp = None
         drawing = False
-        for event in record.recording.events:
+        for event in events:
             stamp = event.stamp
             if not self._showRaw:
                 pos = event.coords_trans
@@ -277,10 +319,10 @@ class MainWindow(QtGui.QMainWindow):
                 if drawing:
                     # calculate speed/color
                     if self._showTime:
-                        sf1 = (stamp - record.recording.events[0].stamp).total_seconds() / total_secs
+                        sf1 = (stamp - events[0].stamp).total_seconds() / total_secs
                         sf0 = 1. - sf1
                     else:
-                        speed = speedAtPoint(record.recording.events, stamp, 0.05)
+                        speed = speedAtPoint(events, stamp, 0.05)
                         sf1 = min(1., max(0., speed * speed_repr))
                         sf0 = 1. - sf1
 
@@ -330,6 +372,7 @@ class MainWindow(QtGui.QMainWindow):
     def load_record(self, record):
         self.reset()
         self.record = record
+        self._load_trials(self.record)
         self._load_props(self.record)
         self._load_scene(self.record)
         self._fit_view()
@@ -383,6 +426,12 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_trace(self, ev):
         self._showTraces = self._ui.actionShowTraces.isChecked()
+        self._redraw_scene()
+
+
+    def on_trial(self, ev):
+        self._curTrial = self._ui.trialSelector.itemData(
+            self._ui.trialSelector.currentIndex()).toPyObject()
         self._redraw_scene()
 
 
