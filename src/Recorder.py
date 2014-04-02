@@ -159,7 +159,7 @@ class EndRecording(QtGui.QDialog):
         self._file_browser.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
         self._file_browser.setAcceptMode(QtGui.QFileDialog.AcceptSave)
         ext_name = translate("recorder", "Recordings")
-        self._file_browser.setFilter(ext_name + " (*.yaml.gz)")
+        self._file_browser.setFilter(ext_name + " (*.rec.yaml.gz)")
 
         pal = self._ui.preview.palette()
         pal.setColor(self._ui.preview.backgroundRole(), Consts.FILL_COLOR)
@@ -448,7 +448,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # guess a decent path name
         save_path = record.recording.session_start.strftime("%Y%m%d")
-        save_path = u"{}_{}_{}.yaml.gz".format(save_path,
+        save_path = u"{}_{}_{}.rec.yaml.gz".format(save_path,
                                                record.aid,
                                                self.drawing_number)
         save_path = os.path.join(self.params.save_path, save_path)

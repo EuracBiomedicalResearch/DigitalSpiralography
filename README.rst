@@ -126,6 +126,7 @@ Version changes
 * An exception caused by an aborted calibration has been fixed.
 * During calibration, the operator and stylus id are now being requested.
 * All recorded trials (caused by pressing RESET while recording) are now saved.
+* Default extension for recordings has been changed to ``rec.yaml.gz``.
 * DrawingVisualizer can show recorded trials, when present.
 * The prompt dialog at the end of a recording has been extensively revised:
 
