@@ -33,7 +33,7 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QTableView" name="props">
+       <widget class="QTableWidget" name="props">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -49,6 +49,12 @@
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
+        <property name="columnCount">
+         <number>2</number>
+        </property>
+        <attribute name="horizontalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
         <attribute name="horizontalHeaderDefaultSectionSize">
          <number>130</number>
         </attribute>
@@ -58,6 +64,8 @@
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>
         </attribute>
+        <column/>
+        <column/>
        </widget>
        <widget class="QPlainTextEdit" name="comments">
         <property name="readOnly">

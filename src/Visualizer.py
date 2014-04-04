@@ -80,10 +80,6 @@ class MainWindow(QtGui.QMainWindow):
         ts.currentIndexChanged.connect(self.on_trial)
         self._ui.toolBar.insertWidget(self._ui.actionRAWCorr, ts)
 
-        # props
-        self._props = QtGui.QStandardItemModel()
-        self._ui.props.setModel(self._props)
-
         # scene
         self._scene = QtGui.QGraphicsScene()
         self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
@@ -108,9 +104,9 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def _reset_props(self):
-        self._props.clear()
-        self._props.setColumnCount(2)
-        self._props.setHorizontalHeaderLabels(
+        self._ui.props.clear()
+        self._ui.props.setColumnCount(2)
+        self._ui.props.setHorizontalHeaderLabels(
             [translate("visualizer", "Property"),
              translate("visualizer", "Value")])
 
@@ -126,8 +122,10 @@ class MainWindow(QtGui.QMainWindow):
         else:
             value = translate("types", "N/A")
 
-        self._props.appendRow([QtGui.QStandardItem(name),
-                               QtGui.QStandardItem(value)])
+        pos = self._ui.props.rowCount()
+        self._ui.props.insertRow(pos)
+        self._ui.props.setItem(pos, 0, QtGui.QTableWidgetItem(name))
+        self._ui.props.setItem(pos, 1, QtGui.QTableWidgetItem(value))
 
 
     def _append_prop_map(self, name, type_map, value):
