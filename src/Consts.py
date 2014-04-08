@@ -14,6 +14,7 @@ APP_DELAY       = 1. / 20.              # general refresh delay for lengthy oper
 # File formats
 FORMAT_VERSION  = "1.2"                 # file format version
 FF_RECORDING    = "rec"                 # recording type
+FF_PROFILE      = "prof"                # profiling type
 
 # Drawing parameters
 POINT_LEN       = 0.05                  # diameter of calibration points (in normalized drawing units)

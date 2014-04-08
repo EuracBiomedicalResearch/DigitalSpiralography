@@ -119,16 +119,18 @@ Version changes
 1.3:
 
 * Several tools for data analysis have been added (``drwstats``,
-  ``drwrenderer``, ``drwstackrenderer``, ``drwconvert``).
+  ``drwrenderer``, ``drwstackrenderer``.
+* Tools for analysis and DrawingVisualizer can now use 'dump' files to speed-up
+  loading/saving time. ``drwconvert`` can convert between YaML/dump formats.
 * A simple tool to generate and check IDs with a Verhoeff check digit
   (patient/table/stylus ID) has been added (``genverhoeff``).
 * In DrawingVisualizer, the speed is now sampled to give more accurate results.
 * An exception caused by an aborted calibration has been fixed.
 * During calibration, the operator and stylus id are now being requested.
 * All recorded trials (caused by pressing RESET while recording) are now saved.
+* DrawingVisualizer can show recorded trials, when present.
 * Default extension for recordings has been changed to ``rec.yaml.gz``, and a
   new ``type`` record has been added.
-* DrawingVisualizer can show recorded trials, when present.
 * The prompt dialog at the end of a recording has been extensively revised:
 
   + The operator id is now also included.
@@ -137,6 +139,12 @@ Version changes
   + A new option "Next hand" has been added to preserve the patient data and
     automatically create a recording for the other hand.
   + Quality of the preview has been improved.
+
+* A new tool ``StylusProfiler`` has been added:
+
+  + Allows to profile the individual pressure response of each stylus.
+  + Performs a simple quadratic fit of the response curve.
+  + A new file format ``prof.yaml.gz`` has been designed for the purpose.
 
 1.2:
 
@@ -307,11 +315,21 @@ Customize the tablet preferences as follows:
 Technical informations
 ----------------------
 
-File format
-~~~~~~~~~~~
+File formats
+~~~~~~~~~~~~
 
-The file format is self-descriptive GZip-compressed YaML_. GZip is used both to
-conserve space (YaML is quite inefficient) and for check-summing purposes.
+The file formats are stored in self-descriptive GZip-compressed YaML_. GZip is
+used both to conserve space (YaML is quite inefficient) and for check-summing
+purposes.
+
+To speed-up loading for repeated processing, ``drwconvert`` can be used to dump
+an existing file into a "dump" object. It's important to note though that such
+dumps must not be used for distribution and are not compatible across different
+versions.
+
+
+Recorder ``rec.yaml.gz`` File format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Keys related to drawing/calibration (all keys are mandatory):
 
@@ -387,6 +405,31 @@ Chunks introduced with format 1.2:
   format as ``recording/events``, one for each trial during the recording.
   ``recording/retries`` is just the length of this array + 1 (for backward
   compatibility).
+
+
+Profiler ``prof.yaml.gz`` File format
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Keys related to the profile (all keys are mandatory):
+
+* ``data``: list of data points, where each point contains:
+
+  + ``press``: stylus pressure reported
+  + ``weight``: applied weight
+
+* ``fit``: 2nd degree polynomial fit of the response curve.
+
+Ancillary data (all keys are mandatory):
+
+* ``format``: file format version (1.* describes this format)
+* ``type``: "prof".
+* ``version``: application version
+* ``tablet_id``: tablet ID used for calibration
+* ``operator``: the name of the operator performing the calibration
+* ``stylus_id``: stylus ID currently being profiled
+* ``ts_created``: profile creation timestamp
+* ``ts_updated``: profile update (last change) timestamp
+* ``extra_data``: provisional dictionary for arbitrary data.
 
 
 Coordinate projection types

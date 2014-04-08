@@ -11,6 +11,7 @@ import datetime
 import yaml
 import gzip
 from PyQt4 import QtCore
+import numpy as np
 import cPickle
 
 
@@ -298,3 +299,84 @@ class DrawingRecord(object):
                              _to_type(PAT_HANDEDNESS, data['pat_handedness']),
                              _to_type(PAT_HAND, data['pat_hand']),
                              extra_data, data['comments'])
+
+
+# Stylus profile data
+class StylusResponseData(object):
+    def __init__(self, pressure=None, weight=None):
+        self.pressure = pressure
+        self.weight = weight
+
+    @classmethod
+    def serialize(cls, data):
+        return {'press': data.pressure, 'weight': data.weight}
+
+    @classmethod
+    def deserialize(cls, data):
+        return StylusResponseData(data['press'], data['weight'])
+
+
+class StylusProfile(object):
+    def __init__(self, ts_created=None, ts_updated=None, oid=None, sid=None, tid=None,
+                 data=None, fit=None, extra_data=None):
+        self.ts_created = ts_created if ts_created is not None else datetime.datetime.now()
+        self.ts_updated = ts_updated if ts_updated is not None else self.ts_created
+        self.oid = oid
+        self.sid = sid
+        self.tid = tid
+        self.data = data if data is not None else []
+        self.fit = fit if fit is not None else []
+        self.extra_data = extra_data if extra_data is not None else {}
+
+
+    @classmethod
+    def save(cls, profile, path):
+        # basic data to save
+        data = {"format": Consts.FORMAT_VERSION,
+                "type": Consts.FF_PROFILE,
+                "version": Consts.APP_VERSION,
+                "ts_created": profile.ts_created,
+                "ts_updated": profile.ts_updated,
+                "operator": profile.oid,
+                "stylus_id": profile.sid,
+                "tablet_id": profile.tid,
+                "data": map(StylusResponseData.serialize, profile.data),
+                "fit": profile.fit[0].tolist(),
+                "extra_data": profile.extra_data}
+
+        # avoid saving unicode in the FNAME header
+        fd = gzip.GzipFile(profile.sid, 'wb', fileobj=open(path, 'wb', 0))
+
+        # dump
+        yaml.safe_dump(data, fd, default_flow_style=False,
+                       allow_unicode=True, encoding='utf-8')
+
+
+    @classmethod
+    def load(cls, path):
+        data = None
+        try:
+            fd = gzip.GzipFile(path, 'rb')
+            data = yaml.safe_load(fd)
+        except:
+            pass
+
+        # check version info
+        if not data or 'format' not in data or \
+          type(data['format']) != str or \
+          int(float(data['format'])) != 1 or \
+          data.get('type', Consts.FF_PROFILE) != Consts.FF_PROFILE:
+            msg = translate("analysis", 'Invalid or unsupported file format')
+            raise Exception(msg, path)
+
+        # recover extra data
+        extra_data = data['extra_data']
+        extra_data['format'] = data['format']
+        extra_data['version'] = data['version']
+        extra_data['type'] = data['type']
+
+        # final object
+        return StylusProfile(data['ts_created'], data['ts_updated'],
+                             data['operator'], data['stylus_id'], data['tablet_id'],
+                             map(StylusResponseData.deserialize, data['data']),
+                             (np.asarray(data['fit'])), extra_data)
