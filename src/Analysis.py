@@ -149,7 +149,7 @@ BOOL_MAP_DSC = {True: translate('types', 'Yes'),
 class DrawingRecord:
     def __init__(self, aid, drawing, calibration, calibration_age,
                  recording, pat_type, pat_handedness, pat_hand,
-                 extra_data={}, comments=None):
+                 extra_data=None, comments=None):
         self.aid = aid
         self.drawing = drawing
         self.calibration = calibration
@@ -158,7 +158,7 @@ class DrawingRecord:
         self.pat_type = pat_type
         self.pat_handedness = pat_handedness
         self.pat_hand = pat_hand
-        self.extra_data = extra_data
+        self.extra_data = extra_data if extra_data is not None else {}
         self.comments = comments
 
 
