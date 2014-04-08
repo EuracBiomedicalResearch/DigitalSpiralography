@@ -39,34 +39,6 @@ def _to_type(type_map, value):
     return value
 
 
-def _serialize_event(event):
-    return {'stamp': event.stamp,
-            'type': _from_type(EVENT_MAP, event.typ),
-            'cdraw': list(event.coords_drawing),
-            'ctrans': list(event.coords_trans),
-            'press': event.pressure,
-            'tdraw': list(event.tilt_drawing),
-            'ttrans': list(event.tilt_trans)}
-
-
-def _deserialize_event(event):
-    typ = _to_type(EVENT_MAP, event['type'])
-    coords_drawing = tuple(event['cdraw'])
-    coords_trans = tuple(event['ctrans'])
-    pressure = event['press']
-    stamp = event['stamp']
-
-    # optional elements (format 1.1)
-    tilt_drawing = event.get('tdraw')
-    tilt_trans = event.get('ttrans')
-    if tilt_drawing is not None:
-        tilt_drawing = tuple(tilt_drawing)
-        tilt_trans = tuple(tilt_trans)
-
-    return RecordingEvent(typ, coords_drawing, coords_trans, pressure,
-                          tilt_drawing, tilt_trans, stamp)
-
-
 # File format event/code maps
 EVENT_MAP = {QtCore.QEvent.TabletMove: 'move',
              QtCore.QEvent.TabletPress: 'press',
@@ -118,6 +90,35 @@ class RecordingEvent(object):
         self.tilt_drawing = tilt_drawing
         self.tilt_trans = tilt_trans
         self.stamp = stamp if stamp is not None else datetime.datetime.now()
+
+    @classmethod
+    def serialize(cls, event):
+        return {'stamp': event.stamp,
+                'type': _from_type(EVENT_MAP, event.typ),
+                'cdraw': list(event.coords_drawing),
+                'ctrans': list(event.coords_trans),
+                'press': event.pressure,
+                'tdraw': list(event.tilt_drawing),
+                'ttrans': list(event.tilt_trans)}
+
+    @classmethod
+    def deserialize(cls, event):
+        typ = _to_type(EVENT_MAP, event['type'])
+        coords_drawing = tuple(event['cdraw'])
+        coords_trans = tuple(event['ctrans'])
+        pressure = event['press']
+        stamp = event['stamp']
+
+        # optional elements (format 1.1)
+        tilt_drawing = event.get('tdraw')
+        tilt_trans = event.get('ttrans')
+        if tilt_drawing is not None:
+            tilt_drawing = tuple(tilt_drawing)
+            tilt_trans = tuple(tilt_trans)
+
+        return RecordingEvent(typ, coords_drawing, coords_trans, pressure,
+                            tilt_drawing, tilt_trans, stamp)
+
 
 
 class RecordingData(object):
@@ -212,9 +213,9 @@ class DrawingRecord(object):
                     "rect_size": list(record.recording.rect_size),
                     "rect_drawing": map(list, record.recording.rect_drawing),
                     "rect_trans": map(list, record.recording.rect_trans),
-                    "events": map(_serialize_event, record.recording.events),
+                    "events": map(RecordingEvent.serialize, record.recording.events),
                     "retries": len(record.recording.retries) + 1,
-                    "retries_events": [map(_serialize_event, el) for el in record.recording.retries],
+                    "retries_events": [map(RecordingEvent.serialize, el) for el in record.recording.retries],
                     "strokes": record.recording.strokes},
                 "extra_data": record.extra_data,
                 "pat_type": _from_type(PAT_TYPE, record.pat_type),
@@ -280,14 +281,14 @@ class DrawingRecord(object):
         if retries_events is None:
             retries_events = [[]] * (data['recording']['retries'] - 1)
         else:
-            retries_events = [map(_deserialize_event, el) for el in retries_events]
+            retries_events = [map(RecordingEvent.deserialize, el) for el in retries_events]
 
         # recording
         recording = RecordingData(data['recording']['session_start'],
                                   tuple(data['recording']['rect_size']),
                                   map(tuple, data['recording']['rect_drawing']),
                                   map(tuple, data['recording']['rect_trans']),
-                                  map(_deserialize_event, data['recording']['events']),
+                                  map(RecordingEvent.deserialize, data['recording']['events']),
                                   retries_events, data['recording']['strokes'])
 
         # final object
