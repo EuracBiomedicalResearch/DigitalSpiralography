@@ -48,7 +48,7 @@ def _reset_grp_state(group):
 
 
 # implementation
-class Params:
+class Params(object):
     def __init__(self, save_path, total_recordings,
                  installation_uuid, installation_stamp):
         self.save_path = save_path

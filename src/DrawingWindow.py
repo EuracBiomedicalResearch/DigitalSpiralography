@@ -13,7 +13,7 @@ from PyQt4 import QtCore, QtGui
 
 
 # implementation
-class Mode:
+class Mode(object):
     Calibrate, Record = range(2)
 
 

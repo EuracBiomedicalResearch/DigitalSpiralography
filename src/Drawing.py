@@ -19,7 +19,7 @@ class Drawing(object):
 
 
 
-class SpiralParams:
+class SpiralParams(object):
     def __init__(self, diameter=None, turns=None, direction=None):
         self.diameter = diameter
         self.turns = turns

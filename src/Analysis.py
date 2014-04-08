@@ -14,62 +14,15 @@ from PyQt4 import QtCore
 import cPickle
 
 
-# types
-class PatType:
+# basic types
+class PatType(object):
     case, control = range(2)
 
-
-class PatHandedness:
+class PatHandedness(object):
     left, right, ambidextrous = range(3)
 
-
-class PatHand:
+class PatHand(object):
     left, right = range(2)
-
-
-class CalibrationData:
-    def __init__(self, oid, tablet_id, stylus_id, cpoints, stamp=None):
-        self.oid = oid
-        self.tablet_id = tablet_id
-        self.stylus_id = stylus_id
-        self.cpoints = cpoints
-        self.stamp = stamp if stamp is not None else datetime.datetime.now()
-
-
-class RecordingEvent:
-    def __init__(self, typ, coords_drawing, coords_trans, pressure,
-                 tilt_drawing, tilt_trans, stamp=None):
-        self.typ = typ
-        self.coords_drawing = coords_drawing
-        self.coords_trans = coords_trans
-        self.pressure = pressure
-        self.tilt_drawing = tilt_drawing
-        self.tilt_trans = tilt_trans
-        self.stamp = stamp if stamp is not None else datetime.datetime.now()
-
-
-class RecordingData:
-    def __init__(self, session_start=None, rect_size=None, rect_drawing=None,
-                 rect_trans=None, events=None, retries=None, strokes=0):
-        self.session_start = session_start if session_start is not None else datetime.datetime.now()
-        self.rect_size = rect_size
-        self.rect_drawing = rect_drawing
-        self.rect_trans = rect_trans
-        self.events = events if events is not None else []
-        self.retries = retries if retries is not None else []
-        self.strokes = strokes
-
-    def clear(self):
-        if self.events:
-            self.retries.append(self.events)
-        self.events = []
-        self.strokes = 0
-
-    def append(self, event):
-        self.events.append(event)
-        if event.typ == QtCore.QEvent.TabletRelease:
-            self.strokes += 1
-
 
 
 # helpers
@@ -145,8 +98,52 @@ BOOL_MAP_DSC = {True: translate('types', 'Yes'),
                 False: translate('types', 'No')}
 
 
-# implementation
-class DrawingRecord:
+# Calibration/Recording data
+class CalibrationData(object):
+    def __init__(self, oid, tablet_id, stylus_id, cpoints, stamp=None):
+        self.oid = oid
+        self.tablet_id = tablet_id
+        self.stylus_id = stylus_id
+        self.cpoints = cpoints
+        self.stamp = stamp if stamp is not None else datetime.datetime.now()
+
+
+class RecordingEvent(object):
+    def __init__(self, typ, coords_drawing, coords_trans, pressure,
+                 tilt_drawing, tilt_trans, stamp=None):
+        self.typ = typ
+        self.coords_drawing = coords_drawing
+        self.coords_trans = coords_trans
+        self.pressure = pressure
+        self.tilt_drawing = tilt_drawing
+        self.tilt_trans = tilt_trans
+        self.stamp = stamp if stamp is not None else datetime.datetime.now()
+
+
+class RecordingData(object):
+    def __init__(self, session_start=None, rect_size=None, rect_drawing=None,
+                 rect_trans=None, events=None, retries=None, strokes=0):
+        self.session_start = session_start if session_start is not None else datetime.datetime.now()
+        self.rect_size = rect_size
+        self.rect_drawing = rect_drawing
+        self.rect_trans = rect_trans
+        self.events = events if events is not None else []
+        self.retries = retries if retries is not None else []
+        self.strokes = strokes
+
+    def clear(self):
+        if self.events:
+            self.retries.append(self.events)
+        self.events = []
+        self.strokes = 0
+
+    def append(self, event):
+        self.events.append(event)
+        if event.typ == QtCore.QEvent.TabletRelease:
+            self.strokes += 1
+
+
+class DrawingRecord(object):
     def __init__(self, aid, drawing, calibration, calibration_age,
                  recording, pat_type, pat_handedness, pat_hand,
                  extra_data=None, comments=None):
