@@ -192,6 +192,7 @@ class DrawingRecord(object):
     def save(cls, record, path):
         # basic data to save
         data = {"format": Consts.FORMAT_VERSION,
+                "type": Consts.FF_RECORDING,
                 "version": Consts.APP_VERSION,
                 "aid": record.aid,
                 "drawing": {
@@ -250,7 +251,8 @@ class DrawingRecord(object):
         # check version info
         if not data or 'format' not in data or \
           type(data['format']) != str or \
-          int(float(data['format'])) != 1:
+          int(float(data['format'])) != 1 or \
+          data.get('type', Consts.FF_RECORDING) != Consts.FF_RECORDING:
             msg = translate("analysis", 'Invalid or unsupported file format')
             raise Exception(msg, path)
 
@@ -258,6 +260,7 @@ class DrawingRecord(object):
         extra_data = data['extra_data']
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
+        extra_data['type'] = data['type']
 
         # drawing
         drawing = Drawing.Drawing(data['drawing']['id'],

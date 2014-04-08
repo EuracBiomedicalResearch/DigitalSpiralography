@@ -126,7 +126,8 @@ Version changes
 * An exception caused by an aborted calibration has been fixed.
 * During calibration, the operator and stylus id are now being requested.
 * All recorded trials (caused by pressing RESET while recording) are now saved.
-* Default extension for recordings has been changed to ``rec.yaml.gz``.
+* Default extension for recordings has been changed to ``rec.yaml.gz``, and a
+  new ``type`` record has been added.
 * DrawingVisualizer can show recorded trials, when present.
 * The prompt dialog at the end of a recording has been extensively revised:
 
@@ -377,6 +378,8 @@ Chunks introduced with format 1.1:
 
 Chunks introduced with format 1.2:
 
+* ``type``: to distinguish file types (recording/profiles), type has been
+  added, and needs to be ``rec`` when present.
 * ``calibration/stylus_id``: stylus ID (introduced in DrawingRecorder 1.3)
 * ``calibration/operator``: operator performing the calibration (introduced in
   DrawingRecorder 1.3)
