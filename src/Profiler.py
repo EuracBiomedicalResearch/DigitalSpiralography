@@ -401,8 +401,8 @@ class MainWindow(QtGui.QMainWindow):
         # file prompt
         title = translate("profiler", "Save profile")
         ext_name = translate("profiler", "Profiles")
-        path = u"{}_{}.prof.yaml.gz".format(self.data.tid,
-                                            self.data.ts_updated.strftime("%Y%m%d"))
+        path = u"{}_{}_{}.prof.yaml.gz".format(self.data.sid, self.data.tid,
+                                               self.data.ts_updated.strftime("%Y%m%d"))
         path = QtGui.QFileDialog.getSaveFileName(
             self, title, path, ext_name + " (*.prof.yaml.gz)")
         if not path:
