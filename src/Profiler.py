@@ -283,6 +283,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def eventFilter(self, watched, ev):
+        # delegate to handle 'del' for row deletion in TableWidget
         if watched == self._ui.data and \
           ev.type() == QtCore.QEvent.KeyPress and \
           ev.key() == QtCore.Qt.Key_Delete:

@@ -119,7 +119,7 @@ Version changes
 1.3:
 
 * Several tools for data analysis have been added (``drwstats``,
-  ``drwrenderer``, ``drwstackrenderer``.
+  ``drwrenderer`` and ``drwstackrenderer``).
 * Tools for analysis and DrawingVisualizer can now use 'dump' files to speed-up
   loading/saving time. ``drwconvert`` can convert between YaML/dump formats.
 * A simple tool to generate and check IDs with a Verhoeff check digit
@@ -322,10 +322,10 @@ The file formats are stored in self-descriptive GZip-compressed YaML_. GZip is
 used both to conserve space (YaML is quite inefficient) and for check-summing
 purposes.
 
-To speed-up loading for repeated processing, ``drwconvert`` can be used to dump
-an existing file into a "dump" object. It's important to note though that such
-dumps must not be used for distribution and are not compatible across different
-versions.
+To speed-up loading for repeated processing, ``drwconvert`` can be used to
+convert an existing file into a "dump" object that loads faster. It's important
+to note though that such dumps must not be used for distribution and are not
+compatible across different versions.
 
 
 Recorder ``rec.yaml.gz`` File format
