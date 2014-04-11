@@ -16,6 +16,7 @@ import sys
 import codecs
 import argparse
 import math
+import numpy as np
 
 
 def remap(vmap, value):
@@ -121,6 +122,17 @@ def spiralLength(record, traces, func):
     return (total_len, total_secs)
 
 
+def pressureCorrect(record, traces, prof):
+    if prof:
+        corr = np.poly1d(prof.fit)
+    else:
+        corr = lambda x: None
+
+    for trace in traces:
+        for event in trace['trace']:
+            event.weight = corr(event.pressure)
+
+
 def spiralPressure(record, traces, func):
     start = record.recording.events[0].stamp
     end = record.recording.events[-1].stamp
@@ -136,6 +148,23 @@ def spiralPressure(record, traces, func):
             'med': sorted(pressures)[len(pressures) / 2],
             'avg': sum(pressures) / len(pressures),
             'max': max(pressures)}
+
+
+def spiralWeight(record, traces, func):
+    start = record.recording.events[0].stamp
+    end = record.recording.events[-1].stamp
+    weights = []
+    for trace in traces:
+        if not func(trace):
+            continue
+        for event in trace['trace']:
+            if ((event.stamp - start).total_seconds() >= 1 and (end - event.stamp).total_seconds() >= 1):
+                weights.append(event.weight)
+
+    return {'min': min(weights),
+            'med': sorted(weights)[len(weights) / 2],
+            'avg': sum(weights) / len(weights),
+            'max': max(weights)}
 
 
 def spiralSpeed(record, traces, window, func):
@@ -185,7 +214,7 @@ def spiralSpeed(record, traces, window, func):
             'max': max_speed}
 
 
-def recordStats(record):
+def recordStats(record, profs):
     repairs = spiralRepair(record)
     traces = spiralTraces(record)
 
@@ -195,7 +224,12 @@ def recordStats(record):
     spr_secs = spr_drw_secs + spr_air_secs
     spr_speed = -1 if spr_secs < 1 else spr_len / spr_secs
 
+    prof = profs.get(record.calibration.stylus_id)
+    pressureCorrect(record, traces, prof)
+
     pressures = spiralPressure(record, traces, lambda x: x['drawing'])
+    weights = spiralWeight(record, traces, lambda x: x['drawing'])
+
     speedsW1 = spiralSpeed(record, traces, 1., lambda x: x['drawing'])
     speedsW01 = spiralSpeed(record, traces, 0.1, lambda x: x['drawing'])
     speedsW005 = spiralSpeed(record, traces, 0.05, lambda x: x['drawing'])
@@ -215,6 +249,7 @@ def recordStats(record):
             "REC_EVENTS": len(record.recording.events),
             "REC_SECS": (record.recording.events[-1].stamp - record.recording.events[0].stamp).total_seconds(),
             "CAL_TID": record.calibration.tablet_id,
+            "CAL_SID": record.calibration.stylus_id,
             "CAL_DATE": record.calibration.stamp,
             "CAL_TS": dtts(record.calibration.stamp),
             "CAL_AGE": record.calibration_age,
@@ -228,6 +263,10 @@ def recordStats(record):
             "SPR_DRW_MED_PRESS_T1": pressures['med'],
             "SPR_DRW_AVG_PRESS_T1": pressures['avg'],
             "SPR_DRW_MAX_PRESS_T1": pressures['max'],
+            "SPR_DRW_MIN_WEIGHT_T1": weights['min'],
+            "SPR_DRW_MED_WEIGHT_T1": weights['med'],
+            "SPR_DRW_AVG_WEIGHT_T1": weights['avg'],
+            "SPR_DRW_MAX_WEIGHT_T1": weights['max'],
             "SPR_DRW_MIN_SPEED_W1": speedsW1['min'],
             "SPR_DRW_MED_SPEED_W1": speedsW1['med'],
             "SPR_DRW_AVG_SPEED_W1": speedsW1['avg'],
@@ -249,6 +288,8 @@ def __main__():
     sys.stdout = codecs.getwriter('UTF-8')(sys.stdout)
 
     ap = argparse.ArgumentParser(description='Print drawing statistics in parseable format')
+    ap.add_argument('-p', dest='prof', action='append',
+                    help='Load stylus correction profile (repeat to load multiple profiles)')
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
     ap.add_argument('-x', dest='xtra', action='store_true',
@@ -256,8 +297,17 @@ def __main__():
     ap.add_argument('file', help='drawing file')
     args = ap.parse_args()
 
+    # load correction profiles
+    profs = {}
+    for path in args.prof:
+        data = Analysis.StylusProfile.load(path)
+        profs[data.sid] = data
+
+    # drawing record
     record = Analysis.DrawingRecord.load(args.file, args.fast)
-    stats = recordStats(record)
+
+    # generate statistics
+    stats = recordStats(record, profs)
     if args.xtra:
         stats['FILE'] = args.file
 
