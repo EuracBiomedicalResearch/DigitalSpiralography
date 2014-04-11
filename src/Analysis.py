@@ -262,7 +262,7 @@ class DrawingRecord(object):
         extra_data = data['extra_data']
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
-        extra_data['type'] = data['type']
+        extra_data['type'] = data.get('type', None) # optional (fmt 1.2)
 
         # drawing
         drawing = Drawing.Drawing(data['drawing']['id'],
