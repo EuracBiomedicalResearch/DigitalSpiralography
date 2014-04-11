@@ -84,7 +84,7 @@ class MainWindow(QtGui.QMainWindow):
         self.rsp_txt.setFont(QtGui.QFont("monospace"))
         self.rsp_txt.setParentItem(self.pg.getViewBox())
 
-        self.rsp = pg.PlotCurveItem()
+        self.rsp = pg.ScatterPlotItem()
         self.pg.addItem(self.rsp)
 
         self.cb = [pg.InfiniteLine(None, 0), pg.InfiniteLine(None, 90)]
