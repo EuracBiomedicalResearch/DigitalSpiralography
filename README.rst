@@ -417,7 +417,7 @@ Keys related to the profile (all keys are mandatory):
   + ``press``: stylus pressure reported
   + ``weight``: applied weight
 
-* ``fit``: 2nd degree polynomial fit of the response curve.
+* ``fit``: 3nd degree polynomial fit of the response curve.
 
 Ancillary data (all keys are mandatory):
 

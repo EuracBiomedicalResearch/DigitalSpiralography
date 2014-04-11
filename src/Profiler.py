@@ -180,7 +180,7 @@ class MainWindow(QtGui.QMainWindow):
             self.rsp_fit.hide()
             self.rsp_txt.hide()
         else:
-            self.data.fit = np.polyfit(y, x, 2, full=True)
+            self.data.fit = np.polyfit(y, x, 3, full=True)
             fy = [el / 50. for el in range(51)]
             fx = [np.polyval(self.data.fit[0], el) for el in fy]
 
