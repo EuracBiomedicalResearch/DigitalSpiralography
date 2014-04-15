@@ -65,6 +65,12 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.actionShowTraces.setChecked(self._showTraces)
         self._ui.actionShowTilt.setChecked(self._showTilt)
 
+        # props
+        self._ui.props.setColumnCount(2)
+        self._ui.props.setHorizontalHeaderLabels(
+            [translate("visualizer", "Property"),
+             translate("visualizer", "Value")])
+
         # signals and events
         self._ui.actionOpen.triggered.connect(self.on_load)
         self._ui.actionInfo.triggered.connect(self.on_info)
@@ -91,8 +97,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def reset(self):
         self._reset_trials()
-        self._reset_props()
         self._reset_scene()
+        self._ui.props.setRowCount(0)
         self._ui.comments.clear()
 
 
@@ -101,14 +107,6 @@ class MainWindow(QtGui.QMainWindow):
         with blocked_signals(self._ui.trialSelector):
             self._ui.trialSelector.clear()
             self._ui.trialSelector.setDisabled(True)
-
-
-    def _reset_props(self):
-        self._ui.props.clear()
-        self._ui.props.setColumnCount(2)
-        self._ui.props.setHorizontalHeaderLabels(
-            [translate("visualizer", "Property"),
-             translate("visualizer", "Value")])
 
 
     def _reset_scene(self):

@@ -69,6 +69,10 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.data.installEventFilter(self)
         self._ui.data.itemChanged.connect(self.on_data_changed)
         self._ui.data.itemSelectionChanged.connect(self.on_selected)
+        self._ui.data.setColumnCount(2)
+        self._ui.data.setHorizontalHeaderLabels(
+            [translate("profiler", "Pressure"),
+            translate("profiler", "Weight (g)")])
 
         # plot
         self.pg = self._ui.view
@@ -309,11 +313,7 @@ class MainWindow(QtGui.QMainWindow):
 
         with sorting_disabled(self._ui.data) \
           and blocked_signals(self._ui.data):
-            self._ui.data.clear()
-            self._ui.data.setColumnCount(2)
-            self._ui.data.setHorizontalHeaderLabels(
-                [translate("profiler", "Pressure"),
-                translate("profiler", "Weight (g)")])
+            self._ui.data.setRowCount(0)
             for p in self.data.data:
                 self._ui.data.addRow([str(p.pressure), str(p.weight)])
         self._ui.data.sortItems(0)
