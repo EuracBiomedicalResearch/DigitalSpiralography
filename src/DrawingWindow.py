@@ -277,7 +277,7 @@ class DrawingWindow(QtGui.QMainWindow):
         super(DrawingWindow, self).__init__()
 
         # scene setup
-        self._scene = QtGui.QGraphicsScene()
+        self._scene = QtGui.QGraphicsScene(self)
         self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
         self._view = QtGui.QGraphicsView(self._scene)
         self._view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
@@ -354,6 +354,7 @@ class DrawingWindow(QtGui.QMainWindow):
         self._warning.setFont(font)
 
         # initial state
+        self.mode = None
         self._drawing_item = None
         self.reset_calibration()
         self.reset_recording()
