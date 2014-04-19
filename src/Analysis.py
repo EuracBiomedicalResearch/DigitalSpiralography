@@ -92,15 +92,22 @@ class RecordingEvent(object):
         self.tilt_trans = tilt_trans
         self.stamp = stamp if stamp is not None else datetime.datetime.now()
 
+
     @classmethod
     def serialize(cls, event):
-        return {'stamp': event.stamp,
-                'type': _from_type(EVENT_MAP, event.typ),
-                'cdraw': list(event.coords_drawing),
-                'ctrans': list(event.coords_trans),
-                'press': event.pressure,
-                'tdraw': list(event.tilt_drawing),
-                'ttrans': list(event.tilt_trans)}
+        data =  {'stamp': event.stamp,
+                 'type': _from_type(EVENT_MAP, event.typ),
+                 'cdraw': list(event.coords_drawing),
+                 'ctrans': list(event.coords_trans),
+                 'press': event.pressure}
+
+        # optional (fmt 1.1)
+        if event.tilt_drawing is not None:
+            data['tdraw'] = list(event.tilt_drawing)
+            data['ttrans'] = list(event.tilt_trans)
+
+        return data
+
 
     @classmethod
     def deserialize(cls, event):
