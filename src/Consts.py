@@ -16,6 +16,10 @@ FORMAT_VERSION  = "1.2"                 # file format version
 FF_RECORDING    = "rec"                 # recording type
 FF_PROFILE      = "prof"                # profiling type
 
+# Recording cycle methodology
+CYCLE_ORDER     = "ABAB"                # recording cycle (ABAB / AABB)
+CYCLE_COUNT     = 3                     # number of requested cycles
+
 # Drawing parameters
 POINT_LEN       = 0.05                  # diameter of calibration points (in normalized drawing units)
 BAR_LEN         = 2.                    # extension of the calibration bars (in normalized drawing units)

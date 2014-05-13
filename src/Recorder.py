@@ -196,6 +196,14 @@ class EndRecording(QtGui.QDialog):
         self.pat_type = record.pat_type
         _set_type(self._ui.pat_type, self.pat_type)
 
+        self.pat_hand_cnt = record.pat_hand_cnt
+        if self.pat_hand_cnt == 1:
+            self._ui.hand_cnt_1.setChecked(True)
+        elif self.pat_hand_cnt == 2:
+            self._ui.hand_cnt_2.setChecked(True)
+        else:
+            _reset_grp_state(self._ui.hand_cnt_grp)
+
         self.pat_handedness = record.pat_handedness
         if self.pat_handedness == PatHandedness.left:
             self._ui.handedness_left.setChecked(True)
@@ -206,11 +214,21 @@ class EndRecording(QtGui.QDialog):
         else:
             _reset_grp_state(self._ui.handedness_grp)
 
+        for btn in self._ui.hand_grp.buttons():
+            font = btn.font()
+            font.setBold(False)
+            btn.setFont(font)
         self.pat_hand = record.pat_hand
         if self.pat_hand == PatHand.left:
             self._ui.hand_left.setChecked(True)
+            font = self._ui.hand_left.font()
+            font.setBold(True)
+            self._ui.hand_left.setFont(font)
         elif self.pat_hand == PatHand.right:
             self._ui.hand_right.setChecked(True)
+            font = self._ui.hand_right.font()
+            font.setBold(True)
+            self._ui.hand_right.setFont(font)
         else:
             _reset_grp_state(self._ui.hand_grp)
 
@@ -218,7 +236,7 @@ class EndRecording(QtGui.QDialog):
         if self.blood_drawn == True:
             self._ui.blood_drawn.setChecked(True)
         elif self.blood_drawn == False:
-            self._ui.blood_drawn.setChecked(False)
+            self._ui.blood_not_drawn.setChecked(True)
         else:
             _reset_grp_state(self._ui.blood_grp)
 
@@ -263,6 +281,10 @@ class EndRecording(QtGui.QDialog):
 
         self.pat_type = _to_type(self._ui.pat_type)
 
+        self.pat_hand_cnt = 1 if self._ui.hand_cnt_1.isChecked() else \
+          2 if self._ui.hand_cnt_2.isChecked() else \
+          None
+
         self.pat_handedness = PatHandedness.left if self._ui.handedness_left.isChecked() else \
           PatHandedness.right if self._ui.handedness_right.isChecked() else \
           PatHandedness.ambidextrous if self._ui.handedness_ambidextrous.isChecked() else \
@@ -287,6 +309,12 @@ class EndRecording(QtGui.QDialog):
         if not self.oid:
             title = translate("recorder", "Invalid operator")
             msg = translate("recorder", "The specified operator is invalid")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return
+
+        if self.pat_hand_cnt is None:
+            title = translate("recorder", "Hand count not set")
+            msg = translate("recorder", "Patient hand count must be specified")
             QtGui.QMessageBox.critical(None, title, msg)
             return
 
@@ -421,7 +449,9 @@ class MainWindow(QtGui.QMainWindow):
                 self._drawing_window.calibration.stamp.strftime("%c"))
 
 
-    def new_recording(self, oid, aid, pat_type=None, pat_handedness=None, pat_hand=None, allow_next=True):
+    def new_recording(self, oid, aid,
+                      pat_type=None, pat_hand_cnt=None, pat_handedness=None, pat_hand=None,
+                      blood_drawn=None, cycle=1, allow_next=True):
         # use the current calibration to take a new recording
         self._drawing_window.reset(DrawingWindow.Mode.Record)
         if not self._drawing_window.exec_():
@@ -434,6 +464,7 @@ class MainWindow(QtGui.QMainWindow):
         preview = self._drawing_window.handler.buffer
 
         extra_data = {"operator": oid,
+                      "blood_drawn": blood_drawn,
                       "drawing_number": self.drawing_number,
                       "total_recordings": self.params.total_recordings,
                       "installation_uuid": self.params.installation_uuid,
@@ -443,7 +474,7 @@ class MainWindow(QtGui.QMainWindow):
                                         self._drawing_window.calibration,
                                         self.calibration_age,
                                         self._drawing_window.recording,
-                                        pat_type, pat_handedness, pat_hand,
+                                        cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand,
                                         extra_data)
 
         # guess a decent path name
@@ -458,6 +489,7 @@ class MainWindow(QtGui.QMainWindow):
         while self._end_recording_dialog.exec_():
             record.aid = self._end_recording_dialog.aid
             record.pat_type = self._end_recording_dialog.pat_type
+            record.pat_hand_cnt = self._end_recording_dialog.pat_hand_cnt
             record.pat_handedness = self._end_recording_dialog.pat_handedness
             record.pat_hand = self._end_recording_dialog.pat_hand
             record.extra_data["operator"] = self._end_recording_dialog.oid
@@ -489,20 +521,49 @@ class MainWindow(QtGui.QMainWindow):
         if not self._new_recording_dialog.exec_():
             return
 
-        # first attempt
-        record = self.new_recording(self._new_recording_dialog.oid,
-                                    self._new_recording_dialog.aid)
-        if record is None or self._end_recording_dialog.next_hand != True:
-            return
+        oid = self._new_recording_dialog.oid
+        aid = self._new_recording_dialog.aid
 
-        # next hand was requested
-        other_hand = PatHand.left if record.pat_hand == PatHand.right else PatHand.right
-        self.new_recording(record.extra_data["operator"],
-                           record.aid,
-                           pat_type=record.pat_type,
-                           pat_handedness=record.pat_handedness,
-                           pat_hand=other_hand,
-                           allow_next=False)
+        # setup recording cycle
+        cycle = 1
+        total = 2 * Consts.CYCLE_COUNT
+        allow_next = (cycle < total)
+
+        # initial state
+        pat_type = None
+        pat_hand_cnt = None
+        pat_handedness = None
+        pat_hand = None
+        blood_drawn_state = {PatHand.left: None, PatHand.right: None}
+        blood_drawn = None
+
+        while True:
+            record = self.new_recording(oid, aid,
+                           pat_type, pat_hand_cnt, pat_handedness,
+                           pat_hand, blood_drawn, cycle, allow_next)
+            if record is None or self._end_recording_dialog.next_hand != True:
+                return
+
+            # update
+            oid = record.extra_data["operator"]
+            aid = record.aid
+            pat_type = record.pat_type
+            pat_hand_cnt = record.pat_hand_cnt
+            pat_handedness = record.pat_handedness
+            blood_drawn_state[record.pat_hand] = record.extra_data["blood_drawn"]
+
+            # other hand
+            if pat_hand_cnt == 1:
+                pat_hand = record.pat_hand
+            else:
+                pat_hand = PatHand.left if record.pat_hand == PatHand.right else PatHand.right
+            blood_drawn = blood_drawn_state[pat_hand]
+
+            # recalculate cycle count
+            cycle = record.cycle + 1
+            total = pat_hand_cnt * Consts.CYCLE_COUNT
+            allow_next = (cycle < total)
+
 
 
 # main application

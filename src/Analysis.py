@@ -153,15 +153,17 @@ class RecordingData(object):
 
 
 class DrawingRecord(object):
-    def __init__(self, aid, drawing, calibration, calibration_age,
-                 recording, pat_type, pat_handedness, pat_hand,
+    def __init__(self, aid, drawing, calibration, calibration_age, recording, cycle,
+                 pat_type, pat_hand_cnt, pat_handedness, pat_hand,
                  extra_data=None, comments=None):
         self.aid = aid
         self.drawing = drawing
         self.calibration = calibration
         self.calibration_age = calibration_age
         self.recording = recording
+        self.cycle = cycle
         self.pat_type = pat_type
+        self.pat_hand_cnt = pat_hand_cnt
         self.pat_handedness = pat_handedness
         self.pat_hand = pat_hand
         self.extra_data = extra_data if extra_data is not None else {}
@@ -225,10 +227,12 @@ class DrawingRecord(object):
                     "retries": len(record.recording.retries) + 1,
                     "retries_events": [map(RecordingEvent.serialize, el) for el in record.recording.retries],
                     "strokes": record.recording.strokes},
-                "extra_data": record.extra_data,
+                "cycle": record.cycle,
                 "pat_type": _from_type(PAT_TYPE, record.pat_type),
+                "pat_hand_cnt": record.pat_hand_cnt,
                 "pat_handedness": _from_type(PAT_HANDEDNESS, record.pat_handedness),
                 "pat_hand": _from_type(PAT_HAND, record.pat_hand),
+                "extra_data": record.extra_data,
                 "comments": record.comments}
 
         # avoid saving unicode in the FNAME header
@@ -302,7 +306,9 @@ class DrawingRecord(object):
         # final object
         return DrawingRecord(data['aid'], drawing, calibration,
                              data['calibration_age'], recording,
+                             data.get('cycle', 1), # optional (fmt 1.2)
                              _to_type(PAT_TYPE, data['pat_type']),
+                             data.get('pat_hand_cnt', None), # optional (fmt 1.2)
                              _to_type(PAT_HANDEDNESS, data['pat_handedness']),
                              _to_type(PAT_HAND, data['pat_hand']),
                              extra_data, data['comments'])
