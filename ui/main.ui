@@ -54,7 +54,7 @@
     <item row="1" column="0">
      <widget class="QLabel" name="tabletIDLabel">
       <property name="text">
-       <string>Tablet ID</string>
+       <string>Tablet ID:</string>
       </property>
      </widget>
     </item>
@@ -71,7 +71,7 @@
     <item row="2" column="0">
      <widget class="QLabel" name="tabletIDLabel_2">
       <property name="text">
-       <string>Pen ID</string>
+       <string>Pen ID:</string>
       </property>
      </widget>
     </item>
