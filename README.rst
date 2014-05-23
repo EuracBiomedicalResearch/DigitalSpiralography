@@ -118,6 +118,7 @@ Version changes
 
 1.3:
 
+* DrawingRecorder file format 1.2.
 * Several tools for data analysis have been added (``drwstats``,
   ``drwrenderer`` and ``drwstackrenderer``).
 * Tools for analysis and DrawingVisualizer can now use 'dump' files to speed-up
@@ -136,18 +137,22 @@ Version changes
   + The operator id is now also included.
   + Patient handedness, drawing hand and blood drawn status are now mandatory
     (the user needs to check the appropriate option in all cases)
+  + Quality of the preview has been improved.
   + A new option "Next hand" has been added to preserve the patient data and
     automatically create a recording for the other hand.
-  + Quality of the preview has been improved.
+  + "Hand cycling" (first hand, second hand, first hand ...) is automatically
+    performed, with 3 cycles being hard-coded, for a total of 6 spirals being
+    requested per-patient.
 
 * A new tool ``StylusProfiler`` has been added:
 
   + Allows to profile the individual pressure response of each stylus.
-  + Performs a simple quadratic fit of the response curve.
+  + Performs a simple 3rd degree polynomial fit of the samples.
   + A new file format ``prof.yaml.gz`` has been designed for the purpose.
 
 1.2:
 
+* DrawingRecorder file format 1.1.
 * An exception caused by empty recordings was fixed.
 * Internationalization of the Recorder/Visualizer interface.
 * Add a new checkbox "Blood drawn on drawing arm" after finishing the recording
@@ -157,6 +162,7 @@ Version changes
 
 1.1:
 
+* DrawingRecorder file format 1.0.
 * Locale issues under Windows were fixed (notably, DrawingRecorder would refuse
   to save a recording if the comment contained any accented letter).
 * DrawingRecorder had a glitch that would sometimes cause a failure to start
@@ -405,6 +411,8 @@ Chunks introduced with format 1.2:
   format as ``recording/events``, one for each trial during the recording.
   ``recording/retries`` is just the length of this array + 1 (for backward
   compatibility).
+* ``pat_hand_cnt``: number of hands the patient is able to draw with.
+* ``cycle``: cycle number in a single recording session.
 
 
 Profiler ``prof.yaml.gz`` File format
