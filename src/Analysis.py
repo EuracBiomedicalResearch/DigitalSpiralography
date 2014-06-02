@@ -16,9 +16,6 @@ import cPickle
 
 
 # basic types
-class PatType(object):
-    case, control = range(2)
-
 class PatHandedness(object):
     left, right, ambidextrous = range(3)
 
@@ -46,12 +43,6 @@ EVENT_MAP = {QtCore.QEvent.TabletMove: 'move',
              QtCore.QEvent.TabletRelease: 'release',
              QtCore.QEvent.TabletEnterProximity: 'enter',
              QtCore.QEvent.TabletLeaveProximity: 'leave'}
-
-PAT_TYPE = {PatType.case: 'Case',
-            PatType.control: 'Control'}
-
-PAT_TYPE_DSC = {PatType.case: translate('types', 'Case'),
-                PatType.control: translate('types', 'Control')}
 
 PAT_HANDEDNESS = {PatHandedness.left: 'Left-handed',
                   PatHandedness.right: 'Right-handed',
@@ -228,7 +219,7 @@ class DrawingRecord(object):
                     "retries_events": [map(RecordingEvent.serialize, el) for el in record.recording.retries],
                     "strokes": record.recording.strokes},
                 "cycle": record.cycle,
-                "pat_type": _from_type(PAT_TYPE, record.pat_type),
+                "pat_type": record.pat_type,
                 "pat_hand_cnt": record.pat_hand_cnt,
                 "pat_handedness": _from_type(PAT_HANDEDNESS, record.pat_handedness),
                 "pat_hand": _from_type(PAT_HAND, record.pat_hand),
@@ -307,7 +298,7 @@ class DrawingRecord(object):
         return DrawingRecord(data['aid'], drawing, calibration,
                              data['calibration_age'], recording,
                              data.get('cycle', 1), # optional (fmt 1.2)
-                             _to_type(PAT_TYPE, data['pat_type']),
+                             data['pat_type'],
                              data.get('pat_hand_cnt', None), # optional (fmt 1.2)
                              _to_type(PAT_HANDEDNESS, data['pat_handedness']),
                              _to_type(PAT_HAND, data['pat_hand']),

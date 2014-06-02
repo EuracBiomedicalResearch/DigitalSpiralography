@@ -152,7 +152,7 @@ class EndRecording(QtGui.QDialog):
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
         self._ui.next_hand_btn.clicked.connect(self.on_next_hand)
 
-        _from_type(self._ui.pat_type, Analysis.PAT_TYPE_DSC)
+        _from_type(self._ui.pat_type, Consts.PAT_TYPES)
 
         self._file_browser = QtGui.QFileDialog(self)
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
@@ -280,6 +280,9 @@ class EndRecording(QtGui.QDialog):
         self.aid = str(self._ui.patient_id.text())
 
         self.pat_type = _to_type(self._ui.pat_type)
+        if self.pat_type is not None:
+            # TODO: why is this needed at all?
+            self.pat_type = str(self.pat_type)
 
         self.pat_hand_cnt = 1 if self._ui.hand_cnt_1.isChecked() else \
           2 if self._ui.hand_cnt_2.isChecked() else \

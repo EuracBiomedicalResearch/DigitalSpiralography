@@ -20,6 +20,12 @@ FF_PROFILE      = "prof"                # profiling type
 CYCLE_ORDER     = "ABAB"                # recording cycle (ABAB / AABB)
 CYCLE_COUNT     = 3                     # number of requested cycles
 
+# Patient types
+PAT_TYPES = {"ET": "ET",
+             "ET+PD": "ET+PD",
+             "TDPD": "TDPD",
+             "Control": "Control"}
+
 # Drawing parameters
 POINT_LEN       = 0.05                  # diameter of calibration points (in normalized drawing units)
 BAR_LEN         = 2.                    # extension of the calibration bars (in normalized drawing units)
