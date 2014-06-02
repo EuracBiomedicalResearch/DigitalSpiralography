@@ -209,6 +209,7 @@ Customize Windows 7 as follows:
     - Pen options:
 
       * Disable press & hold
+      * Disable visual feedback when touching screen
 
     - Flicks:
 
