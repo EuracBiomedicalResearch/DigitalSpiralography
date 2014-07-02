@@ -218,6 +218,11 @@ class MainWindow(QtGui.QMainWindow):
         name = translate("visualizer", "Drawing descr.")
         self._append_prop(name, record.drawing.str)
 
+        name = translate("visualizer", "File created")
+        self._append_prop(name, record.ts_created)
+        name = translate("visualizer", "File updated")
+        self._append_prop(name, record.ts_updated)
+
         name = translate("visualizer", "Rec. date")
         self._append_prop(name, record.recording.session_start)
         name = translate("visualizer", "Rec. no.")

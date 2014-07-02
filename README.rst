@@ -415,6 +415,11 @@ Chunks introduced with format 1.2:
 * ``pat_hand_cnt``: number of hands the patient is able to draw with.
 * ``cycle``: cycle number in a single recording session.
 
+Chunks introduced with format 1.3:
+
+* ``ts_created``: drawing creation timestamp
+* ``ts_updated``: drawing update (last change) timestamp
+
 
 Profiler ``prof.yaml.gz`` File format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -9,6 +9,7 @@ from Intl import translate
 # system modules
 import datetime
 import yaml
+from copy import copy
 import gzip
 from PyQt4 import QtCore
 import numpy as np
@@ -146,7 +147,7 @@ class RecordingData(object):
 class DrawingRecord(object):
     def __init__(self, aid, drawing, calibration, calibration_age, recording, cycle,
                  pat_type, pat_hand_cnt, pat_handedness, pat_hand,
-                 extra_data=None, comments=None):
+                 extra_data=None, comments=None, ts_created=None, ts_updated=None):
         self.aid = aid
         self.drawing = drawing
         self.calibration = calibration
@@ -159,6 +160,8 @@ class DrawingRecord(object):
         self.pat_hand = pat_hand
         self.extra_data = extra_data if extra_data is not None else {}
         self.comments = comments
+        self.ts_created = ts_created if ts_created is not None else datetime.datetime.now()
+        self.ts_updated = ts_updated if ts_updated is not None else copy(self.ts_created)
 
 
     def check_warnings(self):
@@ -224,7 +227,9 @@ class DrawingRecord(object):
                 "pat_handedness": _from_type(PAT_HANDEDNESS, record.pat_handedness),
                 "pat_hand": _from_type(PAT_HAND, record.pat_hand),
                 "extra_data": record.extra_data,
-                "comments": record.comments}
+                "comments": record.comments,
+                "ts_created": record.ts_created,
+                "ts_updated": record.ts_updated}
 
         # avoid saving unicode in the FNAME header
         fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
@@ -263,7 +268,7 @@ class DrawingRecord(object):
         extra_data = data['extra_data']
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
-        extra_data['type'] = data.get('type', None) # optional (fmt 1.2)
+        extra_data['type'] = data.get('type') # optional (fmt 1.2)
 
         # drawing
         drawing = Drawing.Drawing(data['drawing']['id'],
@@ -272,9 +277,9 @@ class DrawingRecord(object):
                                   map(tuple, data['drawing']['cpoints']))
 
         # calibration
-        calibration = CalibrationData(data['calibration'].get('operator', None), # optional (fmt 1.2)
+        calibration = CalibrationData(data['calibration'].get('operator'), # optional (fmt 1.2)
                                       data['calibration']['tablet_id'],
-                                      data['calibration'].get('stylus_id', None), # optional (fmt 1.2)
+                                      data['calibration'].get('stylus_id'), # optional (fmt 1.2)
                                       map(tuple, data['calibration']['cpoints']),
                                       data['calibration']['stamp'])
 
@@ -293,15 +298,22 @@ class DrawingRecord(object):
                                   map(RecordingEvent.deserialize, data['recording']['events']),
                                   retries_events, data['recording']['strokes'])
 
+        # timestamps (optional, fmt 1.3)
+        ts_created = data.get('ts_created')
+        if ts_created is None:
+            ts_created = copy(recording.events[-1].stamp) if recording.events else copy(calibration.stamp)
+        ts_updated = data.get('ts_updated')
+
         # final object
         return DrawingRecord(data['aid'], drawing, calibration,
                              data['calibration_age'], recording,
                              data.get('cycle', 1), # optional (fmt 1.2)
                              data['pat_type'],
-                             data.get('pat_hand_cnt', None), # optional (fmt 1.2)
+                             data.get('pat_hand_cnt'), # optional (fmt 1.2)
                              _to_type(PAT_HANDEDNESS, data['pat_handedness']),
                              _to_type(PAT_HAND, data['pat_hand']),
-                             extra_data, data['comments'])
+                             extra_data, data['comments'],
+                             ts_created, ts_updated)
 
 
 # Stylus profile data
@@ -323,7 +335,7 @@ class StylusProfile(object):
     def __init__(self, ts_created=None, ts_updated=None, oid=None, sid=None, tid=None,
                  data=None, fit=None, extra_data=None):
         self.ts_created = ts_created if ts_created is not None else datetime.datetime.now()
-        self.ts_updated = ts_updated if ts_updated is not None else self.ts_created
+        self.ts_updated = ts_updated if ts_updated is not None else copy(self.ts_created)
         self.oid = oid
         self.sid = sid
         self.tid = tid
