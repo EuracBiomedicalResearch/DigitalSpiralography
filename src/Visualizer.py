@@ -38,6 +38,40 @@ def sampleSpeed(events, window):
     for event in events:
         event.speed = speedAtPoint(events, event.stamp, 0.05)
 
+def ctrb(x, a, b, ctrl, bias):
+    i = (x - a) / (b - a) + bias - 1.
+    r = math.pow(max(min(i, 1.), 0.), 1. / (1. - (ctrl - 1.)))
+    return a + (b - a) * max(min(r, b), a)
+
+
+class CtrbWidget(QtGui.QWidget):
+    def __init__(self, ctrl_f, bias_f, descr):
+        super(QtGui.QWidget, self).__init__()
+        layout = QtGui.QGridLayout()
+        self.setLayout(layout)
+        self.setMaximumWidth(300)
+        self.ctrl_s = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.ctrl_s.setRange(0, 100)
+        self.ctrl_s.setValue(50)
+        self.ctrl_s.valueChanged.connect(ctrl_f)
+        self.ctrl_s.setToolTip(translate("visualizer", "{} Contrast".format(descr)))
+        layout.addWidget(self.ctrl_s, 0, 0)
+        self.bias_s = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.bias_s.setRange(0, 100)
+        self.bias_s.setValue(50)
+        self.bias_s.valueChanged.connect(bias_f)
+        self.bias_s.setToolTip(translate("visualizer", "{} Bias".format(descr)))
+        layout.addWidget(self.bias_s, 1, 0)
+        self.reset_btn = QtGui.QPushButton(self.style().standardIcon(QtGui.QStyle.SP_DialogCancelButton), "")
+        self.reset_btn.setToolTip(translate("visualizer", "Reset {}".format(descr)))
+        self.reset_btn.clicked.connect(self.reset)
+        layout.addWidget(self.reset_btn, 0, 1, 2, 1)
+
+    def reset(self):
+        with blocked_signals(self):
+            self.ctrl_s.setValue(50)
+            self.bias_s.setValue(50)
+
 
 class blocked_signals(object):
     def __init__(self, widget):
@@ -65,6 +99,8 @@ class MainWindow(QtGui.QMainWindow):
         self._showTime = False
         self._showTraces = True
         self._showTilt = True
+        self._wc = [1., 1.]
+        self._cc = [1., 1.]
 
         self._ui.actionRAWCorr.setChecked(self._showRaw)
         self._ui.actionSpeedTime.setChecked(self._showTime)
@@ -90,7 +126,13 @@ class MainWindow(QtGui.QMainWindow):
         ts = self._ui.trialSelector = QtGui.QComboBox()
         ts.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
         ts.currentIndexChanged.connect(self.on_trial)
-        self._ui.toolBar.insertWidget(self._ui.actionRAWCorr, ts)
+        self._ui.mainToolBar.insertWidget(self._ui.actionRAWCorr, ts)
+
+        # width/color ctrb
+        self._ui.widthCtrb = CtrbWidget(self.on_wc_c, self.on_wc_b, translate("visualizer", "Width"))
+        self._ui.ctrbToolBar.insertWidget(self._ui.actionInfo, self._ui.widthCtrb)
+        self._ui.colorCtrb = CtrbWidget(self.on_cc_c, self.on_cc_b, translate("visualizer", "Color"))
+        self._ui.ctrbToolBar.insertWidget(self._ui.actionInfo, self._ui.colorCtrb)
 
         # scene
         self._scene = QtGui.QGraphicsScene()
@@ -332,19 +374,20 @@ class MainWindow(QtGui.QMainWindow):
                     # calculate speed/color
                     if self._showTime:
                         sf1 = (stamp - events[0].stamp).total_seconds() / total_secs
-                        sf0 = 1. - sf1
                     else:
                         sf1 = min(1., max(0., event.speed * speed_repr))
-                        sf0 = 1. - sf1
 
                     # blend the color
+                    sf1 = ctrb(sf1, 0, 1, self._cc[0], self._cc[1])
+                    sf0 = 1. - sf1
                     color = QtGui.QColor(low_color.red() * sf0 + high_color.red() * sf1,
                                          low_color.green() * sf0 + high_color.green() * sf1,
                                          low_color.blue() * sf0 + high_color.blue() * sf1)
 
                     # pen parameters
+                    p = 1 + ctrb(event.pressure, 0, 1, self._wc[0], self._wc[1]) * (Consts.PEN_MAXWIDTH - 1)
                     pen.setColor(color)
-                    pen.setWidthF(1 + event.pressure * (Consts.PEN_MAXWIDTH - 1))
+                    pen.setWidthF(p)
                 else:
                     pen.setColor(Consts.CURSOR_INACTIVE)
                     pen.setWidthF(0.5)
@@ -458,6 +501,26 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_time(self, ev):
         self._showTime = self._ui.actionSpeedTime.isChecked()
+        self._redraw_scene()
+
+    def on_wc_c(self, v):
+        v = 0.01 + float(v) / 51.
+        self._wc[0] = v
+        self._redraw_scene()
+
+    def on_wc_b(self, v):
+        v = 0.01 + float(v) / 51.
+        self._wc[1] = v
+        self._redraw_scene()
+
+    def on_cc_c(self, v):
+        v = 0.01 + float(v) / 51.
+        self._cc[0] = v
+        self._redraw_scene()
+
+    def on_cc_b(self, v):
+        v = 0.01 + float(v) / 51.
+        self._cc[1] = v
         self._redraw_scene()
 
 

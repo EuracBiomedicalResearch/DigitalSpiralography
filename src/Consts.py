@@ -31,7 +31,7 @@ POINT_LEN       = 0.05                  # diameter of calibration points (in nor
 BAR_LEN         = 2.                    # extension of the calibration bars (in normalized drawing units)
 CURSOR_LEN      = 25.                   # cursor extension (in pixels)
 REFRESH_DELAY   = 100                   # timerEvent delay in ms
-PEN_MAXWIDTH    = 10                    # max pen width in pixels (minimum is always 1)
+PEN_MAXWIDTH    = 20                    # max pen width in pixels (minimum is always 1)
 TILT_MAXLEN     = 1./60. * 20.          # max tilt vectors length in 1/60th of pixels
 
 # Text parameters
