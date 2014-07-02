@@ -306,7 +306,7 @@ class MainWindow(QtGui.QMainWindow):
                 pos = (pos.x(), pos.y())
 
             # set drawing status
-            if event.typ == QtCore.QEvent.TabletPress:
+            if event.typ == QtCore.QEvent.TabletPress or event.pressure:
                 drawing = True
             elif event.typ == QtCore.QEvent.TabletRelease:
                 drawing = False
