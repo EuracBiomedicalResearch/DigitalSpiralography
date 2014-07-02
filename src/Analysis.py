@@ -230,8 +230,7 @@ class DrawingRecord(object):
         fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
 
         # dump
-        yaml.safe_dump(data, fd, default_flow_style=False,
-                       allow_unicode=True, encoding='utf-8')
+        yaml.safe_dump(data, fd, allow_unicode=True, encoding='utf-8')
 
 
     @classmethod
@@ -352,8 +351,7 @@ class StylusProfile(object):
         fd = gzip.GzipFile(profile.sid, 'wb', fileobj=open(path, 'wb', 0))
 
         # dump
-        yaml.safe_dump(data, fd, default_flow_style=False,
-                       allow_unicode=True, encoding='utf-8')
+        yaml.safe_dump(data, fd, allow_unicode=True, encoding='utf-8')
 
 
     @classmethod
