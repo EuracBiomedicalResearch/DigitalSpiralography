@@ -34,6 +34,11 @@ def speedAtPoint(events, stamp, window):
     return w_len / w_secs
 
 
+def sampleSpeed(events, window):
+    for event in events:
+        event.speed = speedAtPoint(events, event.stamp, 0.05)
+
+
 class blocked_signals(object):
     def __init__(self, widget):
         self.widget = widget
@@ -44,6 +49,7 @@ class blocked_signals(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.widget.blockSignals(self.orig)
+
 
 
 # main application
@@ -289,6 +295,12 @@ class MainWindow(QtGui.QMainWindow):
         low_color = QtGui.QColor(Consts.RECORDING_COLOR)
         high_color = QtGui.QColor(Consts.FAST_COLOR)
 
+        # sample the speed only once
+        if not self._showTime and 'speed' not in dir(events[0]):
+            record = Shared.background_op(
+                translate("visualizer", "Sampling speed..."),
+                lambda: sampleSpeed(events, 0.05))
+
         speed_repr = 1. / Consts.FAST_SPEED
         total_secs = (events[-1].stamp - events[0].stamp).total_seconds()
 
@@ -322,8 +334,7 @@ class MainWindow(QtGui.QMainWindow):
                         sf1 = (stamp - events[0].stamp).total_seconds() / total_secs
                         sf0 = 1. - sf1
                     else:
-                        speed = speedAtPoint(events, stamp, 0.05)
-                        sf1 = min(1., max(0., speed * speed_repr))
+                        sf1 = min(1., max(0., event.speed * speed_repr))
                         sf0 = 1. - sf1
 
                     # blend the color
