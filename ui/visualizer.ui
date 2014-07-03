@@ -120,6 +120,7 @@
    <addaction name="actionSpeedTime"/>
    <addaction name="actionShowTraces"/>
    <addaction name="actionShowTilt"/>
+   <addaction name="actionShowStrokes"/>
    <addaction name="separator"/>
    <addaction name="actionInfo"/>
   </widget>
@@ -242,6 +243,18 @@
    </property>
    <property name="menuRole">
     <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionShowStrokes">
+   <property name="icon">
+    <iconset>
+     <normaloff>icons/24x24/strokes.png</normaloff>icons/24x24/strokes.png</iconset>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+K</string>
    </property>
   </action>
  </widget>

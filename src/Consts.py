@@ -33,6 +33,8 @@ CURSOR_LEN      = 25.                   # cursor extension (in pixels)
 REFRESH_DELAY   = 100                   # timerEvent delay in ms
 PEN_MAXWIDTH    = 20                    # max pen width in pixels (minimum is always 1)
 TILT_MAXLEN     = 1./60. * 20.          # max tilt vectors length in 1/60th of pixels
+LIFT_PEN_WIDTH  = 3                     # stroke/lift circle pen width
+LIFT_RADIUS     = PEN_MAXWIDTH * 2      # stroke/lift circle radius
 
 # Text parameters
 MAIN_TEXT_SIZE  = 32                    # size of main text (in points)
@@ -48,3 +50,4 @@ RECORDING_COLOR = QtCore.Qt.green       # recorded trace color
 FAST_COLOR      = QtCore.Qt.red         # recorded fast trace color
 FAST_SPEED      = 2                     # recorded fast trace speed (unit/sec)
 TILT_COLOR      = QtCore.Qt.cyan        # tilt vectors
+LIFT_COLOR      = QtCore.Qt.yellow      # stroke/lift circle color

@@ -99,6 +99,7 @@ class MainWindow(QtGui.QMainWindow):
         self._showTime = False
         self._showTraces = True
         self._showTilt = True
+        self._showStrokes = True
         self._wc = [1., 1.]
         self._cc = [1., 1.]
 
@@ -106,6 +107,7 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.actionSpeedTime.setChecked(self._showTime)
         self._ui.actionShowTraces.setChecked(self._showTraces)
         self._ui.actionShowTilt.setChecked(self._showTilt)
+        self._ui.actionShowStrokes.setChecked(self._showStrokes)
 
         # props
         self._ui.props.setColumnCount(2)
@@ -120,6 +122,7 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.actionRAWCorr.triggered.connect(self.on_raw)
         self._ui.actionSpeedTime.triggered.connect(self.on_time)
         self._ui.actionShowTilt.triggered.connect(self.on_tilt)
+        self._ui.actionShowStrokes.triggered.connect(self.on_strokes)
         self._ui.view.wheelEvent = self.on_wheel
 
         # trial selector
@@ -339,6 +342,10 @@ class MainWindow(QtGui.QMainWindow):
         tilt_pen = QtGui.QPen(Consts.TILT_COLOR)
         tilt_pen.setWidthF(0.1)
 
+        lift_pen = QtGui.QPen(Consts.LIFT_COLOR)
+        lift_pen.setWidthF(Consts.LIFT_PEN_WIDTH)
+        lift_pen.setColor(QtGui.QColor(Consts.LIFT_COLOR))
+
         low_color = QtGui.QColor(Consts.RECORDING_COLOR)
         high_color = QtGui.QColor(Consts.FAST_COLOR)
 
@@ -354,6 +361,7 @@ class MainWindow(QtGui.QMainWindow):
         old_pos = None
         old_stamp = None
         drawing = False
+        old_drawing = False
         for event in events:
             stamp = event.stamp
             if not self._showRaw:
@@ -394,8 +402,17 @@ class MainWindow(QtGui.QMainWindow):
                     pen.setColor(color)
                     pen.setWidthF(p)
                 else:
+                    # set trace color only
                     pen.setColor(Consts.CURSOR_INACTIVE)
                     pen.setWidthF(0.5)
+
+                    # highlight stroke/lifts
+                    if self._showStrokes and old_drawing and event is not events[-1]:
+                        tmp = QtGui.QGraphicsEllipseItem(old_pos[0] - Consts.LIFT_RADIUS / 2,
+                                                         old_pos[1] - Consts.LIFT_RADIUS / 2,
+                                                         Consts.LIFT_RADIUS, Consts.LIFT_RADIUS)
+                        tmp.setPen(lift_pen)
+                        tmp.setParentItem(self._screen_group)
 
                 if pos and (drawing or self._showTraces):
                     # the line itself
@@ -418,6 +435,7 @@ class MainWindow(QtGui.QMainWindow):
                         tmp.setParentItem(self._screen_group)
 
             # save old status
+            old_drawing = drawing
             old_pos = pos
             old_stamp = stamp
 
@@ -499,6 +517,11 @@ class MainWindow(QtGui.QMainWindow):
         self._redraw_scene()
 
 
+    def on_strokes(self, ev):
+        self._showStrokes = self._ui.actionShowStrokes.isChecked()
+        self._redraw_scene()
+
+
     def on_raw(self, ev):
         self._showRaw = self._ui.actionRAWCorr.isChecked()
         self._redraw_scene()
@@ -508,20 +531,24 @@ class MainWindow(QtGui.QMainWindow):
         self._showTime = self._ui.actionSpeedTime.isChecked()
         self._redraw_scene()
 
+
     def on_wc_c(self, v):
         v = 0.01 + float(v) / 51.
         self._wc[0] = v
         self._redraw_scene()
+
 
     def on_wc_b(self, v):
         v = 0.01 + float(v) / 51.
         self._wc[1] = v
         self._redraw_scene()
 
+
     def on_cc_c(self, v):
         v = 0.01 + float(v) / 51.
         self._cc[0] = v
         self._redraw_scene()
+
 
     def on_cc_b(self, v):
         v = 0.01 + float(v) / 51.
