@@ -255,6 +255,8 @@ class DrawingRecord(object):
         try:
             fd = gzip.GzipFile(path, 'rb')
             data = yaml.safe_load(fd)
+        except IOError:
+            raise
         except:
             pass
 
@@ -263,7 +265,7 @@ class DrawingRecord(object):
           type(data['format']) != str or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_RECORDING) != Consts.FF_RECORDING:
-            msg = translate("analysis", 'Invalid or unsupported file format')
+            msg = translate("analysis", 'Unsupported file format')
             raise Exception(msg, path)
 
         # recover extra data
@@ -380,6 +382,8 @@ class StylusProfile(object):
         try:
             fd = gzip.GzipFile(path, 'rb')
             data = yaml.safe_load(fd)
+        except IOError:
+            raise
         except:
             pass
 
@@ -388,7 +392,7 @@ class StylusProfile(object):
           type(data['format']) != str or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_PROFILE) != Consts.FF_PROFILE:
-            msg = translate("analysis", 'Invalid or unsupported file format')
+            msg = translate("analysis", 'Unsupported file format')
             raise Exception(msg, path)
 
         # recover extra data
