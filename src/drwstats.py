@@ -161,6 +161,9 @@ def spiralWeight(record, traces, func):
             if ((event.stamp - start).total_seconds() >= 1 and (end - event.stamp).total_seconds() >= 1):
                 weights.append(event.weight)
 
+    if not any(weights):
+        return {'min': None, 'med': None, 'avg': None, 'max': None}
+
     return {'min': min(weights),
             'med': sorted(weights)[len(weights) / 2],
             'avg': sum(weights) / len(weights),
@@ -288,7 +291,7 @@ def __main__():
     sys.stdout = codecs.getwriter('UTF-8')(sys.stdout)
 
     ap = argparse.ArgumentParser(description='Print drawing statistics in parseable format')
-    ap.add_argument('-p', dest='prof', action='append',
+    ap.add_argument('-p', dest='prof', action='append', default=[],
                     help='Load stylus correction profile (repeat to load multiple profiles)')
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
