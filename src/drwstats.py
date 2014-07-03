@@ -6,6 +6,7 @@ from __future__ import print_function
 
 # local modules
 import Analysis
+import Consts
 
 # Qt
 from PyQt4 import QtCore
@@ -238,7 +239,7 @@ def recordStats(record, profs):
     speedsW005 = spiralSpeed(record, traces, 0.05, lambda x: x['drawing'])
 
     return {"PAT_ID": record.aid,
-            "PAT_TYPE": remap(Analysis.PAT_TYPE, record.pat_type),
+            "PAT_TYPE": remap(Consts.PAT_TYPES, record.pat_type),
             "PAT_HANDEDNESS": remap(Analysis.PAT_HANDEDNESS, record.pat_handedness),
             "PAT_HAND": remap(Analysis.PAT_HAND, record.pat_hand),
             "OPERATOR": record.oid,

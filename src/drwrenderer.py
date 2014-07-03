@@ -6,6 +6,7 @@ from __future__ import print_function
 
 # local modules
 import Analysis
+import Consts
 
 # Qt
 from PyQt4 import QtCore
@@ -87,7 +88,7 @@ def renderSpiral(record, output):
 
     # compose a title
     p_aid = record.aid
-    p_type = remap(Analysis.PAT_TYPE, record.pat_type)
+    p_type = remap(Consts.PAT_TYPES, record.pat_type)
     p_hand = remap(Analysis.PAT_HAND, record.pat_hand)
     p_hdn = remap(Analysis.PAT_HANDEDNESS, record.pat_handedness)
     ax.set_title("{} {} ({} hand, {})".format(p_aid, p_type, p_hand, p_hdn))
