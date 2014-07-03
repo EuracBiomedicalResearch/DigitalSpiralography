@@ -399,7 +399,7 @@ Chunks introduced with format 1.1:
     introduced in DrawingRecorder 1.2.
 
   + ``operator`` (optional): the name of the operator assisting during the
-    recording (introduced in DrawingRecorder 1.2).
+    recording (introduced in DrawingRecorder 1.2, moved in 1.4).
 
 Chunks introduced with format 1.2:
 
@@ -419,6 +419,8 @@ Chunks introduced with format 1.3:
 
 * ``ts_created``: drawing creation timestamp
 * ``ts_updated``: drawing update (last change) timestamp
+* ``operator``: the name of the operator assisting during the
+    recording (moved from ``extra_data/operator`` in DrawingRecorder 1.4).
 
 
 Profiler ``prof.yaml.gz`` File format

@@ -167,7 +167,7 @@ class EndRecording(QtGui.QDialog):
 
 
     def reset(self, save_path, record, preview, allow_next):
-        self.oid = record.extra_data["operator"]
+        self.oid = record.oid
         self._ui.operator_id.setText(self.oid)
 
         self.aid = record.aid
@@ -466,13 +466,12 @@ class MainWindow(QtGui.QMainWindow):
         self.params.total_recordings += 1
         preview = self._drawing_window.handler.buffer
 
-        extra_data = {"operator": oid,
-                      "blood_drawn": blood_drawn,
+        extra_data = {"blood_drawn": blood_drawn,
                       "drawing_number": self.drawing_number,
                       "total_recordings": self.params.total_recordings,
                       "installation_uuid": self.params.installation_uuid,
                       "installation_stamp": self.params.installation_stamp}
-        record = Analysis.DrawingRecord(aid,
+        record = Analysis.DrawingRecord(oid, aid,
                                         self._drawing_window.drawing,
                                         self._drawing_window.calibration,
                                         self.calibration_age,
@@ -490,12 +489,12 @@ class MainWindow(QtGui.QMainWindow):
         # keep trying until save is either aborted or succeeds
         self._end_recording_dialog.reset(save_path, record, preview, allow_next)
         while self._end_recording_dialog.exec_():
+            record.oid = self._end_recording_dialog.oid
             record.aid = self._end_recording_dialog.aid
             record.pat_type = self._end_recording_dialog.pat_type
             record.pat_hand_cnt = self._end_recording_dialog.pat_hand_cnt
             record.pat_handedness = self._end_recording_dialog.pat_handedness
             record.pat_hand = self._end_recording_dialog.pat_hand
-            record.extra_data["operator"] = self._end_recording_dialog.oid
             record.extra_data["blood_drawn"] = self._end_recording_dialog.blood_drawn
             record.comments = self._end_recording_dialog.comments
             save_path = self._end_recording_dialog.save_path
@@ -548,7 +547,7 @@ class MainWindow(QtGui.QMainWindow):
                 return
 
             # update
-            oid = record.extra_data["operator"]
+            oid = record.oid
             aid = record.aid
             pat_type = record.pat_type
             pat_hand_cnt = record.pat_hand_cnt

@@ -208,7 +208,7 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop_map(name, Analysis.PAT_HAND_DSC, record.pat_hand)
 
         name = translate("visualizer", "Operator")
-        self._append_prop(name, record.extra_data.get('operator'))
+        self._append_prop(name, record.oid)
         name = translate("visualizer", "Blood drawn")
         self._append_prop_map(name, Analysis.BOOL_MAP_DSC,
                               record.extra_data.get('blood_drawn'))

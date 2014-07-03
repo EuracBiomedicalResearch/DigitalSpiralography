@@ -145,9 +145,10 @@ class RecordingData(object):
 
 
 class DrawingRecord(object):
-    def __init__(self, aid, drawing, calibration, calibration_age, recording, cycle,
+    def __init__(self, oid, aid, drawing, calibration, calibration_age, recording, cycle,
                  pat_type, pat_hand_cnt, pat_handedness, pat_hand,
                  extra_data=None, comments=None, ts_created=None, ts_updated=None):
+        self.oid = oid
         self.aid = aid
         self.drawing = drawing
         self.calibration = calibration
@@ -199,6 +200,7 @@ class DrawingRecord(object):
         data = {"format": Consts.FORMAT_VERSION,
                 "type": Consts.FF_RECORDING,
                 "version": Consts.APP_VERSION,
+                "operator": record.oid,
                 "aid": record.aid,
                 "drawing": {
                     "id": record.drawing.id,
@@ -304,8 +306,14 @@ class DrawingRecord(object):
             ts_created = copy(recording.events[-1].stamp) if recording.events else copy(calibration.stamp)
         ts_updated = data.get('ts_updated')
 
+        # operator (moved, fmt 1.3)
+        oid = data['recording'].get('operator')
+        if oid is None and 'operator' in extra_data:
+            oid = extra_data['operator']
+            del(extra_data['operator'])
+
         # final object
-        return DrawingRecord(data['aid'], drawing, calibration,
+        return DrawingRecord(oid, data['aid'], drawing, calibration,
                              data['calibration_age'], recording,
                              data.get('cycle', 1), # optional (fmt 1.2)
                              data['pat_type'],
