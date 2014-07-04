@@ -45,32 +45,44 @@ def ctrb(x, a, b, ctrl, bias):
 
 
 class CtrbWidget(QtGui.QWidget):
-    def __init__(self, ctrl_f, bias_f, descr):
+    valueChanged = QtCore.pyqtSignal(float, float)
+
+    def __init__(self, descr):
         super(QtGui.QWidget, self).__init__()
         layout = QtGui.QGridLayout()
-        self.setLayout(layout)
         self.setMaximumWidth(300)
-        self.ctrl_s = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.ctrl_s.setRange(0, 100)
-        self.ctrl_s.setValue(50)
-        self.ctrl_s.valueChanged.connect(ctrl_f)
-        self.ctrl_s.setToolTip(translate("visualizer", "{} Contrast".format(descr)))
-        layout.addWidget(self.ctrl_s, 0, 0)
-        self.bias_s = QtGui.QSlider(QtCore.Qt.Horizontal)
-        self.bias_s.setRange(0, 100)
-        self.bias_s.setValue(50)
-        self.bias_s.valueChanged.connect(bias_f)
-        self.bias_s.setToolTip(translate("visualizer", "{} Bias".format(descr)))
-        layout.addWidget(self.bias_s, 1, 0)
+        self._ctrl_s = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self._ctrl_s.setRange(0, 100)
+        self._ctrl_s.valueChanged.connect(self._valueChanged)
+        self._ctrl_s.setToolTip(translate("visualizer", "{} Contrast".format(descr)))
+        self._ctrl_l = QtGui.QLabel()
+        layout.addWidget(self._ctrl_l, 0, 0)
+        layout.addWidget(self._ctrl_s, 0, 1)
+        self._bias_s = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self._bias_s.setRange(0, 100)
+        self._bias_s.valueChanged.connect(self._valueChanged)
+        self._bias_s.setToolTip(translate("visualizer", "{} Bias".format(descr)))
+        self._bias_l = QtGui.QLabel()
+        layout.addWidget(self._bias_l, 1, 0)
+        layout.addWidget(self._bias_s, 1, 1)
         self.reset_btn = QtGui.QPushButton(self.style().standardIcon(QtGui.QStyle.SP_DialogCancelButton), "")
         self.reset_btn.setToolTip(translate("visualizer", "Reset {}".format(descr)))
         self.reset_btn.clicked.connect(self.reset)
-        layout.addWidget(self.reset_btn, 0, 1, 2, 1)
+        layout.addWidget(self.reset_btn, 0, 2, 2, 1)
+        self.setLayout(layout)
+        self.reset()
+
+    def _valueChanged(self, ev):
+        ctrl = 0.01 + float(self._ctrl_s.value()) / 50. * 0.99
+        bias = 0.01 + float(self._bias_s.value()) / 50. * 0.99
+        self._ctrl_l.setText("{:0.2f}".format(ctrl))
+        self._bias_l.setText("{:0.2f}".format(bias))
+        self.valueChanged.emit(ctrl, bias)
 
     def reset(self):
         with blocked_signals(self):
-            self.ctrl_s.setValue(50)
-            self.bias_s.setValue(50)
+            self._ctrl_s.setValue(50)
+            self._bias_s.setValue(50)
 
 
 class blocked_signals(object):
@@ -132,9 +144,11 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.mainToolBar.insertWidget(self._ui.actionRAWCorr, ts)
 
         # width/color ctrb
-        self._ui.widthCtrb = CtrbWidget(self.on_wc_c, self.on_wc_b, translate("visualizer", "Width"))
+        self._ui.widthCtrb = CtrbWidget(translate("visualizer", "Width"))
+        self._ui.widthCtrb.valueChanged.connect(self.on_wc)
         self._ui.ctrbToolBar.insertWidget(self._ui.actionInfo, self._ui.widthCtrb)
-        self._ui.colorCtrb = CtrbWidget(self.on_cc_c, self.on_cc_b, translate("visualizer", "Color"))
+        self._ui.colorCtrb = CtrbWidget(translate("visualizer", "Color"))
+        self._ui.colorCtrb.valueChanged.connect(self.on_cc)
         self._ui.ctrbToolBar.insertWidget(self._ui.actionInfo, self._ui.colorCtrb)
 
         # scene
@@ -532,27 +546,13 @@ class MainWindow(QtGui.QMainWindow):
         self._redraw_scene()
 
 
-    def on_wc_c(self, v):
-        v = 0.01 + float(v) / 51.
-        self._wc[0] = v
+    def on_wc(self, ctrl, bias):
+        self._wc = [ctrl, bias]
         self._redraw_scene()
 
 
-    def on_wc_b(self, v):
-        v = 0.01 + float(v) / 51.
-        self._wc[1] = v
-        self._redraw_scene()
-
-
-    def on_cc_c(self, v):
-        v = 0.01 + float(v) / 51.
-        self._cc[0] = v
-        self._redraw_scene()
-
-
-    def on_cc_b(self, v):
-        v = 0.01 + float(v) / 51.
-        self._cc[1] = v
+    def on_cc(self, ctrl, bias):
+        self._cc = [ctrl, bias]
         self._redraw_scene()
 
 
