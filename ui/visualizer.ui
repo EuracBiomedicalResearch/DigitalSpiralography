@@ -206,7 +206,7 @@
      <normaloff>icons/24x24/showhide.png</normaloff>icons/24x24/showhide.png</iconset>
    </property>
    <property name="text">
-    <string>Show traces</string>
+    <string>Traces</string>
    </property>
    <property name="toolTip">
     <string>Show traces</string>
@@ -224,7 +224,7 @@
      <normaloff>icons/24x24/angle.png</normaloff>icons/24x24/angle.png</iconset>
    </property>
    <property name="text">
-    <string>Show tilt</string>
+    <string>Tilt</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+I</string>
@@ -246,12 +246,18 @@
    </property>
   </action>
   <action name="actionShowStrokes">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>icons/24x24/strokes.png</normaloff>icons/24x24/strokes.png</iconset>
    </property>
-   <property name="checkable">
-    <bool>true</bool>
+   <property name="text">
+    <string>Strokes</string>
+   </property>
+   <property name="toolTip">
+    <string>Show strokes</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+K</string>
