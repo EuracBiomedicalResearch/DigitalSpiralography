@@ -4,9 +4,15 @@
 
 from __future__ import print_function
 
+# setup path
+import os, sys
+DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
+sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+
 # local modules
-import Analysis
-import Consts
+from DrawingRecorder import Analysis
+from DrawingRecorder import Consts
 
 # Qt
 from PyQt4 import QtCore

@@ -6,7 +6,7 @@ from __future__ import print_function
 # local modules
 import Consts
 import Drawing
-from Intl import translate
+from UI import translate
 
 # system modules
 import datetime

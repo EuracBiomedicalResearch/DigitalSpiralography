@@ -1,18 +1,27 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Main Drawing visualizer application"""
 
+from __future__ import print_function
+
+# setup path
+import os, sys
+DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
+sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+
 # local modules
-import Shared
-import Analysis
-import Consts
-import Intl
-from Intl import translate
+from DrawingRecorder import Analysis
+from DrawingRecorder import Consts
+from DrawingRecorder import Shared
+from DrawingRecorder import UI
+from DrawingRecorder.UI import translate
 
 # system modules
 import math
 import platform
 import threading
-from PyQt4 import QtCore, QtGui, uic
+from PyQt4 import QtCore, QtGui
 
 
 # support functions
@@ -102,9 +111,7 @@ class blocked_signals(object):
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        form, _ = uic.loadUiType("ui/visualizer.ui")
-        self._ui = form()
-        self._ui.setupUi(self)
+        self._ui = UI.load_ui(self, DR_ROOT, "visualizer.ui")
 
         # defaults
         self._showRaw = False
@@ -561,7 +568,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
-        Intl.initialize("visualizer")
+        UI.init_intl(DR_ROOT, "visualizer")
 
         # initialize
         self.main_window = MainWindow()
@@ -572,3 +579,9 @@ class Application(QtGui.QApplication):
             args = self.arguments()
             if len(args) > 1:
                 self.main_window.load(unicode(args[1]))
+
+
+# main module
+if __name__ == '__main__':
+    app = Application(sys.argv)
+    sys.exit(app.exec_())

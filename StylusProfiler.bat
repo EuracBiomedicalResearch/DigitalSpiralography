@@ -1,1 +1,2 @@
-start src\profiler.pyw
+set PYTHONOPTIMIZE=1
+start bin\profiler.pyw

@@ -4,7 +4,7 @@
 # local modules
 import Analysis
 import Consts
-from Intl import translate
+from UI import translate
 
 # system modules
 import math

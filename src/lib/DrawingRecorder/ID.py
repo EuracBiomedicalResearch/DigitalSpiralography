@@ -3,7 +3,7 @@
 
 # local modules
 import Verhoeff
-from Intl import translate
+from UI import translate
 
 # system modules
 from PyQt4 import QtGui

@@ -1,19 +1,28 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Main Stylus profiler application"""
 
+from __future__ import print_function
+
+# setup path
+import os, sys
+DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
+sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+
 # local modules
-import Consts
-import ID
-import Intl
-import Analysis
-from Intl import translate
+from DrawingRecorder import Analysis
+from DrawingRecorder import Consts
+from DrawingRecorder import ID
+from DrawingRecorder import UI
+from DrawingRecorder.UI import translate
 
 # system modules
 import datetime
 import platform
 import numpy as np
 import pyqtgraph as pg
-from PyQt4 import QtCore, QtGui, uic
+from PyQt4 import QtCore, QtGui
 
 
 # helpers
@@ -45,9 +54,7 @@ class sorting_disabled(object):
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        form, _ = uic.loadUiType("ui/profiler.ui")
-        self._ui = form()
-        self._ui.setupUi(self)
+        self._ui = UI.load_ui(self, DR_ROOT, "profiler.ui")
 
         # signals and events
         self._ui.actionNew.triggered.connect(self.on_new)
@@ -438,7 +445,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
-        Intl.initialize("profiler")
+        UI.init_intl(DR_ROOT, "profiler")
 
         # initialize
         self.main_window = MainWindow()
@@ -459,3 +466,10 @@ class Application(QtGui.QApplication):
 
         # normal handling
         return super(Application, self).event(ev)
+
+
+
+# entry point
+if __name__ == '__main__':
+    app = Application(sys.argv)
+    sys.exit(app.exec_())

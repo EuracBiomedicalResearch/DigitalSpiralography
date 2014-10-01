@@ -1,2 +1,2 @@
 set PYTHONOPTIMIZE=1
-start /high src\recorder.pyw
+start /high bin\recorder.pyw

@@ -128,7 +128,7 @@
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
+          <normaloff>../icons/24x24/info.png</normaloff>../icons/24x24/info.png</iconset>
         </property>
        </widget>
       </item>

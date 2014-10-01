@@ -1,23 +1,32 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """Main Drawing recorder application"""
 
+from __future__ import print_function
+
+# setup path
+import os, sys
+DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
+sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+
 # local modules
-import ID
-import Analysis
-from Analysis import PatHand, PatHandedness
-import DrawingFactory
-import DrawingWindow
-import Shared
-import Consts
-import Intl
-from Intl import translate
+from DrawingRecorder import ID
+from DrawingRecorder import Analysis
+from DrawingRecorder.Analysis import PatHand, PatHandedness
+from DrawingRecorder import DrawingFactory
+from DrawingRecorder import DrawingWindow
+from DrawingRecorder import Shared
+from DrawingRecorder import Consts
+from DrawingRecorder import UI
+from DrawingRecorder.UI import translate
 
 # system modules
 import os
 import uuid
 import datetime
 import threading
-from PyQt4 import QtCore, QtGui, uic
+from PyQt4 import QtCore, QtGui
 
 
 # helpers
@@ -61,9 +70,7 @@ class Params(object):
 class NewCalibration(QtGui.QDialog):
     def __init__(self):
         super(NewCalibration, self).__init__()
-        form, _ = uic.loadUiType("ui/newcalibration.ui")
-        self._ui = form()
-        self._ui.setupUi(self)
+        self._ui = UI.load_ui(self, DR_ROOT, "newcalibration.ui")
 
 
     def reset(self):
@@ -112,9 +119,7 @@ class NewCalibration(QtGui.QDialog):
 class NewRecording(QtGui.QDialog):
     def __init__(self):
         super(NewRecording, self).__init__()
-        form, _ = uic.loadUiType("ui/newrecording.ui")
-        self._ui = form()
-        self._ui.setupUi(self)
+        self._ui = UI.load_ui(self, DR_ROOT, "newrecording.ui")
 
 
     def reset(self):
@@ -146,9 +151,7 @@ class NewRecording(QtGui.QDialog):
 class EndRecording(QtGui.QDialog):
     def __init__(self):
         super(EndRecording, self).__init__()
-        form, _ = uic.loadUiType("ui/endrecording.ui")
-        self._ui = form()
-        self._ui.setupUi(self)
+        self._ui = UI.load_ui(self, DR_ROOT, "endrecording.ui")
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
         self._ui.next_hand_btn.clicked.connect(self.on_next_hand)
 
@@ -357,9 +360,7 @@ class EndRecording(QtGui.QDialog):
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, params):
         super(MainWindow, self).__init__()
-        form, _ = uic.loadUiType("ui/main.ui")
-        self._ui = form()
-        self._ui.setupUi(self)
+        self._ui = UI.load_ui(self, DR_ROOT, "main.ui")
 
         # signals
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
@@ -572,7 +573,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
-        Intl.initialize("recorder")
+        UI.init_intl(DR_ROOT, "recorder")
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
@@ -603,3 +604,10 @@ class Application(QtGui.QApplication):
 
         # normal handling
         return super(Application, self).event(ev)
+
+
+
+# main module
+if __name__ == '__main__':
+    app = Application(sys.argv)
+    sys.exit(app.exec_())

@@ -138,7 +138,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/open.png</normaloff>icons/24x24/open.png</iconset>
+     <normaloff>../icons/24x24/open.png</normaloff>../icons/24x24/open.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -150,7 +150,7 @@
   <action name="actionExit">
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/exit.png</normaloff>icons/24x24/exit.png</iconset>
+     <normaloff>../icons/24x24/exit.png</normaloff>../icons/24x24/exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -168,8 +168,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/chart_ok.png</normaloff>
-     <normalon>icons/24x24/chart_edit.png</normalon>icons/24x24/chart_ok.png</iconset>
+     <normaloff>../icons/24x24/chart_ok.png</normaloff>
+     <normalon>../icons/24x24/chart_edit.png</normalon>../icons/24x24/chart_ok.png</iconset>
    </property>
    <property name="text">
     <string>RAW/Corrected</string>
@@ -184,8 +184,8 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/color_line.png</normaloff>
-     <normalon>icons/24x24/chrono.png</normalon>icons/24x24/color_line.png</iconset>
+     <normaloff>../icons/24x24/color_line.png</normaloff>
+     <normalon>../icons/24x24/chrono.png</normalon>../icons/24x24/color_line.png</iconset>
    </property>
    <property name="text">
     <string>Speed/Time</string>
@@ -203,7 +203,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/showhide.png</normaloff>icons/24x24/showhide.png</iconset>
+     <normaloff>../icons/24x24/showhide.png</normaloff>../icons/24x24/showhide.png</iconset>
    </property>
    <property name="text">
     <string>Traces</string>
@@ -221,7 +221,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/angle.png</normaloff>icons/24x24/angle.png</iconset>
+     <normaloff>../icons/24x24/angle.png</normaloff>../icons/24x24/angle.png</iconset>
    </property>
    <property name="text">
     <string>Tilt</string>
@@ -233,7 +233,7 @@
   <action name="actionInfo">
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/info.png</normaloff>icons/24x24/info.png</iconset>
+     <normaloff>../icons/24x24/info.png</normaloff>../icons/24x24/info.png</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -251,7 +251,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>icons/24x24/strokes.png</normaloff>icons/24x24/strokes.png</iconset>
+     <normaloff>../icons/24x24/strokes.png</normaloff>../icons/24x24/strokes.png</iconset>
    </property>
    <property name="text">
     <string>Strokes</string>
