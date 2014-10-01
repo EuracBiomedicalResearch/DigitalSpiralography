@@ -52,8 +52,11 @@ def __main__():
 
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
-    ap.add_argument('-d', dest='dump', action='store_true',
+    grp = ap.add_mutually_exclusive_group()
+    grp.add_argument('-d', dest='dump', action='store_true',
                     help='Write a dump file for fast loading')
+    grp.add_argument('-t', dest='text', action='store_true',
+                    help='Write a simple text file for inspection')
     ap.add_argument('-i', '--input', required=True, help='drawing file')
     ap.add_argument('-o', '--output', required=True, help='output file')
     ap.add_argument('-c', dest='cmds', metavar='command', help='command (and arguments) to apply',
@@ -81,6 +84,8 @@ def __main__():
     # save
     if args.dump:
         Analysis.DrawingRecord.dump(record, args.output)
+    elif args.text:
+        Analysis.DrawingRecord.save_text(record, args.output)
     else:
         Analysis.DrawingRecord.save(record, args.output)
 

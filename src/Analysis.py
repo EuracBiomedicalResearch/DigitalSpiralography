@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Drawing structures/analysis"""
 
+from __future__ import print_function
+
 # local modules
 import Consts
 import Drawing
@@ -238,6 +240,21 @@ class DrawingRecord(object):
 
         # dump
         yaml.safe_dump(data, fd, allow_unicode=True, encoding='utf-8')
+
+
+    @classmethod
+    def save_text(cls, record, path):
+        with open(path, "w") as fd:
+            print('\t'.join(["#TIME", "X", "Y", "Z", "W", "T"]), file=fd)
+            start = record.recording.events[0].stamp
+            for event in record.recording.events:
+                time = (event.stamp - start).total_seconds() * 1000.;
+                x = event.coords_drawing[0]
+                y = event.coords_drawing[1]
+                z = event.pressure if pressure != 0 else ""
+                w = event.tilt_drawing[0] if event.tilt_drawing else ""
+                t = event.tilt_drawing[1] if event.tilt_drawing else ""
+                print('\t'.join(map(str, [time, x, y, z, w, t])), file=fd)
 
 
     @classmethod
