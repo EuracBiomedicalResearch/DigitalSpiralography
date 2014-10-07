@@ -25,47 +25,59 @@ def extra_set(record, key, value):
 
 
 # commands
-def cmd_pattype(record, args):
-    """Set patient type (1 arg: ID)"""
-    extra_set(record, 'orig_pat_type', record.pat_type)
-    record.pat_type = args[0]
+class CmdPatType(object):
+    narg = 1
+    help = 'Set patient type (1 arg: ID)'
+
+    @classmethod
+    def handler(cls, record, args):
+        extra_set(record, 'orig_pat_type', record.pat_type)
+        record.pat_type = args[0]
 
 
-def cmd_addcmt(record, args):
-    """Add/append comment text (1 arg: text)"""
-    stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    cmt = "{}: {}".format(stamp, args[0])
-    if not record.comments:
-        record.comments = cmt
-    else:
-        record.comments += "\n"
-        record.comments += cmt
+class CmdAddCmt(object):
+    narg = 1
+    help = 'Add/append comment text (1 arg: text)'
+
+    @classmethod
+    def handler(cls, record, args):
+        stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        cmt = '{}: {}'.format(stamp, args[0])
+        if not record.comments:
+            record.comments = cmt
+        else:
+            record.comments += "\n"
+            record.comments += cmt
 
 
 # command map
-COMMANDS = {'pattype': (1, cmd_pattype),
-            'addcmt': (1, cmd_addcmt)}
+COMMANDS = {'addcmt': CmdAddCmt,
+            'pattype': CmdPatType}
 
 
 def __main__():
     # argument parser
-    epilog = "available commands:\n"
-    for cmd, data in COMMANDS.iteritems():
-        epilog += "  {}:\t\t{}\n".format(cmd, data[1].__doc__)
-
-    ap = argparse.ArgumentParser(description='Drawing file batch manipulator',
-                                 formatter_class=argparse.RawTextHelpFormatter, epilog=epilog)
+    ap = argparse.ArgumentParser(description='Drawing file batch converter/manipulator',
+                                 formatter_class=argparse.RawTextHelpFormatter)
 
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
     grp = ap.add_mutually_exclusive_group()
     grp.add_argument('-d', dest='dump', action='store_true',
-                    help='Write a dump file for fast loading')
+                     help='Write a dump file for fast loading')
     grp.add_argument('-t', dest='text', action='store_true',
-                    help='Write a simple text file for inspection')
+                     help='Write a simple text file for inspection')
     ap.add_argument('-i', '--input', required=True, help='drawing file')
     ap.add_argument('-o', '--output', required=True, help='output file')
-    ap.add_argument('-c', dest='cmds', metavar='command', help='command (and arguments) to apply',
+
+    if not COMMANDS:
+        cmd_help = argparse.SUPPRESS
+    else:
+        cmd_help = 'command (and arguments) to apply'
+        ap.epilog = 'available commands:\n'
+        for cmd, cls in COMMANDS.iteritems():
+            ap.epilog += "  {}:\t\t{}\n".format(cmd, cls.help)
+    ap.add_argument('-c', dest='cmds', metavar='command', help=cmd_help,
                     default=[], nargs='+', action='append')
 
     # validate
@@ -73,7 +85,7 @@ def __main__():
     for cmd in args.cmds:
         if cmd[0] not in COMMANDS:
             ap.error('invalid command {}'.format(cmd[0]))
-        if len(cmd) - 1 != COMMANDS[cmd[0]][0]:
+        if len(cmd) - 1 != COMMANDS[cmd[0]].narg:
             ap.error('invalid number of arguments for command {}'.format(cmd[0]))
 
     # load
@@ -84,7 +96,7 @@ def __main__():
     # process
     if args.cmds:
         for cmd in args.cmds:
-            COMMANDS[cmd[0]][1](record, cmd[1:])
+            COMMANDS[cmd[0]].handler(record, cmd[1:])
         record.ts_updated = datetime.datetime.now()
 
     # save
