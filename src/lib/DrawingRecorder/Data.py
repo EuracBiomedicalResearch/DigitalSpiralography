@@ -394,10 +394,11 @@ class StylusProfile(object):
 
 
     @classmethod
-    def save_text(cls, record, path):
+    def save_text(cls, profile, path):
         with open(path, "w") as fd:
             print('\t'.join(["#P", "W"]), file=fd)
-            # TODO
+            for point in profile.data:
+                print('\t'.join(map(str, [point.pressure, point.weight])), file=fd)
 
 
     @classmethod
