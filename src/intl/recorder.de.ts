@@ -250,19 +250,19 @@
     </message>
 </context>
 <context>
-    <name>analysis</name>
+    <name>data</name>
     <message>
-        <location filename="../src/Analysis.py" line="177"/>
+        <location filename="../src/Data.py" line="177"/>
         <source>Multiple strokes</source>
         <translation>Mehrere Linien</translation>
     </message>
     <message>
-        <location filename="../src/Analysis.py" line="186"/>
+        <location filename="../src/Data.py" line="186"/>
         <source>Short recording</source>
         <translation>Kurze Aufnahme</translation>
     </message>
     <message>
-        <location filename="../src/Analysis.py" line="191"/>
+        <location filename="../src/Data.py" line="191"/>
         <source>Old calibration data</source>
         <translation>Kalibration veraltet</translation>
     </message>
@@ -271,7 +271,7 @@
         <translation type="obsolete">Ungültiges oder nicht unterstütztes Dateiformat</translation>
     </message>
     <message>
-        <location filename="../src/Analysis.py" line="180"/>
+        <location filename="../src/Data.py" line="180"/>
         <source>No data!</source>
         <translation>Keine Daten!</translation>
     </message>

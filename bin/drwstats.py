@@ -11,7 +11,7 @@ sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
 sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
-from DrawingRecorder import Analysis
+from DrawingRecorder import Data
 from DrawingRecorder import Consts
 
 # Qt
@@ -246,8 +246,8 @@ def recordStats(record, profs):
 
     return {"PAT_ID": record.aid,
             "PAT_TYPE": remap(Consts.PAT_TYPES, record.pat_type),
-            "PAT_HANDEDNESS": remap(Analysis.PAT_HANDEDNESS, record.pat_handedness),
-            "PAT_HAND": remap(Analysis.PAT_HAND, record.pat_hand),
+            "PAT_HANDEDNESS": remap(Data.PAT_HANDEDNESS, record.pat_handedness),
+            "PAT_HAND": remap(Data.PAT_HAND, record.pat_hand),
             "OPERATOR": record.oid,
             "BLOOD_DRAWN": record.extra_data.get('blood_drawn'),
             "DRW_ID": record.drawing.id,
@@ -310,11 +310,11 @@ def __main__():
     # load correction profiles
     profs = {}
     for path in args.prof:
-        data = Analysis.StylusProfile.load(path)
+        data = Data.StylusProfile.load(path)
         profs[data.sid] = data
 
     # drawing record
-    record = Analysis.DrawingRecord.load(args.file, args.fast)
+    record = Data.DrawingRecord.load(args.file, args.fast)
 
     # generate statistics
     stats = recordStats(record, profs)

@@ -11,7 +11,7 @@ sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
 sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
-from DrawingRecorder import Analysis
+from DrawingRecorder import Data
 from DrawingRecorder import Consts
 
 # Qt
@@ -95,8 +95,8 @@ def renderSpiral(record, output):
     # compose a title
     p_aid = record.aid
     p_type = remap(Consts.PAT_TYPES, record.pat_type)
-    p_hand = remap(Analysis.PAT_HAND, record.pat_hand)
-    p_hdn = remap(Analysis.PAT_HANDEDNESS, record.pat_handedness)
+    p_hand = remap(Data.PAT_HAND, record.pat_hand)
+    p_hdn = remap(Data.PAT_HANDEDNESS, record.pat_handedness)
     ax.set_title("{} {} ({} hand, {})".format(p_aid, p_type, p_hand, p_hdn))
 
     ax.set_xlim(-1,1)
@@ -122,7 +122,7 @@ def __main__():
     ap.add_argument('output', help='output file')
     args = ap.parse_args()
 
-    record = Analysis.DrawingRecord.load(args.file, args.fast)
+    record = Data.DrawingRecord.load(args.file, args.fast)
     renderSpiral(record, args.output)
 
 

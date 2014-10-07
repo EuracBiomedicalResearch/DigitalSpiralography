@@ -80,29 +80,29 @@
     </message>
 </context>
 <context>
-    <name>analysis</name>
+    <name>data</name>
     <message>
-        <location filename="src/Analysis.py" line="137"/>
+        <location filename="src/Data.py" line="137"/>
         <source>Multiple strokes</source>
         <translation>Mehrere Linien</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="146"/>
+        <location filename="src/Data.py" line="146"/>
         <source>Short recording</source>
         <translation>Kurze Aufnahme</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="151"/>
+        <location filename="src/Data.py" line="151"/>
         <source>Old calibration data</source>
         <translation>Kalibration veraltet</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="215"/>
+        <location filename="src/Data.py" line="215"/>
         <source>Invalid or unsupported file format</source>
         <translation>Ungültiges oder nicht unterstütztes Dateiformat</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="140"/>
+        <location filename="src/Data.py" line="140"/>
         <source>No data!</source>
         <translation>Keine Daten!</translation>
     </message>
@@ -115,47 +115,47 @@
         <translation>k.A.</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="95"/>
+        <location filename="src/Data.py" line="95"/>
         <source>Case</source>
         <translation>Prüfgruppe</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="96"/>
+        <location filename="src/Data.py" line="96"/>
         <source>Control</source>
         <translation>Kontrollgruppe</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="102"/>
+        <location filename="src/Data.py" line="102"/>
         <source>Left-handed</source>
         <translation>Linkshänder</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="103"/>
+        <location filename="src/Data.py" line="103"/>
         <source>Right-handed</source>
         <translation>Rechtshänder</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="104"/>
+        <location filename="src/Data.py" line="104"/>
         <source>Ambidextrous</source>
         <translation>Beidhändig</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="109"/>
+        <location filename="src/Data.py" line="109"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="110"/>
+        <location filename="src/Data.py" line="110"/>
         <source>Right</source>
         <translation>Rechts</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="112"/>
+        <location filename="src/Data.py" line="112"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="src/Analysis.py" line="113"/>
+        <location filename="src/Data.py" line="113"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>

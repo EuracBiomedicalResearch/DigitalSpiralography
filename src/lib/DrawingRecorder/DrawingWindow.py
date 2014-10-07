@@ -2,7 +2,7 @@
 """Drawing window"""
 
 # local modules
-import Analysis
+import Data
 import Consts
 from UI import translate
 
@@ -62,7 +62,7 @@ class CalibrationHandler(Handler):
 
     def completed(self):
         res, error = self.dw.setup_calibration(
-            Analysis.CalibrationData(self.dw.oid, self.dw.tablet_id, self.dw.stylus_id, self.cpoints))
+            Data.CalibrationData(self.dw.oid, self.dw.tablet_id, self.dw.stylus_id, self.cpoints))
         if not res:
             msg = translate("calib",
                             "CALIBRATION FAILED: {reason}!\n"
@@ -171,7 +171,7 @@ class RecordingHandler(Handler):
         self.pen.setCapStyle(QtCore.Qt.RoundCap)
 
         # initial state
-        self.dw.recording = Analysis.RecordingData()
+        self.dw.recording = Data.RecordingData()
         rect = self.dw._view.sceneRect()
         self.dw.recording.rect_size = (rect.width(), rect.height())
         self.dw.recording.rect_drawing = self.get_rect(rect, self.dw._drawing_group)
@@ -233,7 +233,7 @@ class RecordingHandler(Handler):
         coords_drawing = self.dw._drawing_pos
         coords_trans = self.dw._trans_pos
         self.dw.recording.append(
-            Analysis.RecordingEvent(
+            Data.RecordingEvent(
                 ev.type(),
                 [coords_drawing.x(), coords_drawing.y()],
                 [coords_trans.x(), coords_trans.y()],

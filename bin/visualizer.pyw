@@ -11,7 +11,7 @@ sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
 sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
-from DrawingRecorder import Analysis
+from DrawingRecorder import Data
 from DrawingRecorder import Consts
 from DrawingRecorder import Shared
 from DrawingRecorder import UI
@@ -227,14 +227,14 @@ class MainWindow(QtGui.QMainWindow):
         name = translate("visualizer", "Pat. hand count")
         self._append_prop(name, record.pat_hand_cnt)
         name = translate("visualizer", "Pat. handedness")
-        self._append_prop_map(name, Analysis.PAT_HANDEDNESS_DSC, record.pat_handedness)
+        self._append_prop_map(name, Data.PAT_HANDEDNESS_DSC, record.pat_handedness)
         name = translate("visualizer", "Pat. hand")
-        self._append_prop_map(name, Analysis.PAT_HAND_DSC, record.pat_hand)
+        self._append_prop_map(name, Data.PAT_HAND_DSC, record.pat_hand)
 
         name = translate("visualizer", "Operator")
         self._append_prop(name, record.oid)
         name = translate("visualizer", "Blood drawn")
-        self._append_prop_map(name, Analysis.BOOL_MAP_DSC,
+        self._append_prop_map(name, Data.BOOL_MAP_DSC,
                               record.extra_data.get('blood_drawn'))
 
         name = translate("visualizer", "Drawing ID")
@@ -488,7 +488,7 @@ class MainWindow(QtGui.QMainWindow):
             # perform the loading in background thread
             record = Shared.background_op(
                 translate("visualizer", "Loading, please wait..."),
-                lambda: Analysis.DrawingRecord.load(path))
+                lambda: Data.DrawingRecord.load(path))
         except Exception as e:
             msg = translate("visualizer",
                             "Cannot load recording {path}: {reason}")

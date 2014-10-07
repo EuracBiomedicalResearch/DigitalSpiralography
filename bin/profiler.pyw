@@ -11,7 +11,7 @@ sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
 sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
-from DrawingRecorder import Analysis
+from DrawingRecorder import Data
 from DrawingRecorder import Consts
 from DrawingRecorder import ID
 from DrawingRecorder import UI
@@ -221,7 +221,7 @@ class MainWindow(QtGui.QMainWindow):
                     self.data_ok = False
             if v[0] is not None and v[1] is not None:
                 self.data.data.append(
-                    Analysis.StylusResponseData(v[0], v[1]))
+                    Data.StylusResponseData(v[0], v[1]))
 
         self._update_rsp()
         self._update_meta()
@@ -334,7 +334,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def reset(self):
-        self.load_profile(Analysis.StylusProfile())
+        self.load_profile(Data.StylusProfile())
 
 
     def _check_changed(self):
@@ -357,7 +357,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def load(self, path):
         try:
-            profile = Analysis.StylusProfile.load(path)
+            profile = Data.StylusProfile.load(path)
         except Exception as e:
             msg = translate("profiler",
                             "Cannot load profile {path}: {reason}")
@@ -417,7 +417,7 @@ class MainWindow(QtGui.QMainWindow):
             return
 
         try:
-            Analysis.StylusProfile.save(self.data, path)
+            Data.StylusProfile.save(self.data, path)
         except IOError as e:
             msg = translate("profiler",
                             "Cannot save profile to {path}: {reason}!")

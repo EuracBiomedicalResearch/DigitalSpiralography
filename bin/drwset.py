@@ -11,7 +11,7 @@ sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
 sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
-from DrawingRecorder import Analysis
+from DrawingRecorder import Data
 
 # system modules
 import argparse
@@ -77,7 +77,7 @@ def __main__():
             ap.error('invalid number of arguments for command {}'.format(cmd[0]))
 
     # load
-    record = Analysis.DrawingRecord.load(args.input, args.fast)
+    record = Data.DrawingRecord.load(args.input, args.fast)
     extra_set(record, 'orig_version', record.extra_data['version'])
     extra_set(record, 'orig_format', record.extra_data['format'])
 
@@ -89,11 +89,11 @@ def __main__():
 
     # save
     if args.dump:
-        Analysis.DrawingRecord.dump(record, args.output)
+        Data.DrawingRecord.dump(record, args.output)
     elif args.text:
-        Analysis.DrawingRecord.save_text(record, args.output)
+        Data.DrawingRecord.save_text(record, args.output)
     else:
-        Analysis.DrawingRecord.save(record, args.output)
+        Data.DrawingRecord.save(record, args.output)
 
 
 if __name__ == '__main__':

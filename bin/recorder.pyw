@@ -12,8 +12,8 @@ sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
 from DrawingRecorder import ID
-from DrawingRecorder import Analysis
-from DrawingRecorder.Analysis import PatHand, PatHandedness
+from DrawingRecorder import Data
+from DrawingRecorder.Data import PatHand, PatHandedness
 from DrawingRecorder import DrawingFactory
 from DrawingRecorder import DrawingWindow
 from DrawingRecorder import Shared
@@ -472,13 +472,13 @@ class MainWindow(QtGui.QMainWindow):
                       "total_recordings": self.params.total_recordings,
                       "installation_uuid": self.params.installation_uuid,
                       "installation_stamp": self.params.installation_stamp}
-        record = Analysis.DrawingRecord(oid, aid,
-                                        self._drawing_window.drawing,
-                                        self._drawing_window.calibration,
-                                        self.calibration_age,
-                                        self._drawing_window.recording,
-                                        cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand,
-                                        extra_data)
+        record = Data.DrawingRecord(oid, aid,
+                                    self._drawing_window.drawing,
+                                    self._drawing_window.calibration,
+                                    self.calibration_age,
+                                    self._drawing_window.recording,
+                                    cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand,
+                                    extra_data)
 
         # guess a decent path name
         save_path = record.recording.session_start.strftime("%Y%m%d")
@@ -502,7 +502,7 @@ class MainWindow(QtGui.QMainWindow):
             try:
                 # put save into a background thread
                 Shared.background_op(translate("recorder", "Saving, please wait..."),
-                                     lambda: Analysis.DrawingRecord.save(record, save_path),
+                                     lambda: Data.DrawingRecord.save(record, save_path),
                                      self)
             except IOError as e:
                 msg = translate("recorder",

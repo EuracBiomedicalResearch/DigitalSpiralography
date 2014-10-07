@@ -11,7 +11,7 @@ sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
 sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
 
 # local modules
-from DrawingRecorder import Analysis
+from DrawingRecorder import Data
 
 # Qt
 from PyQt4 import QtCore
@@ -117,7 +117,7 @@ def renderSpirals(files, output, fast, pressure, desc, ticks):
         c = smap.to_rgba(i)
 
         sys.stderr.write("1")
-        record = Analysis.DrawingRecord.load(path, fast)
+        record = Data.DrawingRecord.load(path, fast)
 
         sys.stderr.write("\b2")
         renderPatch(record, s_ax, c, pressure)

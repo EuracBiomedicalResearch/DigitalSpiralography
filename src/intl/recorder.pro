@@ -1,5 +1,5 @@
 SOURCES		= ../../bin/recorder.pyw \
-		  ../lib/DrawingRecorder/Analysis.py \
+		  ../lib/DrawingRecorder/Data.py \
 		  ../lib/DrawingRecorder/Drawing.py \
 		  ../lib/DrawingRecorder/ID.py
 FORMS		= ../ui/main.ui \

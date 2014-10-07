@@ -171,21 +171,21 @@ class DrawingRecord(object):
         ret = []
 
         if self.recording.strokes > 1:
-            ret.append(translate("analysis", "Multiple strokes"))
+            ret.append(translate("data", "Multiple strokes"))
 
         if not self.recording.events:
-            ret.append(translate("analysis", "No data!"))
+            ret.append(translate("data", "No data!"))
         else:
             length = (self.recording.events[-1].stamp -
                       self.recording.events[0].stamp)
             if length < datetime.timedelta(seconds=1) or \
               len(self.recording.events) < 100:
-                ret.append(translate("analysis", "Short recording"))
+                ret.append(translate("data", "Short recording"))
 
         stamp = datetime.datetime.now()
         if (stamp - self.calibration.stamp) > datetime.timedelta(hours=8) or \
           self.calibration_age > 50:
-            ret.append(translate("analysis", "Old calibration data"))
+            ret.append(translate("data", "Old calibration data"))
 
         return ret
 
@@ -282,7 +282,7 @@ class DrawingRecord(object):
           type(data['format']) != str or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_RECORDING) != Consts.FF_RECORDING:
-            msg = translate("analysis", 'Unsupported file format')
+            msg = translate("data", 'Unsupported file format')
             raise Exception(msg, path)
 
         # recover extra data
@@ -394,6 +394,13 @@ class StylusProfile(object):
 
 
     @classmethod
+    def save_text(cls, record, path):
+        with open(path, "w") as fd:
+            print('\t'.join(["#P", "W"]), file=fd)
+            # TODO
+
+
+    @classmethod
     def load(cls, path):
         data = None
         try:
@@ -409,7 +416,7 @@ class StylusProfile(object):
           type(data['format']) != str or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_PROFILE) != Consts.FF_PROFILE:
-            msg = translate("analysis", 'Unsupported file format')
+            msg = translate("data", 'Unsupported file format')
             raise Exception(msg, path)
 
         # recover extra data
