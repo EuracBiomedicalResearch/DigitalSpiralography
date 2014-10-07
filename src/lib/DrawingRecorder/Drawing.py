@@ -20,8 +20,8 @@ class Drawing(object):
 
 
 class SpiralParams(object):
-    def __init__(self, diameter=None, turns=None, direction=None):
-        self.diameter = diameter
+    def __init__(self, radius=None, turns=None, direction=None):
+        self.radius = radius
         self.turns = turns
         self.direction = direction
 
@@ -35,8 +35,8 @@ class Spiral(Drawing):
 
 
     def _describe(self):
-        return u"Ø{}mm {}T {}".format(
-            self.params.diameter, self.params.turns, self.params.direction)
+        return u"R{}mm {}T {}".format(
+            self.params.radius, self.params.turns, self.params.direction)
 
 
     def _generate(self, step=1.):

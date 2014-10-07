@@ -8,9 +8,9 @@ import Drawing
 # drawing ID/s constructors table
 id_table = {
     "DSPR1": lambda: Drawing.Spiral(
-        "DSPR1", Drawing.SpiralParams(diameter=65, turns=5., direction="CW")),
+        "DSPR1", Drawing.SpiralParams(radius=65, turns=5., direction="CW")),
     "DSPR2": lambda: Drawing.Spiral(
-        "DSPR2", Drawing.SpiralParams(diameter=65, turns=5., direction="CW"))}
+        "DSPR2", Drawing.SpiralParams(radius=65, turns=5., direction="CW"))}
 
 
 # implementation
