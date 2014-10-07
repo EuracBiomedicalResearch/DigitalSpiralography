@@ -74,24 +74,36 @@ class CtrbWidget(QtGui.QWidget):
         self._bias_l = QtGui.QLabel()
         layout.addWidget(self._bias_l, 1, 0)
         layout.addWidget(self._bias_s, 1, 1)
+        self.auto_btn = QtGui.QPushButton(self.style().standardIcon(QtGui.QStyle.SP_MediaSeekBackward), "")
+        self.auto_btn.setToolTip(translate("visualizer", "Auto {}".format(descr)))
+        self.auto_btn.clicked.connect(self.auto)
+        layout.addWidget(self.auto_btn, 0, 2)
         self.reset_btn = QtGui.QPushButton(self.style().standardIcon(QtGui.QStyle.SP_DialogCancelButton), "")
         self.reset_btn.setToolTip(translate("visualizer", "Reset {}".format(descr)))
         self.reset_btn.clicked.connect(self.reset)
-        layout.addWidget(self.reset_btn, 0, 2, 2, 1)
+        layout.addWidget(self.reset_btn, 1, 2)
         self.setLayout(layout)
         self.reset()
 
-    def _valueChanged(self, ev):
+    def _valueChanged(self, ev=None):
         ctrl = 0.01 + float(self._ctrl_s.value()) / 50. * 0.99
         bias = 0.01 + float(self._bias_s.value()) / 50. * 0.99
         self._ctrl_l.setText("{:0.2f}".format(ctrl))
         self._bias_l.setText("{:0.2f}".format(bias))
         self.valueChanged.emit(ctrl, bias)
 
+    def auto(self):
+        with blocked_signals(self):
+            # TODO: should use an histogram-based method for maximization
+            self._ctrl_s.setValue(90)
+            self._bias_s.setValue(70)
+        self._valueChanged()
+
     def reset(self):
         with blocked_signals(self):
             self._ctrl_s.setValue(50)
             self._bias_s.setValue(50)
+        self._valueChanged()
 
 
 class blocked_signals(object):
