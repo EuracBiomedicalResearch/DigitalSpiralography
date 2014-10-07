@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Drawing file batch manipulator"""
+"""Drawing file converter/batch manipulator"""
 
 from __future__ import print_function
 
