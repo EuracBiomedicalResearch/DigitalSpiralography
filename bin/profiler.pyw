@@ -18,8 +18,8 @@ from DrawingRecorder import UI
 from DrawingRecorder.UI import translate
 
 # system modules
+import argparse
 import datetime
-import platform
 import numpy as np
 import pyqtgraph as pg
 from PyQt4 import QtCore, QtGui
@@ -447,15 +447,16 @@ class Application(QtGui.QApplication):
         super(Application, self).__init__(args)
         UI.init_intl(DR_ROOT, "profiler")
 
+        # command-line flags
+        ap = argparse.ArgumentParser(description='Stylus profiler')
+        ap.add_argument('file', nargs='?', help='stylus profile to load')
+        args = ap.parse_args(map(unicode, self.arguments()[1:]))
+
         # initialize
         self.main_window = MainWindow()
         self.main_window.show()
-
-        # if a file was specified on the cmd-line, load it
-        if platform.system() != 'Windows':
-            args = self.arguments()
-            if len(args) > 1:
-                self.main_window.load(unicode(args[1]))
+        if args.file:
+            self.main_window.load(args.file)
 
 
     def event(self, ev):

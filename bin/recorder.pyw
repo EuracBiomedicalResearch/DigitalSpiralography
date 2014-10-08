@@ -22,10 +22,11 @@ from DrawingRecorder import UI
 from DrawingRecorder.UI import translate
 
 # system modules
-import os
-import uuid
+import argparse
 import datetime
+import os
 import threading
+import uuid
 from PyQt4 import QtCore, QtGui
 
 
@@ -574,6 +575,10 @@ class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
         UI.init_intl(DR_ROOT, "recorder")
+
+        # command-line flags
+        ap = argparse.ArgumentParser(description='Drawing recorder')
+        args = ap.parse_args(map(unicode, self.arguments()[1:]))
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
