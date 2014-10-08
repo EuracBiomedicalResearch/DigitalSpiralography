@@ -25,6 +25,29 @@ from PyQt4 import QtCore, QtGui
 
 
 # support functions
+def drawArrow(group, pen, start, end, angle=10., ext=Consts.LIFT_RADIUS):
+    tmp = QtGui.QGraphicsLineItem(start[0], start[1], end[0], end[1])
+    tmp.setPen(pen)
+    tmp.setParentItem(group)
+
+    dx0 = end[0] - start[0]
+    dx1 = end[1] - start[1]
+    a = math.atan2(dx0, dx1)
+    angle = angle * (math.pi * 2) / 360.
+
+    tmp = QtGui.QGraphicsLineItem(end[0], end[1],
+                                  end[0] - math.sin(a + angle) * ext,
+                                  end[1] - math.cos(a + angle) * ext)
+    tmp.setPen(pen)
+    tmp.setParentItem(group)
+
+    tmp = QtGui.QGraphicsLineItem(end[0], end[1],
+                                  end[0] - math.sin(a - angle) * ext,
+                                  end[1] - math.cos(a - angle) * ext)
+    tmp.setPen(pen)
+    tmp.setParentItem(group)
+
+
 def speedAtPoint(events, stamp, window):
     w_events = []
     for w_event in events:
@@ -376,7 +399,6 @@ class MainWindow(QtGui.QMainWindow):
         tilt_pen.setWidthF(0.1)
 
         lift_pen = QtGui.QPen(Consts.LIFT_COLOR)
-        lift_pen.setWidthF(Consts.LIFT_PEN_WIDTH)
         lift_pen.setColor(QtGui.QColor(Consts.LIFT_COLOR))
 
         low_color = QtGui.QColor(Consts.RECORDING_COLOR)
@@ -395,6 +417,7 @@ class MainWindow(QtGui.QMainWindow):
         old_stamp = None
         drawing = False
         old_drawing = False
+        last_stroke = None
         for event in events:
             stamp = event.stamp
             if not self._showRaw:
@@ -439,13 +462,20 @@ class MainWindow(QtGui.QMainWindow):
                     pen.setColor(Consts.CURSOR_INACTIVE)
                     pen.setWidthF(0.5)
 
-                    # highlight stroke/lifts
-                    if self._showStrokes and old_drawing and event is not events[-1]:
+                # highlight stroke/lifts
+                if self._showStrokes:
+                    if drawing and last_stroke:
+                        lift_pen.setWidthF(1.)
+                        drawArrow(self._screen_group, lift_pen, last_stroke, pos)
+                        last_stroke = None
+                    elif not drawing and old_drawing and event is not events[-1]:
                         tmp = QtGui.QGraphicsEllipseItem(old_pos[0] - Consts.LIFT_RADIUS / 2,
                                                          old_pos[1] - Consts.LIFT_RADIUS / 2,
                                                          Consts.LIFT_RADIUS, Consts.LIFT_RADIUS)
+                        lift_pen.setWidthF(Consts.LIFT_PEN_WIDTH)
                         tmp.setPen(lift_pen)
                         tmp.setParentItem(self._screen_group)
+                        last_stroke = pos
 
                 if pos and (drawing or self._showTraces):
                     # the line itself
