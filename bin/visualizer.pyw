@@ -18,8 +18,8 @@ from DrawingRecorder import UI
 from DrawingRecorder.UI import translate
 
 # system modules
+import argparse
 import math
-import platform
 import threading
 from PyQt4 import QtCore, QtGui
 
@@ -495,12 +495,12 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.view.scale(delta, delta)
 
 
-    def load(self, path):
+    def load(self, path, fast=False):
         try:
             # perform the loading in background thread
             record = Shared.background_op(
                 translate("visualizer", "Loading, please wait..."),
-                lambda: Data.DrawingRecord.load(path))
+                lambda: Data.DrawingRecord.load(path, fast))
         except Exception as e:
             msg = translate("visualizer",
                             "Cannot load recording {path}: {reason}")
@@ -582,15 +582,18 @@ class Application(QtGui.QApplication):
         super(Application, self).__init__(args)
         UI.init_intl(DR_ROOT, "visualizer")
 
+        # command-line flags
+        ap = argparse.ArgumentParser(description='Drawing file visualizer')
+        ap.add_argument('-f', dest='fast', action='store_true',
+                        help='Enable fast loading')
+        ap.add_argument('file', nargs='?', help='drawing file')
+        args = ap.parse_args(map(unicode, self.arguments()[1:]))
+
         # initialize
         self.main_window = MainWindow()
         self.main_window.show()
-
-        # if a file was specified on the cmd-line, load it
-        if platform.system() != 'Windows':
-            args = self.arguments()
-            if len(args) > 1:
-                self.main_window.load(unicode(args[1]))
+        if args.file:
+            self.main_window.load(args.file, args.fast)
 
 
 # main module
