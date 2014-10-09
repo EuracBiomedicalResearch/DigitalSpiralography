@@ -119,7 +119,7 @@ class RecordingEvent(object):
             tilt_trans = tuple(tilt_trans)
 
         return RecordingEvent(typ, coords_drawing, coords_trans, pressure,
-                            tilt_drawing, tilt_trans, stamp)
+                              tilt_drawing, tilt_trans, stamp)
 
 
 
