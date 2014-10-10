@@ -243,7 +243,10 @@ class MainWindow(QtGui.QMainWindow):
     def _load_trials(self, record):
         ts = self._ui.trialSelector
         with blocked_signals(ts):
-            ts.addItem(translate("visualizer", "Main recording"), 0)
+            if record.recording.events:
+                ts.addItem(translate("visualizer", "Main recording"), 0)
+            else:
+                ts.addItem(translate("visualizer", "Main recording (no data)"), 0)
             if record.recording.retries:
                 for i in range(len(record.recording.retries)):
                     if record.recording.retries[i]:
@@ -294,11 +297,19 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop(name, record.recording.strokes)
         name = translate("visualizer", "Rec. events")
         self._append_prop(name, len(record.recording.events))
+
         name = translate("visualizer", "Rec. start")
-        self._append_prop(name, record.recording.events[0].stamp)
+        if record.recording.events:
+            self._append_prop(name, record.recording.events[0].stamp)
+        else:
+            self._append_prop(name, None)
+
         name = translate("visualizer", "Rec. length")
-        self._append_prop(name, record.recording.events[-1].stamp -
-                          record.recording.events[0].stamp)
+        if record.recording.events:
+            self._append_prop(name, record.recording.events[-1].stamp -
+                              record.recording.events[0].stamp)
+        else:
+            self._append_prop(name, None)
 
         name = translate("visualizer", "Calib. operator")
         self._append_prop(name, record.calibration.oid)
@@ -318,8 +329,12 @@ class MainWindow(QtGui.QMainWindow):
 
         name = translate("visualizer", "Software version")
         self._append_prop(name, record.extra_data['version'])
+        name = translate("visualizer", "Software version (original)")
+        self._append_prop(name, record.extra_data.get('orig_version', record.extra_data['version']))
         name = translate("visualizer", "Format version")
         self._append_prop(name, record.extra_data['format'])
+        name = translate("visualizer", "Format version (original)")
+        self._append_prop(name, record.extra_data.get('format', record.extra_data['format']))
 
         name = translate("visualizer", "Inst. UUID")
         self._append_prop(name, record.extra_data['installation_uuid'])
@@ -390,8 +405,9 @@ class MainWindow(QtGui.QMainWindow):
         # select the event trace
         events = record.recording.events if self._curTrial == 0 \
             else record.recording.retries[self._curTrial - 1]
+        if not events: return
 
-        # trace
+        # setup some styles
         pen = QtGui.QPen(Consts.RECORDING_COLOR)
         pen.setCapStyle(QtCore.Qt.RoundCap)
 
