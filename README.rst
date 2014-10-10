@@ -37,11 +37,10 @@ How to use the recorder
 11. When satisfied, press ENTER.
 12. Set the patient details (left/right handedness, hand used for drawing,
     patient/case) and eventually comments when needed.
-13. Save the drawing.
+13. Save the drawing, which will automatically proceed to the next hand until
+    the required spirals have been recorded (current: 6 in total).
 14. Double-check that the paper still doesn't move. If the paper moves, repeat
     the calibration procedure from step 3.
-15. Repeat from step 5 forcing the patient to use the other hand, or with a
-    different patient.
 
 
 Recording warnings
@@ -341,29 +340,26 @@ Recorder ``rec.yaml.gz`` File format
 Keys related to drawing/calibration (all keys are mandatory):
 
 * ``drawing/points``: contains a list of coordinate pairs (from now on: points)
-  in "normalized drawing space" that represent the the drawing to be reproduced
-  (the spiral itself).
-* ``drawing/cpoints``: contains a list of points in ''normalized drawing
-  space'' that are expected to be used as ''reference points'' for the
-  calibration procedure.
-* ``calibration/cpoints``: contains a list of points, each point being in "raw
-  screen-transformed" space in respect to the reference point in
-  ``drawing/cpoints`` at the same position (as returned by the tablet/operator
-  during the calibration).
+  in "normalized drawing space" that represent the drawing as overlaid on the
+  paper (the spiral itself).
+* ``drawing/cpoints``: contains a list of points in "normalized drawing space".
+  Each point is used as a calibration target, and is mapped to a different
+  coordinate space in ``calibration/cpoints`` at the same list index.
+* ``calibration/cpoints``: contains a list of points, with each point being a
+  calibration target for ``drawing/cpoints`` but in the same coordinate space
+  as ``recording/events/cdraw``.
 * ``recording/events``: each event has at least two point pairs: ``cdraw`` and
   ``ctrans``:
 
-  + ``cdraw`` contains *corrected* and "normalized drawing coordinates" as
-    produced by the built-in DrawingRecorder calibration/alignment module.
-  + ``ctrans`` contains *uncorrected* "raw screen-transformed" coordinates
-    coming from the tablet.
+  + ``cdraw``: points in the same coordinate space as ``calibration/cpoints``.
+  + ``ctrans``: points in recorder's internal viewing space.
 
-* ``recording/rect_drawing``: contains the screen quadrilateral in effect to
-  map the "raw screen-space" to "normalized drawing space".
-* ``recording/rect_trans``: contains the screen quadrilateral in effect to map
-  "*uncorrected* drawing-normalized" coordinates to "*corrected*
-  drawing-normalized" coordinates.
-* ``recording/rect_size``: the size of the screen during the recording.
+* ``recording/rect_drawing``: contains the screen quadrilateral in the same
+  coordinate space as ``calibration/cpoints``.
+* ``recording/rect_trans``:  contains the screen quadrilateral in the same
+  coordinate space as ``recording/events/ctrans``.
+* ``recording/rect_size``: the size of the screen (in pixels) during the
+  recording.
 
 Ancillary data (all keys are mandatory):
 
@@ -391,7 +387,7 @@ Chunks introduced with format 1.1:
 
   + ``tdraw`` (optional): *uncorrected* x/y tilt information expressed in +/-
     0-60 degrees for each axis.
-  + ``ttrans`` (optional): rotation-adjusted x/y tilt information
+  + ``ttrans`` (optional): rotation-adjusted x/y tilt information.
 
 * ``extra_data``:
 
@@ -452,49 +448,19 @@ Coordinate projection types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Several coordinate types and transformations are stored in the file itself.
-It's important to understand how these coordinates are manipulated.
 
-First, the coordinates coming from the tablet are mapped onto the screen (their
-extension is 0x0 to screen's WxH). Since the tablet has a higher resolution
-than that of the screen, the resulting coordinates are always floating point.
-This space is called "raw screen-transformed space", as it's independent of the
-tablet itself.
+Coordinates that come directly from the tablet are mapped onto the screen (with
+range 0x0 to screen's WxH). Since the tablet has a higher resolution than that
+of the screen, the resulting coordinates are floating point.
 
-When the user draws on the tablet during the calibration (producing
-``calibration/cpoints`` pairs) or during the recording itself
-(``recording/events/ctrans``), the coordinates are mapped again, so that the
-center of the spiral on the tablet matches the center of the spiral on the
-screen.
+When the user draws on the tablet during the calibration, the coordinates are
+re-mapped so that the center of the tablet matches center of the drawing with
+an unit-less scale and a square aspect ratio. This is the "drawing space" (as
+stored in ``calibration/cpoints`` and ``recording/events/cdraw``).
 
-The spiral on the screen though is always located at the ideal location 0x0,
-with an extension of exactly 1x1. This is referred to as the "normalized
-drawing space", which makes comparing different spirals trivial. The
-quadrilateral in effect to transform "raw screen-trasformed" coordinates to
-"normalized drawing coordinates" is stored in the ``recording/rect_drawing``
-tree in the file. The resulting coordinate is then transformed again to correct
-for the calibration points, by using the ``recording/rect_trans``
-quadrilateral.
-
-The full flow during the recording is thus:
-
-1. raw coordinates coming from the tablet
-2. scale to screen size ("raw screen-transformed space")
-3. scale to drawing size ("*uncorrected* normalized drawing space")
-4. correct for deformations ("*corrected* normalized drawing space")
-
-Mappings from one coordinate space to the other can be performed by calculating
-the affine matrix transforming the ideal quadrilateral [[-1,1],[1,-1]] to the
-specified screen size, ``rect_drawing`` or ``rect_trans`` quadrilateral.
-Storing the mapped quadrilateral (2x2 matrix) instead of the transform (3x3
-matrix) allows for less rounding errors in less space. Transformation from "raw
-screen-space" to "*uncorrected* normalized drawing space" is also always a
-linear scaling operation, and thus also simpler to perform.
-
-It's important to note that the ``recording/events/cdraw`` points and the
-``recording/rect_trans`` quadrilateral itself can be recomputed from scratch in
-case a flaw in the calibration or a better calibration model is found. These
-coordinates are "redundant" on purpose. DrawingVisualizer allows to switch
-between the uncorrected/corrected models.
+The "normalized drawing space" uses information from the calibration points to
+map the drawing to the unit length *and* direction using an affine transform.
+By using such mapping it's possible to reconstruct the original drawing unit.
 
 
 Coding of IDs
@@ -546,13 +512,9 @@ Future improvements
   format (drawing/points needs to be a list of lists) and recording itself (do
   we want to perform drawing separation ourselves, or not?).
 * Implement a batch analysis module.
-* To be able to generate a score of the digitized spiral, we also need a sample
-  of human-rated scores.
 * Record the actual tablet serial/details in the file instead of relying on the
   user scanning a barcode.
-* Add a pressure indicator during the calibration.
-* Pressure has currently no reference value. Introducing pressure calibration
-  would allow us to compare pressure among different tablets.
+* Record pressure/tilt during the calibration.
 
 
 .. _YaML: http://www.yaml.org/
