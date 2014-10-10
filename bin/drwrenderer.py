@@ -55,9 +55,15 @@ def renderSpiral(record, output):
 
     gs = GridSpec(2, 1, height_ratios=[3,1])
     ax = fig.add_subplot(gs[0])
-    codes = [Path.MOVETO, Path.LINETO]
+
+    # drawing/calibration points
+    plt.plot(map(lambda x: x[0], record.drawing.points),
+             map(lambda x: -x[1], record.drawing.points), '-')
+    plt.scatter(map(lambda x: x[0], record.drawing.cpoints),
+                map(lambda x: -x[1], record.drawing.cpoints))
 
     # track drawing status to recover actual tracing length/time
+    codes = [Path.MOVETO, Path.LINETO]
     old_pos = None
     old_stamp = None
     drawing = False
@@ -66,7 +72,7 @@ def renderSpiral(record, output):
         pos = flip_y(event.coords_drawing)
 
         # set drawing status
-        if event.typ == QtCore.QEvent.TabletPress:
+        if event.typ == QtCore.QEvent.TabletPress or event.pressure:
             drawing = True
         elif event.typ == QtCore.QEvent.TabletRelease:
             drawing = False
@@ -81,11 +87,11 @@ def renderSpiral(record, output):
             if drawing and pos:
                 verts = [old_pos, pos]
                 p = MIN_LW + math.pow(event.pressure, EXP_LEVEL) * MAX_LW
-                patch = PathPatch(Path(verts, codes), lw=p)
+                patch = PathPatch(Path(verts, codes), lw=p, color='black')
                 ax.add_patch(patch)
             elif pos:
                 verts = [old_pos, pos]
-                patch = PathPatch(Path(verts, codes), lw=SHA_LW, edgecolor='red')
+                patch = PathPatch(Path(verts, codes), lw=SHA_LW, color='red')
                 ax.add_patch(patch)
 
         # save old status
@@ -99,8 +105,8 @@ def renderSpiral(record, output):
     p_hdn = remap(Data.PAT_HANDEDNESS, record.pat_handedness)
     ax.set_title("{} {} ({} hand, {})".format(p_aid, p_type, p_hand, p_hdn))
 
-    ax.set_xlim(-1,1)
-    ax.set_ylim(-1,1)
+    ax.set_xlim(-1.2, 1.2)
+    ax.set_ylim(-1.2, 1.2)
     ax.grid(True)
 
     # pressure plot
