@@ -376,12 +376,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>221</x>
-     <y>250</y>
+     <x>202</x>
+     <y>264</y>
     </hint>
     <hint type="destinationlabel">
-     <x>312</x>
-     <y>252</y>
+     <x>248</x>
+     <y>264</y>
     </hint>
    </hints>
   </connection>
@@ -392,11 +392,11 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>312</x>
-     <y>219</y>
+     <x>179</x>
+     <y>228</y>
     </hint>
     <hint type="destinationlabel">
-     <x>221</x>
+     <x>179</x>
      <y>250</y>
     </hint>
    </hints>
@@ -408,11 +408,11 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>255</x>
-     <y>120</y>
+     <x>115</x>
+     <y>129</y>
     </hint>
     <hint type="destinationlabel">
-     <x>253</x>
+     <x>115</x>
      <y>149</y>
     </hint>
    </hints>
@@ -420,16 +420,32 @@
   <connection>
    <sender>stylus_id</sender>
    <signal>returnPressed()</signal>
+   <receiver>tablet_id</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>137</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>137</x>
+     <y>184</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tablet_id</sender>
+   <signal>returnPressed()</signal>
    <receiver>pressure</receiver>
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>198</x>
-     <y>148</y>
+     <x>155</x>
+     <y>197</y>
     </hint>
     <hint type="destinationlabel">
-     <x>296</x>
-     <y>219</y>
+     <x>155</x>
+     <y>228</y>
     </hint>
    </hints>
   </connection>
