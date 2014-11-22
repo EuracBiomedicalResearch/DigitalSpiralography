@@ -71,6 +71,10 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.tablet_id.textEdited.connect(
             lambda: self.on_meta_changed("tid", self._ui.tablet_id))
 
+        self._ui.tare_btn.clicked.connect(self.on_tare)
+        self._ui.weight.textEdited.connect(self.on_weight)
+        self._ui.tare.textEdited.connect(self.on_weight)
+
         # data
         self._ui.data.setEditable(True)
         self._ui.data.installEventFilter(self)
@@ -272,7 +276,7 @@ class MainWindow(QtGui.QMainWindow):
         try:
             press = float(unicode(press))
         except ValueError:
-            self._ui.pressure.clear()
+            self._ui.pressure.selectAll()
             self._ui.pressure.setFocus()
             return
 
@@ -280,12 +284,25 @@ class MainWindow(QtGui.QMainWindow):
         try:
             weight = float(unicode(weight))
         except ValueError:
-            self._ui.weight.clear()
+            self._ui.weight.selectAll()
             self._ui.weight.setFocus()
             return
 
-        self._add(press, weight)
+        if not self._tare:
+            total = weight
+        else:
+            tare = self._ui.tare.text()
+            try:
+                tare = float(unicode(tare))
+            except ValueError:
+                self._ui.tare.selectAll()
+                self._ui.tare.setFocus()
+                return
+            total = weight + tare
+
+        self._add(press, total)
         self._ui.weight.clear()
+        self.on_weight(None)
         if self._tablet:
             self._ui.weight.setFocus()
         else:
@@ -331,6 +348,10 @@ class MainWindow(QtGui.QMainWindow):
         self.pg.setYRange(0, 1)
         self.data_ok = True
         self.changed = False
+
+        self._ui.tare.clear()
+        self._ui.tare_btn.setChecked(False)
+        self.on_tare(False)
 
 
     def reset(self):
@@ -425,6 +446,40 @@ class MainWindow(QtGui.QMainWindow):
             title = translate("profiler", "Save failure")
             QtGui.QMessageBox.critical(self, title, msg)
         self.changed = False
+
+
+    def on_tare(self, state):
+        self._tare = state
+        self._ui.tare_lbl.setEnabled(state)
+        self._ui.total_lbl.setEnabled(state)
+        self._ui.tare.setEnabled(state)
+        if state:
+            self._ui.tare.setFocus()
+        else:
+            self._ui.weight.setFocus()
+        self.on_weight(None)
+
+
+    def on_weight(self, ev):
+        weight = self._ui.weight.text()
+        try:
+            weight = float(unicode(weight))
+        except ValueError:
+            self._ui.total.clear()
+            return
+
+        if not self._tare:
+            total = weight
+        else:
+            tare = self._ui.tare.text()
+            try:
+                tare = float(unicode(tare))
+            except ValueError:
+                self._ui.total.clear()
+                return
+            total = weight + tare
+
+        self._ui.total.setText(str(total))
 
 
     def on_fullscreen(self, state):

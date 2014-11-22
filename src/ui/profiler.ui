@@ -46,6 +46,16 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
+        <property name="horizontalSpacing">
+         <number>6</number>
+        </property>
+        <item row="0" column="2" colspan="3">
+         <widget class="QLineEdit" name="ts_created">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
         <item row="5" column="1">
          <widget class="QLabel" name="label_4">
           <property name="text">
@@ -72,20 +82,6 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="3">
-         <widget class="QPushButton" name="add_weight_btn">
-          <property name="text">
-           <string>&amp;Add</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2" colspan="2">
-         <widget class="QLineEdit" name="ts_created">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="1">
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -96,13 +92,6 @@
           </property>
           <property name="buddy">
            <cstring>stylus_id</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2" colspan="2">
-         <widget class="QLineEdit" name="ts_updated">
-          <property name="enabled">
-           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -119,19 +108,6 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="2" colspan="2">
-         <widget class="QLineEdit" name="stylus_id">
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2" colspan="2">
-         <widget class="QLineEdit" name="pressure"/>
-        </item>
-        <item row="6" column="2">
-         <widget class="QLineEdit" name="weight"/>
-        </item>
         <item row="1" column="1">
          <widget class="QLabel" name="label_3">
           <property name="text">
@@ -145,7 +121,125 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="0" colspan="4">
+        <item row="2" column="1">
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Operator:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="buddy">
+           <cstring>operator_id</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Tablet id:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="buddy">
+           <cstring>tablet_id</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="3">
+         <widget class="QLabel" name="total_lbl">
+          <property name="text">
+           <string>Total (g):</string>
+          </property>
+          <property name="buddy">
+           <cstring>total</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2" colspan="3">
+         <widget class="QLineEdit" name="operator_id"/>
+        </item>
+        <item row="3" column="2" colspan="3">
+         <widget class="QLineEdit" name="stylus_id">
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLabel" name="tare_lbl">
+          <property name="text">
+           <string>&amp;Tare (g):</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="buddy">
+           <cstring>tare</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="2" colspan="3">
+         <widget class="QLineEdit" name="pressure"/>
+        </item>
+        <item row="7" column="2">
+         <widget class="QLineEdit" name="tare"/>
+        </item>
+        <item row="4" column="2" colspan="3">
+         <widget class="QLineEdit" name="tablet_id"/>
+        </item>
+        <item row="7" column="4">
+         <widget class="QLineEdit" name="total">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2" colspan="3">
+         <widget class="QLineEdit" name="ts_updated">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="2" colspan="3">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="weight"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="add_weight_btn">
+            <property name="text">
+             <string>&amp;Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="tare_btn">
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>Toggle Tare</string>
+            </property>
+            <property name="text">
+             <string>T</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="8" column="0" colspan="5">
          <widget class="TableWidget" name="data">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -177,38 +271,6 @@
           <column/>
           <column/>
          </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Operator:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>operator_id</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2" colspan="2">
-         <widget class="QLineEdit" name="operator_id"/>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Tablet id:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-          <property name="buddy">
-           <cstring>tablet_id</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2" colspan="2">
-         <widget class="QLineEdit" name="tablet_id"/>
         </item>
        </layout>
       </widget>
@@ -348,6 +410,9 @@
   <tabstop>pressure</tabstop>
   <tabstop>weight</tabstop>
   <tabstop>add_weight_btn</tabstop>
+  <tabstop>tare_btn</tabstop>
+  <tabstop>tare</tabstop>
+  <tabstop>total</tabstop>
   <tabstop>data</tabstop>
   <tabstop>view</tabstop>
  </tabstops>
@@ -376,12 +441,12 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>202</x>
-     <y>264</y>
+     <x>122</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel">
-     <x>248</x>
-     <y>264</y>
+     <x>236</x>
+     <y>265</y>
     </hint>
    </hints>
   </connection>
@@ -392,12 +457,12 @@
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>179</x>
-     <y>228</y>
+     <x>177</x>
+     <y>226</y>
     </hint>
     <hint type="destinationlabel">
-     <x>179</x>
-     <y>250</y>
+     <x>177</x>
+     <y>278</y>
     </hint>
    </hints>
   </connection>
@@ -446,6 +511,22 @@
     <hint type="destinationlabel">
      <x>155</x>
      <y>228</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tare</sender>
+   <signal>returnPressed()</signal>
+   <receiver>weight</receiver>
+   <slot>setFocus()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>130</x>
+     <y>265</y>
     </hint>
    </hints>
   </connection>
