@@ -353,6 +353,8 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.tare_btn.setChecked(False)
         self.on_tare(False)
 
+        self._ui.operator_id.setFocus()
+
 
     def reset(self):
         self.load_profile(Data.StylusProfile())
@@ -416,14 +418,17 @@ class MainWindow(QtGui.QMainWindow):
             title = translate("profiler", "Invalid operator")
             msg = translate("profiler", "The specified operator is invalid")
             QtGui.QMessageBox.critical(None, title, msg)
+            self._ui.operator_id.selectAll()
             self._ui.operator_id.setFocus()
             return
 
         # check IDs
         if not ID.validate_sid_err(self.data.sid):
+            self._ui.stylus_id.selectAll()
             self._ui.stylus_id.setFocus()
             return
         if not ID.validate_tid_err(self.data.tid):
+            self._ui.tablet_id.selectAll()
             self._ui.tablet_id.setFocus()
             return
 
