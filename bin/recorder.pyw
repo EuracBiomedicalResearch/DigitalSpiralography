@@ -482,11 +482,13 @@ class MainWindow(QtGui.QMainWindow):
                                     extra_data)
 
         # guess a decent path name
-        save_path = record.recording.session_start.strftime("%Y%m%d")
-        save_path = u"{}_{}_{}.rec.yaml.gz".format(save_path,
-                                               record.aid,
-                                               self.drawing_number)
-        save_path = os.path.join(self.params.save_path, save_path)
+        save_path = u"{}_{}_{}.rec.yaml.gz".format(
+            record.recording.session_start.strftime("%Y%m%d"),
+            record.aid, self.drawing_number)
+        save_path = os.path.join(
+            self.params.save_path,
+            record.recording.session_start.strftime("%Y%m"),
+            save_path)
 
         # keep trying until save is either aborted or succeeds
         self._end_recording_dialog.reset(save_path, record, preview, allow_next)
@@ -501,6 +503,11 @@ class MainWindow(QtGui.QMainWindow):
             record.comments = self._end_recording_dialog.comments
             save_path = self._end_recording_dialog.save_path
             try:
+                # attempt to create hierarchy
+                path_dir = os.path.dirname(save_path)
+                if not os.path.isdir(path_dir):
+                    os.makedirs(path_dir)
+
                 # put save into a background thread
                 Shared.background_op(translate("recorder", "Saving, please wait..."),
                                      lambda: Data.DrawingRecord.save(record, save_path),
