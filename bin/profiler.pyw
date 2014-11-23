@@ -349,6 +349,8 @@ class MainWindow(QtGui.QMainWindow):
         self.data_ok = True
         self.changed = False
 
+        self._ui.pressure.clear()
+        self._ui.weight.clear()
         self._ui.tare.clear()
         self._ui.tare_btn.setChecked(False)
         self.on_tare(False)
