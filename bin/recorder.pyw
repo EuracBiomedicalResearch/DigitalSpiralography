@@ -6,9 +6,7 @@ from __future__ import print_function
 
 # setup path
 import os, sys
-DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
-sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import ID
@@ -71,7 +69,7 @@ class Params(object):
 class NewCalibration(QtGui.QDialog):
     def __init__(self):
         super(NewCalibration, self).__init__()
-        self._ui = UI.load_ui(self, DR_ROOT, "newcalibration.ui")
+        self._ui = UI.load_ui(self, "newcalibration.ui")
 
 
     def reset(self):
@@ -120,7 +118,7 @@ class NewCalibration(QtGui.QDialog):
 class NewRecording(QtGui.QDialog):
     def __init__(self):
         super(NewRecording, self).__init__()
-        self._ui = UI.load_ui(self, DR_ROOT, "newrecording.ui")
+        self._ui = UI.load_ui(self, "newrecording.ui")
 
 
     def reset(self):
@@ -152,7 +150,7 @@ class NewRecording(QtGui.QDialog):
 class EndRecording(QtGui.QDialog):
     def __init__(self):
         super(EndRecording, self).__init__()
-        self._ui = UI.load_ui(self, DR_ROOT, "endrecording.ui")
+        self._ui = UI.load_ui(self, "endrecording.ui")
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
         self._ui.next_hand_btn.clicked.connect(self.on_next_hand)
 
@@ -361,7 +359,7 @@ class EndRecording(QtGui.QDialog):
 class MainWindow(QtGui.QMainWindow):
     def __init__(self, params):
         super(MainWindow, self).__init__()
-        self._ui = UI.load_ui(self, DR_ROOT, "main.ui")
+        self._ui = UI.load_ui(self, "main.ui")
 
         # signals
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
@@ -581,7 +579,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
-        UI.init_intl(DR_ROOT, "recorder")
+        UI.init_intl("recorder")
 
         # command-line flags
         ap = argparse.ArgumentParser(description='Drawing recorder')

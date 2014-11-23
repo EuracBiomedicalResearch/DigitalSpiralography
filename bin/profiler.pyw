@@ -6,9 +6,7 @@ from __future__ import print_function
 
 # setup path
 import os, sys
-DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
-sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
@@ -54,7 +52,7 @@ class sorting_disabled(object):
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self._ui = UI.load_ui(self, DR_ROOT, "profiler.ui")
+        self._ui = UI.load_ui(self, "profiler.ui")
 
         # signals and events
         self._ui.actionNew.triggered.connect(self.on_new)
@@ -507,7 +505,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
-        UI.init_intl(DR_ROOT, "profiler")
+        UI.init_intl("profiler")
 
         # command-line flags
         ap = argparse.ArgumentParser(description='Stylus profiler')

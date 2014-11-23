@@ -6,9 +6,7 @@ from __future__ import print_function
 
 # setup path
 import os, sys
-DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
-sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Verhoeff

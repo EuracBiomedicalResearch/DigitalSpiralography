@@ -6,9 +6,7 @@ from __future__ import print_function
 
 # setup path
 import os, sys
-DR_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(os.path.join(DR_ROOT, "src", "lib"))
-sys.path.append(os.path.join(DR_ROOT, "src", "dist"))
+sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
@@ -146,7 +144,7 @@ class blocked_signals(object):
 class MainWindow(QtGui.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self._ui = UI.load_ui(self, DR_ROOT, "visualizer.ui")
+        self._ui = UI.load_ui(self, "visualizer.ui")
 
         # defaults
         self._showRaw = False
@@ -626,7 +624,7 @@ class MainWindow(QtGui.QMainWindow):
 class Application(QtGui.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
-        UI.init_intl(DR_ROOT, "visualizer")
+        UI.init_intl("visualizer")
 
         # command-line flags
         ap = argparse.ArgumentParser(description='Drawing file visualizer')

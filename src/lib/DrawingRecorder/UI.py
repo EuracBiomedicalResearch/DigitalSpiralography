@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 """UI helpers"""
 
-# imports
+# local modules
+import Paths
+
+# system modules
 import os
 from PyQt4 import QtCore, QtGui, uic
 
@@ -10,17 +13,16 @@ from PyQt4 import QtCore, QtGui, uic
 def translate(ctx, msg):
     return unicode(QtGui.QApplication.translate(ctx, msg))
 
-def init_intl(root, file):
-    path = os.path.join(root, "src", "intl", file)
+def init_intl(file):
+    path = os.path.join(Paths.INTL, file)
     translator = QtCore.QTranslator(QtGui.QApplication.instance())
     if translator.load(QtCore.QLocale.system(), path, "."):
         QtGui.QApplication.installTranslator(translator)
 
-def load_ui(obj, root, file):
+def load_ui(obj, file):
     # chdir to the "ui" directory to preserve icon paths
     cwd = os.getcwd()
-    path = os.path.join(root, "src", "ui")
-    os.chdir(path)
+    os.chdir(Paths.UI)
 
     # setup the form and attach it to obj
     form, _ = uic.loadUiType(file)
