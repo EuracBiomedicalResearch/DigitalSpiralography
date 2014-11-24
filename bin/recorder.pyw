@@ -619,12 +619,14 @@ class Application(QtGui.QApplication):
 
         # command-line flags
         ap = argparse.ArgumentParser(description='Drawing recorder')
+        ap.add_argument('dir', nargs='?', help='project directory')
         args = ap.parse_args(map(unicode, self.arguments()[1:]))
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
-        params = Params(unicode(self.settings.value("proj_path", "recordings").toString()),
-                        self.settings.value("total_recordings", 0).toInt()[0],
+        proj_path = args.dir if args.dir else \
+          unicode(self.settings.value("proj_path", "recordings").toString())
+        params = Params(proj_path, self.settings.value("total_recordings", 0).toInt()[0],
                         str(self.settings.value("installation_uuid", uuid.getnode()).toString()),
                         str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))
 
