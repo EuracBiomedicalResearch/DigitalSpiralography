@@ -16,15 +16,8 @@ FORMAT_VERSION  = "1.3"                 # file format version
 FF_RECORDING    = "rec"                 # recording type
 FF_PROFILE      = "prof"                # profiling type
 
-# Recording cycle methodology
-CYCLE_ORDER     = "ABAB"                # recording cycle (ABAB / AABB)
-CYCLE_COUNT     = 3                     # number of requested cycles
-
-# Patient types
-PAT_TYPES = {"ET": "ET",
-             "ET+PD": "ET+PD",
-             "TDPD": "TDPD",
-             "Control": "Control"}
+# File names
+PROJ_CONFIG     = "config.yaml"         # project configuration file name
 
 # Drawing parameters
 POINT_LEN       = 0.05                  # diameter of calibration points (in normalized drawing units)

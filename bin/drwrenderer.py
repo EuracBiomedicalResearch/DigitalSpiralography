@@ -98,7 +98,7 @@ def renderSpiral(record, output):
 
     # compose a title
     p_aid = record.aid
-    p_type = remap(Consts.PAT_TYPES, record.pat_type)
+    p_type = record.config.pat_types.get(record.pat_type, record.pat_type)
     p_hand = remap(Data.PAT_HAND, record.pat_hand)
     p_hdn = remap(Data.PAT_HANDEDNESS, record.pat_handedness)
     ax.set_title("{} {} ({} hand, {})".format(p_aid, p_type, p_hand, p_hdn))

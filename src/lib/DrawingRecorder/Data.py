@@ -6,16 +6,17 @@ from __future__ import print_function
 # local modules
 import Consts
 import Drawing
+import RxUtil
 from UI import translate
 
 # system modules
-import datetime
-import yaml
-from copy import copy
-import gzip
 from PyQt4 import QtCore
-import numpy as np
+from copy import copy
 import cPickle
+import datetime
+import gzip
+import numpy as np
+import yaml
 
 
 # basic types
@@ -63,6 +64,50 @@ PAT_HAND_DSC = {PatHand.left: translate('types', 'Left'),
 
 BOOL_MAP_DSC = {True: translate('types', 'Yes'),
                 False: translate('types', 'No')}
+
+
+# Configuration
+class Config(object):
+    def __init__(self, project_id=None, project_name=None,
+                 pat_types=None, allow_no_pat_type=True, cycle_count=3):
+        self.project_id = project_id
+        self.project_name = project_name
+        self.pat_types = pat_types if pat_types is not None else {}
+        self.allow_no_pat_type = allow_no_pat_type
+        self.cycle_count = cycle_count
+
+    @classmethod
+    def serialize(cls, data):
+        return {'project_id': data.project_id,
+                'project_name': data.project_name,
+                'pat_types': data.pat_types,
+                'allow_no_pat_type': data.allow_no_pat_type,
+                'cycle_count': data.cycle_count}
+
+    @classmethod
+    def deserialize(cls, data):
+        return Config(data['project_id'], data['project_name'], data['pat_types'],
+                      data['allow_no_pat_type'], data['cycle_count'])
+
+    @classmethod
+    def load(cls, path):
+        obj = Config()
+        data = RxUtil.load_yaml('config', path)
+        if data is None:
+            msg = translate('data', 'Malformed configuration file')
+            raise Exception(msg, path)
+
+        types = data['PAT_TYPES']
+        if isinstance(types, dict):
+            obj.pat_types = types
+        else:
+            obj.pat_types = dict(zip(types, types))
+
+        obj.project_id = data['PROJECT_ID']
+        obj.project_name = data['PROJECT_NAME']
+        obj.allow_no_pat_type = data['ALLOW_NO_PAT_TYPE']
+        obj.cycle_count = data['CYCLE_COUNT']
+        return obj
 
 
 # Calibration/Recording data
@@ -147,9 +192,10 @@ class RecordingData(object):
 
 
 class DrawingRecord(object):
-    def __init__(self, oid, aid, drawing, calibration, calibration_age, recording, cycle,
-                 pat_type, pat_hand_cnt, pat_handedness, pat_hand,
+    def __init__(self, config, oid, aid, drawing, calibration, calibration_age, recording,
+                 cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand,
                  extra_data=None, comments=None, ts_created=None, ts_updated=None):
+        self.config = config
         self.oid = oid
         self.aid = aid
         self.drawing = drawing
@@ -202,6 +248,7 @@ class DrawingRecord(object):
         data = {"format": Consts.FORMAT_VERSION,
                 "type": Consts.FF_RECORDING,
                 "version": Consts.APP_VERSION,
+                "config": Config.serialize(record.config),
                 "operator": record.oid,
                 "aid": record.aid,
                 "drawing": {
@@ -248,7 +295,7 @@ class DrawingRecord(object):
             print('\t'.join(["#TIME", "X", "Y", "Z", "W", "T"]), file=fd)
             start = record.recording.events[0].stamp
             for event in record.recording.events:
-                time = (event.stamp - start).total_seconds() * 1000.;
+                time = (event.stamp - start).total_seconds() * 1000.
                 x = event.coords_drawing[0]
                 y = event.coords_drawing[1]
                 z = event.pressure if pressure != 0 else ""
@@ -330,8 +377,15 @@ class DrawingRecord(object):
         if oid is None and 'operator' in extra_data:
             oid = extra_data.pop('operator')
 
+        # project configuration (optional, fmt 1.3)
+        config = data.get('config')
+        if config is not None:
+            config = Config.deserialize(config)
+        else:
+            config = Config()
+
         # final object
-        return DrawingRecord(oid, data['aid'], drawing, calibration,
+        return DrawingRecord(config, oid, data['aid'], drawing, calibration,
                              data['calibration_age'], recording,
                              data.get('cycle', 1), # optional (fmt 1.2)
                              data['pat_type'],

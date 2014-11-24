@@ -30,7 +30,7 @@ def recordStats(record, cmts):
         rec_secs = (record.recording.events[-1].stamp - record.recording.events[0].stamp).total_seconds()
 
     data = {"PAT_ID": record.aid,
-            "PAT_TYPE": Consts.PAT_TYPES.get(record.pat_type, record.pat_type),
+            "PAT_TYPE": record.config.pat_types.get(record.pat_type, record.pat_type),
             "PAT_HANDEDNESS": Data.PAT_HANDEDNESS.get(record.pat_handedness, record.pat_handedness),
             "PAT_HAND": Data.PAT_HAND.get(record.pat_hand, record.pat_hand),
             "PAT_HAND_CNT": record.pat_hand_cnt,

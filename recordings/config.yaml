@@ -1,0 +1,34 @@
+# Sample configuration file for DrawingRecorder >= 1.4.
+
+# PROJECT_ID is a generic ID (alphanumeric) for the project.
+PROJECT_ID: P0
+
+# PROJECT_NAME is a descriptive name of the current project
+PROJECT_NAME: Generic Case/Control study
+
+# PAT_TYPES should be a list or a dictionary definining the available patient
+# types IDs and their human representation.
+#
+# If PAT_TYPES is defined as a list:
+#
+#   PAT_TYPES: [Case, Control]
+#
+# then the interface will use the same identifier both for storage and for
+# representation. If PAT_TYPES is defined as a dictionary:
+#
+#   PAT_TYPES:
+#     0: Case
+#     1: Control
+#
+# then the mapped values will be used in the Recorder/Visualizer instead.
+# Patient type IDs can be either numerical or strings.
+PAT_TYPES: [Case, Control]
+
+# ALLOW_NO_PAT_TYPE defines if the Recorder allows to leave the patient type to
+# be left undefined.
+ALLOW_NO_PAT_TYPE: Yes
+
+# CYCLE_COUNT sets the number of recordings required for each hand. Hands are
+# automatically alternated when the 'Next hand' button is pressed until all
+# required spirals are collected. Setting COUNT to 0 disables 'Next hand'.
+CYCLE_COUNT: 3

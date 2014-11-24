@@ -29,15 +29,11 @@ from PyQt4 import QtCore, QtGui
 
 
 # helpers
-def _from_type(cb, type_map):
-    cb.clear()
-    cb.addItem(translate("types", "N/A"))
-    for k, v in type_map.iteritems():
-        cb.addItem(translate("types", v), k)
-
-
 def _to_type(cb):
-    return cb.itemData(cb.currentIndex()).toPyObject()
+    val = cb.itemData(cb.currentIndex()).toPyObject()
+    if type(val) is QtCore.QString:
+        val = unicode(val)
+    return val
 
 
 def _set_type(cb, val):
@@ -57,9 +53,9 @@ def _reset_grp_state(group):
 
 # implementation
 class Params(object):
-    def __init__(self, save_path, total_recordings,
+    def __init__(self, proj_path, total_recordings,
                  installation_uuid, installation_stamp):
-        self.save_path = save_path
+        self.proj_path = proj_path
         self.total_recordings = total_recordings
         self.installation_uuid = installation_uuid
         self.installation_stamp = installation_stamp
@@ -154,8 +150,6 @@ class EndRecording(QtGui.QDialog):
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
         self._ui.next_hand_btn.clicked.connect(self.on_next_hand)
 
-        _from_type(self._ui.pat_type, Consts.PAT_TYPES)
-
         self._file_browser = QtGui.QFileDialog(self)
         self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
         self._file_browser.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
@@ -168,7 +162,14 @@ class EndRecording(QtGui.QDialog):
         self._ui.preview.setPalette(pal)
 
 
-    def reset(self, save_path, record, preview, allow_next):
+    def reset(self, config, record, preview, save_path, allow_next):
+        self.config = config
+        cb = self._ui.pat_type
+        cb.clear()
+        cb.addItem(translate("types", "N/A"))
+        for k, v in config.pat_types.iteritems():
+            cb.addItem(v, k)
+
         self.oid = record.oid
         self._ui.operator_id.setText(self.oid)
 
@@ -280,11 +281,7 @@ class EndRecording(QtGui.QDialog):
     def accept(self, next_hand=False):
         self.oid = str(self._ui.operator_id.text())
         self.aid = str(self._ui.patient_id.text())
-
         self.pat_type = _to_type(self._ui.pat_type)
-        if self.pat_type is not None:
-            # TODO: why is this needed at all?
-            self.pat_type = str(self.pat_type)
 
         self.pat_hand_cnt = 1 if self._ui.hand_cnt_1.isChecked() else \
           2 if self._ui.hand_cnt_2.isChecked() else \
@@ -314,6 +311,12 @@ class EndRecording(QtGui.QDialog):
         if not self.oid:
             title = translate("recorder", "Invalid operator")
             msg = translate("recorder", "The specified operator is invalid")
+            QtGui.QMessageBox.critical(None, title, msg)
+            return
+
+        if self.pat_type is None and not self.config.allow_no_pat_type:
+            title = translate("recorder", "Patient type not set")
+            msg = translate("recorder", "Patient type must be specified")
             QtGui.QMessageBox.critical(None, title, msg)
             return
 
@@ -362,8 +365,8 @@ class MainWindow(QtGui.QMainWindow):
         self._ui = UI.load_ui(self, "main.ui")
 
         # signals
-        self._ui.save_path_btn.clicked.connect(self.on_save_path)
-        self._ui.save_path.editingFinished.connect(self.on_save_path_changed)
+        self._ui.proj_path_btn.clicked.connect(self.on_proj_path)
+        self._ui.proj_path.editingFinished.connect(self.on_proj_path_changed)
         self._ui.info.clicked.connect(self.on_info)
         self._ui.calibrate.clicked.connect(self.on_calibrate)
         self._ui.new_recording.clicked.connect(self.on_new_recording)
@@ -378,23 +381,51 @@ class MainWindow(QtGui.QMainWindow):
         self._dir_browser.setOption(QtGui.QFileDialog.ShowDirsOnly)
 
         # parameters/initial state
-        self.set_params(params)
-        self.reset_calibration()
-        self.drawing_number = 0
-
-
-    def reset_calibration(self):
         self.calibration_age = 0
-        self._ui.new_recording.setEnabled(False)
-        self._ui.tablet_id.setText("-")
-        self._ui.stylus_id.setText("-")
-        self._ui.drawing_id.setText("-")
-        self._ui.last_calibration.setText("-")
+        self.drawing_number = 0
+        self.set_params(params)
+
+
+    def on_data_changed(self):
+        if self.config is not None:
+            self._ui.proj_id.setText(self.config.project_id)
+            self._ui.proj_name.setText(self.config.project_name)
+        else:
+            self._ui.proj_id.setText("-")
+            self._ui.proj_name.setText("-")
+
+        if self._drawing_window.calibration is not None:
+            self._ui.tablet_id.setText(
+                self._drawing_window.calibration.tablet_id)
+            self._ui.stylus_id.setText(
+                self._drawing_window.calibration.stylus_id)
+            self._ui.drawing_id.setText(
+                self._drawing_window.drawing.id + ": " +
+                self._drawing_window.drawing.str)
+            self._ui.last_calibration.setText(
+                self._drawing_window.calibration.stamp.strftime("%c"))
+        else:
+            self._ui.tablet_id.setText("-")
+            self._ui.stylus_id.setText("-")
+            self._ui.drawing_id.setText("-")
+            self._ui.last_calibration.setText("-")
+
+        ready = self._drawing_window.calibration is not None and self.config is not None
+        self._ui.new_recording.setEnabled(ready)
 
 
     def set_params(self, params):
         self.params = params
-        self._ui.save_path.setText(params.save_path)
+        self._ui.proj_path.setText(params.proj_path)
+
+        # load configuration
+        try:
+            conf_path = os.path.join(self.params.proj_path, Consts.PROJ_CONFIG)
+            self.config = Data.Config.load(conf_path)
+        except:
+            self.config = None
+
+        self.on_data_changed()
 
 
     def on_info(self, ev):
@@ -410,20 +441,35 @@ class MainWindow(QtGui.QMainWindow):
         QtGui.QMessageBox.about(self, title, ver + "\n" + about)
 
 
-    def on_save_path(self):
-        self._dir_browser.setDirectory(self.params.save_path)
+    def on_proj_path(self):
+        self._dir_browser.setDirectory(self.params.proj_path)
         if self._dir_browser.exec_():
-            save_path = os.path.relpath(unicode(self._dir_browser.selectedFiles()[0]))
-            self.set_save_path(save_path)
+            proj_path = os.path.relpath(unicode(self._dir_browser.selectedFiles()[0]))
+            self._ui.proj_path.setText(proj_path)
+            self.on_proj_path_changed()
 
 
-    def on_save_path_changed(self):
-        self.params.save_path = unicode(self._ui.save_path.text())
+    def on_proj_path_changed(self):
+        proj_path = unicode(self._ui.proj_path.text())
+        if self.params.proj_path == proj_path:
+            # do not re-validate when losing focus without changes
+            return
 
+        self.params.proj_path = unicode(self._ui.proj_path.text())
+        conf_path = os.path.join(self.params.proj_path, Consts.PROJ_CONFIG)
 
-    def set_save_path(self, save_path):
-        self._ui.save_path.setText(save_path)
-        self.on_save_path_changed()
+        # show errors when configuring the recorder interactively
+        try:
+            self.config = Data.Config.load(conf_path)
+        except Exception as e:
+            self.config = None
+            msg = translate("recorder",
+                            "Invalid project directory {path}: {reason}")
+            msg = msg.format(path=self.params.proj_path, reason=e)
+            title = translate("recorder", "Project directory")
+            QtGui.QMessageBox.critical(self, title, msg)
+
+        self.on_data_changed()
 
 
     def on_calibrate(self):
@@ -433,23 +479,13 @@ class MainWindow(QtGui.QMainWindow):
             return
 
         # perform the actual calibration
-        self.reset_calibration()
         self._drawing_window.set_params(self._new_calibration_dialog.oid,
                                         self._new_calibration_dialog.tablet_id,
                                         self._new_calibration_dialog.stylus_id,
                                         self._new_calibration_dialog.drawing)
         self._drawing_window.reset(DrawingWindow.Mode.Calibrate)
-        if self._drawing_window.exec_():
-            self._ui.new_recording.setEnabled(True)
-            self._ui.tablet_id.setText(
-                self._drawing_window.calibration.tablet_id)
-            self._ui.stylus_id.setText(
-                self._drawing_window.calibration.stylus_id)
-            self._ui.drawing_id.setText(
-                self._drawing_window.drawing.id + ": " +
-                self._drawing_window.drawing.str)
-            self._ui.last_calibration.setText(
-                self._drawing_window.calibration.stamp.strftime("%c"))
+        self._drawing_window.exec_()
+        self.on_data_changed()
 
 
     def new_recording(self, oid, aid,
@@ -471,7 +507,7 @@ class MainWindow(QtGui.QMainWindow):
                       "total_recordings": self.params.total_recordings,
                       "installation_uuid": self.params.installation_uuid,
                       "installation_stamp": self.params.installation_stamp}
-        record = Data.DrawingRecord(oid, aid,
+        record = Data.DrawingRecord(self.config, oid, aid,
                                     self._drawing_window.drawing,
                                     self._drawing_window.calibration,
                                     self.calibration_age,
@@ -484,12 +520,12 @@ class MainWindow(QtGui.QMainWindow):
             record.recording.session_start.strftime("%Y%m%d"),
             record.aid, self.drawing_number)
         save_path = os.path.join(
-            self.params.save_path,
+            self.params.proj_path,
             record.recording.session_start.strftime("%Y%m"),
             save_path)
 
         # keep trying until save is either aborted or succeeds
-        self._end_recording_dialog.reset(save_path, record, preview, allow_next)
+        self._end_recording_dialog.reset(self.config, record, preview, save_path, allow_next)
         while self._end_recording_dialog.exec_():
             record.oid = self._end_recording_dialog.oid
             record.aid = self._end_recording_dialog.aid
@@ -535,7 +571,7 @@ class MainWindow(QtGui.QMainWindow):
 
         # setup recording cycle
         cycle = 1
-        total = 2 * Consts.CYCLE_COUNT
+        total = 2 * self.config.cycle_count
         allow_next = (cycle < total)
 
         # initial state
@@ -570,7 +606,7 @@ class MainWindow(QtGui.QMainWindow):
 
             # recalculate cycle count
             cycle = record.cycle + 1
-            total = pat_hand_cnt * Consts.CYCLE_COUNT
+            total = pat_hand_cnt * self.config.cycle_count
             allow_next = (cycle < total)
 
 
@@ -587,7 +623,7 @@ class Application(QtGui.QApplication):
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
-        params = Params(unicode(self.settings.value("save_path", "recordings").toString()),
+        params = Params(unicode(self.settings.value("proj_path", "recordings").toString()),
                         self.settings.value("total_recordings", 0).toInt()[0],
                         str(self.settings.value("installation_uuid", uuid.getnode()).toString()),
                         str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))
@@ -600,7 +636,7 @@ class Application(QtGui.QApplication):
 
     def _on_close(self):
         params = self.main_window.params
-        self.settings.setValue("save_path", params.save_path)
+        self.settings.setValue("proj_path", params.proj_path)
         self.settings.setValue("total_recordings", params.total_recordings)
         self.settings.setValue("installation_uuid", params.installation_uuid)
         self.settings.setValue("installation_stamp", params.installation_stamp)

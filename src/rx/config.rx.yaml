@@ -1,0 +1,14 @@
+type: //rec
+rest: //any
+required:
+  PROJECT_ID: //str
+  PROJECT_NAME: //str
+  PAT_TYPES:
+    type: //any
+    of:
+    - type: //arr
+      contents: //str
+    - type: //map
+      values: //str
+  ALLOW_NO_PAT_TYPE: //bool
+  CYCLE_COUNT: //int
