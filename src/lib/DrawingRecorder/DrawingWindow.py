@@ -206,6 +206,7 @@ class RecordingHandler(Handler):
     def restart(self):
         self.dw.recording.clear()
         self.buffer.fill(Consts.FILL_COLOR)
+        self.dw._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         self.update_buffer()
         self.dw._set_bt_text(translate("rec", "Waiting for events..."))
 
@@ -228,6 +229,9 @@ class RecordingHandler(Handler):
         if self.dw.recording.events:
             stamp = datetime.datetime.now()
             elapsed = stamp - self.dw.recording.events[0].stamp
+            self.dw._main_text.setBrush(
+                QtGui.QBrush(
+                    QtCore.Qt.gray if elapsed.seconds % 2 else QtCore.Qt.red))
             length = (self.dw.recording.events[-1].stamp -
                       self.dw.recording.events[0].stamp)
             msg = translate("rec",
@@ -281,6 +285,7 @@ class RecordingHandler(Handler):
 
 
     def terminate(self):
+        self.dw._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         self.painter = None
         self.dw._scene.removeItem(self.item)
 
