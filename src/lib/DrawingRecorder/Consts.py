@@ -19,8 +19,14 @@ FF_PROFILE      = "prof"                # profiling type
 # File names
 PROJ_CONFIG     = "config.yaml"         # project configuration file name
 
+# Calibration
+CAL_POINT_LEN   = 0.05                  # diameter of calibration points (in normalized drawing units)
+CAL_MAX_TILT    = 5.                    # maximum tilt (degrees) during stylus calibration
+CAL_OK_COL      = QtCore.Qt.green       # filling color of calibration points
+CAL_NOPEN_COL   = QtCore.Qt.red         # filling color of uncalibrated next point
+CAL_TILT_COL    = QtCore.Qt.yellow      # filling color of current point with bad tilt
+
 # Drawing parameters
-POINT_LEN       = 0.05                  # diameter of calibration points (in normalized drawing units)
 BAR_LEN         = 2.                    # extension of the calibration bars (in normalized drawing units)
 CURSOR_LEN      = 25.                   # cursor extension (in pixels)
 REFRESH_DELAY   = 100                   # timerEvent delay in ms

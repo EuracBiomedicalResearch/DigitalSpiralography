@@ -83,8 +83,10 @@ class CalibrationHandler(Handler):
         # update visual
         if self.point:
             self.dw._warning.setText("")
-            self.point.setPen(QtGui.QPen(QtCore.Qt.green))
-            self.point.setBrush(QtGui.QBrush(QtGui.QColor(0, 255, 0, 127)))
+            col = QtGui.QColor(Consts.CAL_OK_COL)
+            self.point.setPen(QtGui.QPen(col))
+            col.setAlpha(127)
+            self.point.setBrush(QtGui.QBrush(col))
 
         # check if we reached the last point
         pos = len(self.cpoints)
@@ -94,11 +96,11 @@ class CalibrationHandler(Handler):
 
         # prepare the next point
         next_point = self.dw.drawing.cpoints[pos]
-        self.point = QtGui.QGraphicsEllipseItem(-Consts.POINT_LEN / 2,
-                                                -Consts.POINT_LEN / 2,
-                                                Consts.POINT_LEN,
-                                                Consts.POINT_LEN)
-        self.point.setPen(QtGui.QPen(QtCore.Qt.red))
+        self.point = QtGui.QGraphicsEllipseItem(-Consts.CAL_POINT_LEN / 2,
+                                                -Consts.CAL_POINT_LEN / 2,
+                                                Consts.CAL_POINT_LEN,
+                                                Consts.CAL_POINT_LEN)
+        self.point.setPen(QtGui.QPen(Consts.CAL_NOPEN_COL))
         self.point.setPos(next_point[0], next_point[1])
         self.point.setParentItem(self.items)
 
@@ -110,6 +112,9 @@ class CalibrationHandler(Handler):
     def add_point(self):
         if not self.dw._drawing_state:
             self.dw._warning.setText(translate("calib", "No cursor at point!"))
+        elif abs(self.dw._drawing_tilt[0]) > Consts.CAL_MAX_TILT or \
+          abs(self.dw._drawing_tilt[1]) > Consts.CAL_MAX_TILT:
+            self.dw._warning.setText(translate("calib", "Pen is tilted!"))
         else:
             self.cpoints.append((self.dw._drawing_pos.x(), self.dw._drawing_pos.y()))
             self.prepare_next_point()
@@ -136,10 +141,16 @@ class CalibrationHandler(Handler):
 
     def tabletEventTS(self, ev, stamp):
         if self.point:
-            if ev.type() == QtCore.QEvent.TabletPress:
-                self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 127)))
-            elif ev.type() == QtCore.QEvent.TabletRelease:
-                self.point.setBrush(QtGui.QBrush(QtGui.QColor(255, 0, 0, 0)))
+            if not self.dw._drawing_state:
+                col = QtGui.QColor(0, 0, 0, 0)
+            elif abs(self.dw._drawing_tilt[0]) > Consts.CAL_MAX_TILT or \
+              abs(self.dw._drawing_tilt[1]) > Consts.CAL_MAX_TILT:
+                col = QtGui.QColor(Consts.CAL_TILT_COL)
+                col.setAlpha(127)
+            else:
+                col = QtGui.QColor(Consts.CAL_OK_COL)
+                col.setAlpha(127)
+            self.point.setBrush(QtGui.QBrush(col))
         else:
             self.dw._cursor.setVisible(self.dw._tracking_state)
 
