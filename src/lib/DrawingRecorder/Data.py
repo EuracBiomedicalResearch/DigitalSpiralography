@@ -112,11 +112,12 @@ class Config(object):
 
 # Calibration/Recording data
 class CalibrationData(object):
-    def __init__(self, oid, tablet_id, stylus_id, cpoints, stamp=None):
+    def __init__(self, oid, tablet_id, stylus_id, cpoints, ctilts, stamp=None):
         self.oid = oid
         self.tablet_id = tablet_id
         self.stylus_id = stylus_id
         self.cpoints = cpoints
+        self.ctilts = ctilts
         self.stamp = stamp if stamp is not None else datetime.datetime.now()
 
 
@@ -261,7 +262,8 @@ class DrawingRecord(object):
                     "tablet_id": record.calibration.tablet_id,
                     "stylus_id": record.calibration.stylus_id,
                     "stamp": record.calibration.stamp,
-                    "cpoints": map(list, record.calibration.cpoints)},
+                    "cpoints": map(list, record.calibration.cpoints),
+                    "ctilts": map(list, record.calibration.ctilts)},
                 "calibration_age": record.calibration_age,
                 "recording": {
                     "session_start": record.recording.session_start,
@@ -345,11 +347,17 @@ class DrawingRecord(object):
                                   map(tuple, data['drawing']['cpoints']))
 
         # calibration
+        cpoints = map(tuple, data['calibration']['cpoints'])
+        ctilts = data['calibration'].get('ctilts') # optional (fmt 1.3)
+        if ctilts is None:
+            ctilts = [(0, 0)] * len(cpoints)
+        else:
+            ctilts = map(tuple, ctilts)
+
         calibration = CalibrationData(data['calibration'].get('operator'), # optional (fmt 1.2)
                                       data['calibration']['tablet_id'],
                                       data['calibration'].get('stylus_id'), # optional (fmt 1.2)
-                                      map(tuple, data['calibration']['cpoints']),
-                                      data['calibration']['stamp'])
+                                      cpoints, ctilts, data['calibration']['stamp'])
 
         # past retries (optional, fmt 1.2)
         retries_events = data['recording'].get('retries_events')

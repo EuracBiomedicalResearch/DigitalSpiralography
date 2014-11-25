@@ -56,13 +56,15 @@ class CalibrationHandler(Handler):
 
         # initial state
         self.cpoints = []
+        self.ctilts = []
         self.point = None
         self.prepare_next_point()
 
 
     def completed(self):
         res, error = self.dw.setup_calibration(
-            Data.CalibrationData(self.dw.oid, self.dw.tablet_id, self.dw.stylus_id, self.cpoints))
+            Data.CalibrationData(self.dw.oid, self.dw.tablet_id, self.dw.stylus_id,
+                                 self.cpoints, self.ctilts))
         if not res:
             msg = translate("calib",
                             "CALIBRATION FAILED: {reason}!\n"
@@ -117,6 +119,7 @@ class CalibrationHandler(Handler):
             self.dw._warning.setText(translate("calib", "Pen is tilted!"))
         else:
             self.cpoints.append((self.dw._drawing_pos.x(), self.dw._drawing_pos.y()))
+            self.ctilts.append(self.dw._drawing_tilt)
             self.prepare_next_point()
 
 
