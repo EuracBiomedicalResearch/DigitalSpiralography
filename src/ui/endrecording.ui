@@ -295,79 +295,6 @@
      </item>
     </layout>
    </item>
-   <item row="11" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Comments:</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-     </property>
-     <property name="buddy">
-      <cstring>comments</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="1">
-    <widget class="QPlainTextEdit" name="comments">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="plainText">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item row="12" column="0" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Discard recording</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="next_hand_btn">
-       <property name="text">
-        <string>Next hand</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_2">
-       <property name="text">
-        <string>Save and complete</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-       <property name="default">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item row="0" column="2" rowspan="12">
     <widget class="QLabel" name="preview">
      <property name="sizePolicy">
@@ -390,6 +317,86 @@
      </property>
      <property name="margin">
       <number>9</number>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="next_hand_lbl">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Discard and stop</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="next_hand_btn">
+       <property name="text">
+        <string>&amp;Next hand</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="text">
+        <string>Save and complete</string>
+       </property>
+       <property name="autoDefault">
+        <bool>false</bool>
+       </property>
+       <property name="default">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="11" column="1" rowspan="2">
+    <widget class="QPlainTextEdit" name="comments">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>1</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="plainText">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0" rowspan="2">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Comments:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+     <property name="buddy">
+      <cstring>comments</cstring>
      </property>
     </widget>
    </item>
@@ -431,9 +438,9 @@
   <tabstop>blood_drawn</tabstop>
   <tabstop>blood_not_drawn</tabstop>
   <tabstop>comments</tabstop>
-  <tabstop>pushButton</tabstop>
   <tabstop>next_hand_btn</tabstop>
   <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -444,8 +451,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>856</x>
-     <y>585</y>
+     <x>852</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>13</x>
@@ -461,7 +468,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>1091</x>
-     <y>585</y>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>40</x>
@@ -472,8 +479,8 @@
  </connections>
  <buttongroups>
   <buttongroup name="blood_grp"/>
+  <buttongroup name="hand_cnt_grp"/>
   <buttongroup name="hand_grp"/>
   <buttongroup name="handedness_grp"/>
-  <buttongroup name="hand_cnt_grp"/>
  </buttongroups>
 </ui>

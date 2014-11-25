@@ -162,7 +162,7 @@ class EndRecording(QtGui.QDialog):
         self._ui.preview.setPalette(pal)
 
 
-    def reset(self, config, record, preview, save_path, allow_next):
+    def reset(self, config, record, preview, save_path, cycle_state):
         self.config = config
         cb = self._ui.pat_type
         cb.clear()
@@ -252,7 +252,13 @@ class EndRecording(QtGui.QDialog):
         self._ui.preview.setPixmap(preview)
 
         self.next_hand = None
+        allow_next = (cycle_state[0] < cycle_state[1])
+        self._ui.next_hand_lbl.setVisible(allow_next)
         self._ui.next_hand_btn.setEnabled(allow_next)
+        if allow_next:
+            msg = translate("recorder", "Spiral {cycle}/{total}")
+            msg = msg.format(cycle=cycle_state[0], total=cycle_state[1])
+            self._ui.next_hand_lbl.setText(msg)
 
 
     def on_save_path(self):
@@ -490,7 +496,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def new_recording(self, oid, aid,
                       pat_type=None, pat_hand_cnt=None, pat_handedness=None, pat_hand=None,
-                      blood_drawn=None, cycle=1, allow_next=True):
+                      blood_drawn=None, cycle_state=(1,1)):
         # use the current calibration to take a new recording
         self._drawing_window.reset(DrawingWindow.Mode.Record)
         if not self._drawing_window.exec_():
@@ -512,7 +518,8 @@ class MainWindow(QtGui.QMainWindow):
                                     self._drawing_window.calibration,
                                     self.calibration_age,
                                     self._drawing_window.recording,
-                                    cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand,
+                                    cycle_state[0],
+                                    pat_type, pat_hand_cnt, pat_handedness, pat_hand,
                                     extra_data)
 
         # guess a decent path name
@@ -525,7 +532,7 @@ class MainWindow(QtGui.QMainWindow):
             save_path)
 
         # keep trying until save is either aborted or succeeds
-        self._end_recording_dialog.reset(self.config, record, preview, save_path, allow_next)
+        self._end_recording_dialog.reset(self.config, record, preview, save_path, cycle_state)
         while self._end_recording_dialog.exec_():
             record.oid = self._end_recording_dialog.oid
             record.aid = self._end_recording_dialog.aid
@@ -572,7 +579,7 @@ class MainWindow(QtGui.QMainWindow):
         # setup recording cycle
         cycle = 1
         total = 2 * self.config.cycle_count
-        allow_next = (cycle < total)
+        cycle_state = (cycle, total)
 
         # initial state
         pat_type = None
@@ -585,7 +592,7 @@ class MainWindow(QtGui.QMainWindow):
         while True:
             record = self.new_recording(oid, aid,
                            pat_type, pat_hand_cnt, pat_handedness,
-                           pat_hand, blood_drawn, cycle, allow_next)
+                           pat_hand, blood_drawn, cycle_state)
             if record is None or self._end_recording_dialog.next_hand != True:
                 return
 
@@ -607,7 +614,7 @@ class MainWindow(QtGui.QMainWindow):
             # recalculate cycle count
             cycle = record.cycle + 1
             total = pat_hand_cnt * self.config.cycle_count
-            allow_next = (cycle < total)
+            cycle_state = (cycle, total)
 
 
 
