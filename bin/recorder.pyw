@@ -627,7 +627,7 @@ class Application(QtGui.QApplication):
         # command-line flags
         ap = argparse.ArgumentParser(description='Drawing recorder')
         ap.add_argument('dir', nargs='?', help='project directory')
-        args = ap.parse_args(map(unicode, self.arguments()[1:]))
+        args = ap.parse_args(map(unicode, args[1:]))
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)

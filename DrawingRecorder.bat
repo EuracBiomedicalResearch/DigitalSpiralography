@@ -1,2 +1,3 @@
 set PYTHONOPTIMIZE=1
-start /high bin\recorder.pyw
+cd %0\..\
+start /high bin\recorder.pyw %*

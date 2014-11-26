@@ -510,7 +510,7 @@ class Application(QtGui.QApplication):
         # command-line flags
         ap = argparse.ArgumentParser(description='Stylus profiler')
         ap.add_argument('file', nargs='?', help='stylus profile to load')
-        args = ap.parse_args(map(unicode, self.arguments()[1:]))
+        args = ap.parse_args(map(unicode, args[1:]))
 
         # initialize
         self.main_window = MainWindow()

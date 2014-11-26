@@ -641,7 +641,7 @@ class Application(QtGui.QApplication):
         ap.add_argument('-f', dest='fast', action='store_true',
                         help='Enable fast loading')
         ap.add_argument('file', nargs='?', help='drawing file')
-        args = ap.parse_args(map(unicode, self.arguments()[1:]))
+        args = ap.parse_args(map(unicode, args[1:]))
 
         # initialize
         self.main_window = MainWindow()

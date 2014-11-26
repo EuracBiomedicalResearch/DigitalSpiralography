@@ -1,2 +1,3 @@
 set PYTHONOPTIMIZE=1
-start bin\visualizer.pyw
+cd %0\..\
+start bin\visualizer.pyw %*
