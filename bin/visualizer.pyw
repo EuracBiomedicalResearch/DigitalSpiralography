@@ -323,6 +323,11 @@ class MainWindow(QtGui.QMainWindow):
         name = translate("visualizer", "Calib. age")
         self._append_prop(name, record.calibration_age)
 
+        name = translate("visualizer", "Project ID")
+        self._append_prop(name, record.config.project_id)
+        name = translate("visualizer", "Project name")
+        self._append_prop(name, record.config.project_name)
+
         name = translate("visualizer", "Screen width")
         self._append_prop(name, int(record.recording.rect_size[0]))
         name = translate("visualizer", "Screen height")
