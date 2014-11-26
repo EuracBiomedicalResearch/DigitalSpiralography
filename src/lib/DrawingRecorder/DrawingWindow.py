@@ -85,7 +85,7 @@ class CalibrationHandler(Handler):
         # update visual
         if self.point:
             self.dw._warning.setText("")
-            col = QtGui.QColor(Consts.CAL_OK_COL)
+            col = QtGui.QColor(Consts.CAL_DONE_COL)
             self.point.setPen(QtGui.QPen(col))
             col.setAlpha(127)
             self.point.setBrush(QtGui.QBrush(col))
@@ -102,7 +102,7 @@ class CalibrationHandler(Handler):
                                                 -Consts.CAL_POINT_LEN / 2,
                                                 Consts.CAL_POINT_LEN,
                                                 Consts.CAL_POINT_LEN)
-        self.point.setPen(QtGui.QPen(Consts.CAL_NOPEN_COL))
+        self.point.setPen(QtGui.QPen(Consts.CAL_NEXT_COL))
         self.point.setPos(next_point[0], next_point[1])
         self.point.setParentItem(self.items)
 
@@ -148,7 +148,7 @@ class CalibrationHandler(Handler):
                 col = QtGui.QColor(0, 0, 0, 0)
             elif abs(self.dw._drawing_tilt[0]) > Consts.CAL_MAX_TILT or \
               abs(self.dw._drawing_tilt[1]) > Consts.CAL_MAX_TILT:
-                col = QtGui.QColor(Consts.CAL_TILT_COL)
+                col = QtGui.QColor(Consts.CAL_NEXT_COL)
                 col.setAlpha(127)
             else:
                 col = QtGui.QColor(Consts.CAL_OK_COL)

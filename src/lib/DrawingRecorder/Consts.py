@@ -22,9 +22,9 @@ PROJ_CONFIG     = "config.yaml"         # project configuration file name
 # Calibration
 CAL_POINT_LEN   = 0.05                  # diameter of calibration points (in normalized drawing units)
 CAL_MAX_TILT    = 5.                    # maximum tilt (degrees) during stylus calibration
-CAL_OK_COL      = QtCore.Qt.green       # filling color of calibration points
-CAL_NOPEN_COL   = QtCore.Qt.red         # filling color of uncalibrated next point
-CAL_TILT_COL    = QtCore.Qt.yellow      # filling color of current point with bad tilt
+CAL_DONE_COL    = QtCore.Qt.green       # filling color of previous points
+CAL_OK_COL      = QtCore.Qt.yellow      # filling color of current calibration point
+CAL_NEXT_COL    = QtCore.Qt.red         # filling color of uncalibrated/bad next point
 
 # Drawing parameters
 BAR_LEN         = 2.                    # extension of the calibration bars (in normalized drawing units)

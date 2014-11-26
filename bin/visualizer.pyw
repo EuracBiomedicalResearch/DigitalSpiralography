@@ -391,13 +391,15 @@ class MainWindow(QtGui.QMainWindow):
 
         if self._showRaw:
             # calibration points
-            pen = QtGui.QPen(QtGui.QColor(255, 0, 0, 127))
-            brush = QtGui.QBrush(QtGui.QColor(255, 0, 0, 64))
+            pen = QtGui.QPen(QtGui.QColor(Consts.CAL_NEXT_COL))
+            col = QtGui.QColor(Consts.CAL_NEXT_COL)
+            col.setAlpha(127)
+            brush = QtGui.QBrush(col)
             for point in record.calibration.cpoints:
-                tmp = QtGui.QGraphicsEllipseItem(-Consts.POINT_LEN / 2,
-                                                 -Consts.POINT_LEN / 2,
-                                                 Consts.POINT_LEN,
-                                                 Consts.POINT_LEN)
+                tmp = QtGui.QGraphicsEllipseItem(-Consts.CAL_POINT_LEN / 2,
+                                                 -Consts.CAL_POINT_LEN / 2,
+                                                 Consts.CAL_POINT_LEN,
+                                                 Consts.CAL_POINT_LEN)
                 tmp.setPen(pen)
                 tmp.setBrush(brush)
                 tmp.setPos(point[0], point[1])
