@@ -189,11 +189,18 @@ class MainWindow(QtGui.QMainWindow):
 
         # 2nd degree fit
         if len(self.data.data) < 3:
+            self.data.fit = None
+        else:
+            try:
+                self.data.fit = np.polyfit(y, x, 3, full=True)
+            except ValueError:
+                pass
+
+        if self.data.fit is None:
             self.fit = None
             self.rsp_fit.hide()
             self.rsp_txt.hide()
         else:
-            self.data.fit = np.polyfit(y, x, 3, full=True)
             fy = [el / 50. for el in range(51)]
             fx = [np.polyval(self.data.fit[0], el) for el in fy]
 

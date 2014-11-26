@@ -444,7 +444,7 @@ class StylusProfile(object):
                 "stylus_id": profile.sid,
                 "tablet_id": profile.tid,
                 "data": map(StylusResponseData.serialize, profile.data),
-                "fit": profile.fit[0].tolist(),
+                "fit": profile.fit[0].tolist() if profile.fit is not None else None,
                 "extra_data": profile.extra_data}
 
         # avoid saving unicode in the FNAME header
