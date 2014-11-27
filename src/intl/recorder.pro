@@ -1,6 +1,7 @@
 SOURCES		= ../../bin/recorder.pyw \
 		  ../lib/DrawingRecorder/Data.py \
 		  ../lib/DrawingRecorder/Drawing.py \
+		  ../lib/DrawingRecorder/DrawingWindow.py \
 		  ../lib/DrawingRecorder/ID.py
 FORMS		= ../ui/main.ui \
 		  ../ui/newcalibration.ui \

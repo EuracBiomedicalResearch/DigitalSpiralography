@@ -325,7 +325,7 @@
      <item>
       <widget class="QLabel" name="next_hand_lbl">
        <property name="text">
-        <string>TextLabel</string>
+        <string notr="true">Cycle status</string>
        </property>
       </widget>
      </item>
