@@ -381,7 +381,7 @@ class DrawingRecord(object):
         ts_updated = data.get('ts_updated')
 
         # operator (moved, fmt 1.3)
-        oid = data['recording'].get('operator')
+        oid = data.get('operator')
         if oid is None and 'operator' in extra_data:
             oid = extra_data.pop('operator')
 
