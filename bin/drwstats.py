@@ -29,6 +29,11 @@ def recordStats(record, cmts):
     if record.recording.events:
         rec_secs = (record.recording.events[-1].stamp - record.recording.events[0].stamp).total_seconds()
 
+    rec_data_cnt = 0
+    for events in [record.recording.events] + record.recording.retries:
+        if len(events):
+            rec_data_cnt += 1
+
     data = {"PAT_ID": record.aid,
             "PAT_TYPE": record.config.pat_types.get(record.pat_type, record.pat_type),
             "PAT_HANDEDNESS": Data.PAT_HANDEDNESS.get(record.pat_handedness, record.pat_handedness),
@@ -47,6 +52,7 @@ def recordStats(record, cmts):
             "REC_TS": dtts(record.recording.session_start),
             "REC_CYCLE": record.cycle,
             "REC_RETRIES": len(record.recording.retries) + 1,
+            "REC_DATA_CNT": rec_data_cnt,
             "REC_STROKES": record.recording.strokes,
             "REC_EVENTS": len(record.recording.events),
             "REC_SECS": rec_secs,
