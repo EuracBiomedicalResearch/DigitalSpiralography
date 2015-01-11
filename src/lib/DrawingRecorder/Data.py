@@ -300,7 +300,7 @@ class DrawingRecord(object):
                 time = (event.stamp - start).total_seconds() * 1000.
                 x = event.coords_drawing[0]
                 y = event.coords_drawing[1]
-                z = event.pressure if pressure != 0 else ""
+                z = event.pressure if event.pressure else ""
                 w = event.tilt_drawing[0] if event.tilt_drawing else ""
                 t = event.tilt_drawing[1] if event.tilt_drawing else ""
                 print('\t'.join(map(str, [time, x, y, z, w, t])), file=fd)
