@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
-from DrawingRecorder import Consts
+from DrawingRecorder import DrawingFactory
 
 # Qt
 from PyQt4 import QtCore
@@ -54,11 +54,21 @@ def renderSpiral(record, output):
     gs = GridSpec(2, 1, height_ratios=[3,1])
     ax = fig.add_subplot(gs[0])
 
+    # offline recalibration
+    drawing = DrawingFactory.from_id(record.drawing.id)
+    aff, error = drawing.calibrate(record.calibration.cpoints)
+    if error: raise Exception("calibration error: {error}".format(error=error))
+
+    # remap to unit coordinates
+    cpoints = map(lambda x: aff.map(x[0], x[1]), record.calibration.cpoints)
+    for event in record.recording.events:
+        event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
+
     # drawing/calibration points
     plt.plot(map(lambda x: x[0], record.drawing.points),
              map(lambda x: -x[1], record.drawing.points), '-')
-    plt.scatter(map(lambda x: x[0], record.drawing.cpoints),
-                map(lambda x: -x[1], record.drawing.cpoints))
+    plt.scatter(map(lambda x: x[0], cpoints),
+                map(lambda x: -x[1], cpoints))
 
     # track drawing status to recover actual tracing length/time
     codes = [Path.MOVETO, Path.LINETO]
@@ -67,7 +77,7 @@ def renderSpiral(record, output):
     drawing = False
     for event in record.recording.events:
         stamp = event.stamp
-        pos = flip_y(event.coords_drawing)
+        pos = flip_y(event.coords_unit)
 
         # set drawing status
         if event.typ == QtCore.QEvent.TabletPress or event.pressure:

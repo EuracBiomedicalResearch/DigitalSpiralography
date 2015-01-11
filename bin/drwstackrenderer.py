@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
+from DrawingRecorder import DrawingFactory
 
 # Qt
 from PyQt4 import QtCore
@@ -20,6 +21,7 @@ import sys
 import codecs
 import argparse
 import math
+import itertools
 
 # matplotlib
 import numpy as np
@@ -56,10 +58,10 @@ def renderPatch(record, ax, c, pressure):
     drawing = False
     for event in record.recording.events:
         stamp = event.stamp
-        pos = flip_y(event.coords_drawing)
+        pos = flip_y(event.coords_unit)
 
         # set drawing status
-        if event.typ == QtCore.QEvent.TabletPress:
+        if event.typ == QtCore.QEvent.TabletPress or event.pressure:
             drawing = True
         elif event.typ == QtCore.QEvent.TabletRelease:
             drawing = False
@@ -81,6 +83,18 @@ def renderPatch(record, ax, c, pressure):
         old_stamp = stamp
 
 
+def remapSpiral(record):
+    # offline recalibration
+    drawing = DrawingFactory.from_id(record.drawing.id)
+    aff, error = drawing.calibrate(record.calibration.cpoints)
+    if error: raise Exception("calibration error: {error}".format(error=error))
+
+    # remap to unit coordinates
+    cpoints = map(lambda x: aff.map(x[0], x[1]), record.calibration.cpoints)
+    for event in record.recording.events:
+        event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
+
+
 def renderSpirals(files, output, fast, pressure, desc, ticks):
     fig = plt.figure()
     fig.set_size_inches((7.35,9))
@@ -88,8 +102,8 @@ def renderSpirals(files, output, fast, pressure, desc, ticks):
     # spiral axis
     gs = GridSpec(2, 2, height_ratios=[3,1], width_ratios=[20, 1])
     s_ax = fig.add_subplot(gs[0,0])
-    s_ax.set_xlim(-1,1)
-    s_ax.set_ylim(-1,1)
+    s_ax.set_xlim(-1.2, 1.2)
+    s_ax.set_ylim(-1.2, 1.2)
     s_ax.grid(True)
 
     # pressure axis
@@ -113,15 +127,28 @@ def renderSpirals(files, output, fast, pressure, desc, ticks):
     for i in range(nfiles):
         path = files[i]
         c = smap.to_rgba(i)
+        step = itertools.count()
 
-        sys.stderr.write("1")
+        sys.stderr.write(str(next(step)))
         record = Data.DrawingRecord.load(path, fast)
 
-        sys.stderr.write("\b2")
+        if i == 0:
+            # we assume we're comparing identical drawings
+            sys.stderr.write("\b" + str(next(step)))
+            s_ax.plot(map(lambda x: x[0], record.drawing.points),
+                      map(lambda x: -x[1], record.drawing.points),
+                      '-', color='gray', alpha=0.5)
+
+        sys.stderr.write("\b" + str(next(step)))
+        remapSpiral(record)
+
+        sys.stderr.write("\b" + str(next(step)))
         renderPatch(record, s_ax, c, pressure)
 
-        sys.stderr.write("\b3")
+        sys.stderr.write("\b" + str(next(step)))
         p_ax.plot([x.pressure for x in record.recording.events], color=c)
+
+        # clear
         sys.stderr.write("\b.")
 
     sys.stderr.write("\nrendering ...")
