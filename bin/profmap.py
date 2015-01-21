@@ -25,11 +25,18 @@ mpl.use("Agg")
 import matplotlib.pyplot as plt
 
 
+def date(string):
+    return datetime.datetime.strptime(string, "%Y-%m-%d")
+
 def __main__():
     ap = argparse.ArgumentParser(description='Plot the stylus profile evolution map')
     ap.add_argument('-o', dest='output', help='Output image file', required=True)
     ap.add_argument('-s', dest='sid', help='Stylus ID to plot')
     ap.add_argument('-m', dest='max', help='Maximum weight (default to auto)')
+    ap.add_argument('-S', dest='start', type=date,
+                    help='Starting time range (YYYY-MM-DD, default to first measurement)')
+    ap.add_argument('-E', dest='end', type=date,
+                    help='Ending time range (YYYY-MM-DD, default to last measurement)')
     ap.add_argument('files', nargs='+', help='Stylus profiles')
     args = ap.parse_args()
 
@@ -44,13 +51,25 @@ def __main__():
     else:
         ap.sid = sids[0]
 
+    # adjust displayed ranges
     sm = pmap.sid_map(ap.sid)
-    wr = sm.weight_range()
-    tr = sm.time_range()
+    wr = list(sm.weight_range())
+    tr = list(sm.time_range())
 
-    # manual maximum range
     if args.max is not None:
-        wr = wr[0], int(args.max)
+        wr[1] = int(args.max)
+    else:
+        wr[1] = wr[1] * 1.1
+
+    trd = (tr[1] - tr[0]) / 10
+    if args.start is not None:
+        tr[0] = args.start
+    else:
+        tr[0] = tr[0] - trd
+    if args.end is not None:
+        tr[1] = args.end
+    else:
+        tr[1] = tr[1] + trd
 
     # calculate the response field
     nx = max(100, int((tr[1] - tr[0]).total_seconds() / 86400.))
@@ -81,7 +100,7 @@ def __main__():
     xlabels = []
     for x in xlocs:
         t = datetime.datetime.fromtimestamp(time.mktime(tr[0].timetuple()) + x)
-        xlabels.append(t.strftime("%d/%m/%Y"))
+        xlabels.append(t.strftime("%Y-%m-%d"))
     plt.xticks(xlocs, xlabels, rotation=45, horizontalalignment='right')
 
     plt.title('{sid} profile map'.format(sid=ap.sid))

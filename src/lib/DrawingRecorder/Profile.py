@@ -59,18 +59,18 @@ class ProfileMap(object):
 
     def map_at_time(self, t):
         # TODO: switch either to NURBS or bicubic interpolation
-        i = bisect.bisect_right(self.times, t)
-        if i == len(self.times):
-            return self.curves[-1]
-        elif self.times[i] == t:
-            return self.curves[i]
-        elif i == 0:
+        if len(self.times) < 2:
             return self.curves[0]
 
-        t1 = self.times[i - 1]
-        t2 = self.times[i]
+        i1 = bisect.bisect_right(self.times, t) - 1
+        i1 = max(0, min(i1, len(self.times) - 2))
+        i2 = i1 + 1
+
+        # linear interpolation in the reported range
+        t1 = self.times[i1]
+        t2 = self.times[i2]
         v = 1. - (t2 - t).total_seconds() / (t2 - t1).total_seconds()
-        return ProfileCurve2(self.curves[i - 1], self.curves[i], v)
+        return ProfileCurve2(self.curves[i1], self.curves[i2], v)
 
 
 class ProfileMapper(object):
