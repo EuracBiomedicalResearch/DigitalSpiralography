@@ -48,11 +48,11 @@ def __main__():
     elif len(sids) > 1 and args.sid is None:
         ap.error("more than one stylus ID was loaded ({sids}), sid required".format(
             sids=', '.join(sids)))
-    else:
-        ap.sid = sids[0]
+    elif args.sid is None:
+        args.sid = sids[0]
 
     # adjust displayed ranges
-    sm = pmap.sid_map(ap.sid)
+    sm = pmap.sid_map(args.sid)
     wr = list(sm.weight_range())
     tr = list(sm.time_range())
 
@@ -75,16 +75,25 @@ def __main__():
     nx = max(100, int((tr[1] - tr[0]).total_seconds() / 86400.))
     ny = max(100, int(wr[1]))
     xi, yi = np.meshgrid(np.linspace(0, (tr[1] - tr[0]).total_seconds(), nx),
-                         np.linspace(0, wr[1], ny))
+                         np.linspace(0, 1, ny))
     z = np.empty([ny, nx])
     for x in range(nx):
         t = datetime.datetime.fromtimestamp(time.mktime(tr[0].timetuple()) + xi[0,x])
         curve = sm.map_at_time(t)
-        lm = curve(1.)
         for y in range(ny):
-            v = yi[y,x] / lm
+            v = yi[y, x]
             z[y, x] = curve(v)
-    plt.pcolor(xi, yi, z, cmap='Spectral', vmax=wr[1])
+    plt.pcolor(xi, z, yi, cmap='cool_r')
+
+    # isolines
+    istep = 50. / sm.weight_range()[1]
+    for y in [1.] + list(np.arange(0, 1, istep)):
+        yt = []
+        for x in range(nx):
+            t = datetime.datetime.fromtimestamp(time.mktime(tr[0].timetuple()) + xi[0,x])
+            curve = sm.map_at_time(t)
+            yt.append(curve(y))
+        plt.plot(xi[0], yt, color='k', alpha=0.1)
 
     # plot the individual measurements
     for i in range(len(sm.profs)):
@@ -103,9 +112,10 @@ def __main__():
         xlabels.append(t.strftime("%Y-%m-%d"))
     plt.xticks(xlocs, xlabels, rotation=45, horizontalalignment='right')
 
-    plt.title('{sid} profile map'.format(sid=ap.sid))
+    plt.title('{sid} profile map'.format(sid=args.sid))
     plt.ylabel('Weight (g)')
     plt.margins(0.05)
+    plt.ylim(0, wr[1])
     plt.grid()
     plt.tick_params(right=True, labelright=True)
     plt.savefig(args.output, bbox_inches='tight')
