@@ -5,6 +5,8 @@
 import Consts
 
 # system modules
+import datetime
+import time
 import threading
 from PyQt4 import QtCore, QtGui
 
@@ -44,3 +46,11 @@ def background_op(message, func, parent=None):
     if 'exception' in ret:
         raise ret['exception']
     return ret['ret']
+
+
+def dtts(dt):
+    return int(time.mktime(dt.timetuple()))
+
+
+def tsdt(ts):
+    return datetime.datetime.fromtimestamp(ts)

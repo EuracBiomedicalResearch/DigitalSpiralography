@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 # local modules
 from DrawingRecorder import Data
 from DrawingRecorder import Consts
+from DrawingRecorder.Shared import dtts
 
 # system modules
 import argparse
@@ -18,10 +19,6 @@ import codecs
 import re
 import sys
 import time
-
-
-def dtts(dt):
-    return int(time.mktime(dt.timetuple()))
 
 
 def recordStats(record, cmts):
