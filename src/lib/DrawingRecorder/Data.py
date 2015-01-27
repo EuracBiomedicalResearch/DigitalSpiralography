@@ -295,17 +295,15 @@ class DrawingRecord(object):
 
     @classmethod
     def save_text(cls, record, path):
-        with open(path, "w") as fd:
-            print('\t'.join(["#TIME", "X", "Y", "Z", "W", "T"]), file=fd)
-            start = record.recording.events[0].stamp
-            for event in record.recording.events:
-                time = (event.stamp - start).total_seconds() * 1000.
-                x = event.coords_drawing[0]
-                y = event.coords_drawing[1]
-                z = event.pressure if event.pressure else ""
-                w = event.tilt_drawing[0] if event.tilt_drawing else ""
-                t = event.tilt_drawing[1] if event.tilt_drawing else ""
-                print('\t'.join(map(str, [time, x, y, z, w, t])), file=fd)
+        fd = Tab.TabWriter(path, ["TIME", "X", "Y", "Z", "W", "T"])
+        start = record.recording.events[0].stamp
+        for event in record.recording.events:
+            fd.write({'TIME': (event.stamp - start).total_seconds() * 1000.,
+                      'X': event.coords_drawing[0],
+                      'Y': event.coords_drawing[1],
+                      'Z': event.pressure,
+                      'W': event.tilt_drawing[0] if event.tilt_drawing else None,
+                      'T': event.tilt_drawing[1] if event.tilt_drawing else None})
 
 
     @classmethod
@@ -458,10 +456,10 @@ class StylusProfile(object):
 
     @classmethod
     def save_text(cls, profile, path):
-        with open(path, "w") as fd:
-            print('\t'.join(["#P", "W"]), file=fd)
-            for point in profile.data:
-                print('\t'.join(map(str, [point.pressure, point.weight])), file=fd)
+        fd = Tab.TabWriter(path, ["P", "W"])
+        for point in profile.data:
+            fd.write({'P': point.pressure,
+                      'W': point.weight})
 
 
     @classmethod

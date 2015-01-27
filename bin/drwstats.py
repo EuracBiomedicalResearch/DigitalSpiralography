@@ -10,7 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
-from DrawingRecorder import Consts
+from DrawingRecorder import Tab
 from DrawingRecorder.Shared import dtts
 
 # system modules
@@ -89,7 +89,7 @@ def __main__():
     ap.add_argument('files', nargs='+', help='drawing file/s')
     args = ap.parse_args()
 
-    hdr = True
+    fd = None
     for file in args.files:
         # drawing record
         record = Data.DrawingRecord.load(file, args.fast)
@@ -98,12 +98,11 @@ def __main__():
             stats['FILE'] = file
 
         # header
-        if hdr:
-            print('\t'.join(stats.keys()))
-            hdr = False
+        if fd is None:
+            fd = Tab.TabWriter(sys.stdout, stats.keys())
 
         # data
-        print('\t'.join(map(unicode, stats.values())))
+        fd.write(stats)
 
 
 if __name__ == '__main__':
