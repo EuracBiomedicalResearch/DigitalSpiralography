@@ -9,14 +9,12 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
-from DrawingRecorder import Data
 from DrawingRecorder import Profile
 
 # system modules
 import argparse
 import datetime
 import numpy as np
-import sys
 import time
 
 # matplotlib

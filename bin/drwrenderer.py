@@ -16,9 +16,6 @@ from DrawingRecorder import DrawingFactory
 from PyQt4 import QtCore
 
 # system modules
-import time
-import sys
-import codecs
 import argparse
 import math
 

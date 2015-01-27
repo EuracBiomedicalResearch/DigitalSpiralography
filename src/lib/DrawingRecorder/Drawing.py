@@ -2,7 +2,7 @@
 """Drawing modules"""
 
 # local modules
-from UI import translate
+from .UI import translate
 
 # system modules
 import math

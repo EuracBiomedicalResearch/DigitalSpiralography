@@ -18,7 +18,6 @@ import argparse
 import codecs
 import re
 import sys
-import time
 
 
 def recordStats(record, cmts):

@@ -2,7 +2,7 @@
 """Shared functions between Recorder/Visualizer"""
 
 # local modules
-import Consts
+from . import Consts
 
 # system modules
 import datetime

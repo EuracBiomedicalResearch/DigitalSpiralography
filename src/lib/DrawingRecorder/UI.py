@@ -2,7 +2,7 @@
 """UI helpers"""
 
 # local modules
-import Paths
+from . import Paths
 
 # system modules
 import os

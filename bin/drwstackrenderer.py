@@ -16,15 +16,12 @@ from DrawingRecorder import DrawingFactory
 from PyQt4 import QtCore
 
 # system modules
-import time
 import sys
-import codecs
 import argparse
 import math
 import itertools
 
 # matplotlib
-import numpy as np
 import matplotlib as mpl
 mpl.use("Agg")
 import matplotlib.pyplot as plt

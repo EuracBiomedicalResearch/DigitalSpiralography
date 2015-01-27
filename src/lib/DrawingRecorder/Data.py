@@ -4,10 +4,12 @@
 from __future__ import print_function
 
 # local modules
-import Consts
-import Drawing
-import RxUtil
-from UI import translate
+from . import Consts
+from . import Drawing
+from . import RxUtil
+from . import Tab
+from .Shared import dtts, tsdt
+from .UI import translate
 
 # system modules
 from PyQt4 import QtCore

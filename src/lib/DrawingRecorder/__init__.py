@@ -1,3 +1,3 @@
 import sys
-import Paths
+from . import Paths
 sys.path.append(Paths.join(Paths.ROOT, "dist"))
