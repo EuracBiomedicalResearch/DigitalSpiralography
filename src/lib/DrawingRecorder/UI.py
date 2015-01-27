@@ -20,15 +20,16 @@ def init_intl(file):
         QtGui.QApplication.installTranslator(translator)
 
 def load_ui(obj, file):
-    # chdir to the "ui" directory to preserve icon paths
     cwd = os.getcwd()
-    os.chdir(Paths.UI)
+    try:
+        # chdir to the "ui" directory to preserve icon paths
+        os.chdir(Paths.UI)
 
-    # setup the form and attach it to obj
-    form, _ = uic.loadUiType(file)
-    ret = form()
-    ret.setupUi(obj)
-
-    # switch back
-    os.chdir(cwd)
+        # setup the form and attach it to obj
+        form, _ = uic.loadUiType(file)
+        ret = form()
+        ret.setupUi(obj)
+    finally:
+        # switch back
+        os.chdir(cwd)
     return ret
