@@ -4,26 +4,36 @@
 from __future__ import print_function
 
 # local modules
-import Data
+from . import Data
 
 # system modules
 import collections
 import bisect
+import datetime
 import numpy as np
 import scipy.optimize
 
 
-def resp_curve(x, n, m, a, b):
-    if n <= 0 or m <= 0 or a < 0 or b < 0:
-        return np.nan
-    return x ** n * a + x ** m * b
+def resp_curve(x, a, b, c):
+    return x * a + x ** 2 * b + x ** 3 * c
+
+
+def _closest_time_pair(times, t):
+    i1 = bisect.bisect_right(times, t) - 1
+    i1 = max(0, min(i1, len(times) - 2))
+    i2 = i1 + 1
+    t1 = times[i1]
+    t2 = times[i2]
+    v = 1. - (t2 - t).total_seconds() / (t2 - t1).total_seconds()
+    return (i1, i2, v)
 
 
 class ProfileCurve(object):
     def __init__(self, prof):
         assert(len(prof.data) > 5)
-        x = np.array(map(lambda x: x.pressure, prof.data))
-        y = np.array(map(lambda x: x.weight, prof.data))
+        data = sorted(prof.data, key=lambda x: x.pressure)
+        x = np.array(map(lambda x: x.pressure, data))
+        y = np.array(map(lambda x: x.weight, data))
         self.param, _ = scipy.optimize.curve_fit(resp_curve, x, y)
 
     def __call__(self, v):
@@ -43,46 +53,72 @@ class ProfileCurve2(object):
 
 
 class ProfileMap(object):
-    def __init__(self, sid, profs):
+    def __init__(self, sid, profs, marks):
         self.profs = sorted(profs, key=lambda p: p.ts_created)
         self.times = [p.ts_created for p in self.profs]
         self.curves = map(ProfileCurve, self.profs)
+
+        if marks is not None:
+            marks = sorted(marks, key=lambda m: m.stamp)
+        else:
+            # synthesize data
+            marks = [Data.StylusUsageMark(self.times[0], 0),
+                     Data.StylusUsageMark(self.times[-1], 1)]
+
+        self.marks = [m.stamp for m in marks]
+        self.counts = [float(m.count) for m in marks]
+
 
     def weight_range(self):
         ws = [c(1.) for c in self.curves]
         return (reduce(min, ws, ws[0]),
                 reduce(max, ws, ws[0]))
 
+
     def time_range(self):
-        return self.times[0], self.times[-1]
+        return (min(self.times[0], self.marks[0]),
+                max(self.times[-1], self.marks[-1]))
+
 
     def map_at_time(self, t):
-        # TODO: switch either to NURBS or bicubic interpolation
         if len(self.times) < 2:
             return self.curves[0]
 
-        i1 = bisect.bisect_right(self.times, t) - 1
-        i1 = max(0, min(i1, len(self.times) - 2))
-        i2 = i1 + 1
+        i1, i2, iv = _closest_time_pair(self.times, t)
 
-        # linear interpolation in the reported range
-        t1 = self.times[i1]
-        t2 = self.times[i2]
-        v = 1. - (t2 - t).total_seconds() / (t2 - t1).total_seconds()
+        m1, m2, mv = _closest_time_pair(self.marks, self.times[i1])
+        c1 = self.counts[m1] + (self.counts[m2] - self.counts[m1]) * mv
+        m1, m2, mv = _closest_time_pair(self.marks, self.times[i2])
+        c2 = self.counts[m1] + (self.counts[m2] - self.counts[m1]) * mv
+
+        tv = self.times[i1] + datetime.timedelta(
+            seconds=(self.times[i2] - self.times[i1]).total_seconds() * iv)
+        m1, m2, mv = _closest_time_pair(self.marks, tv)
+        cv = self.counts[m1] + (self.counts[m2] - self.counts[m1]) * mv
+
+        v = (cv - c1) / (c2 - c1)
         return ProfileCurve2(self.curves[i1], self.curves[i2], v)
 
 
+
 class ProfileMapper(object):
-    def __init__(self, files):
+    def __init__(self, profs, sur=None):
         # load data
         self.profs = collections.defaultdict(list)
-        for file in files:
-            prof = Data.StylusProfile.load(file)
+        for fn in profs:
+            prof = Data.StylusProfile.load(fn)
             self.profs[prof.sid].append(prof)
+
+        # stylus usage report
+        if sur is None:
+            self.sur = None
+        else:
+            self.sur = Data.StylusUsageReport.load(sur)
 
         # initialize each sid independently
         for sid, profs in self.profs.iteritems():
-            self.profs[sid] = ProfileMap(sid, profs)
+            marks = self.sur.get(sid) if self.sur else None
+            self.profs[sid] = ProfileMap(sid, profs, marks)
 
     def sids(self):
         """Return the list of available stylus IDs"""

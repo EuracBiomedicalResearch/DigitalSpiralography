@@ -8,13 +8,14 @@ from . import Consts
 from . import Drawing
 from . import RxUtil
 from . import Tab
-from .Shared import dtts, tsdt
+from .Shared import dtts, tsdt, strdt
 from .UI import translate
 
 # system modules
 from PyQt4 import QtCore
 from copy import copy
 import cPickle
+import collections
 import datetime
 import gzip
 import numpy as np
@@ -492,3 +493,39 @@ class StylusProfile(object):
                              data['operator'], data['stylus_id'], data['tablet_id'],
                              map(StylusResponseData.deserialize, data['data']),
                              (np.asarray(data['fit'])), extra_data)
+
+
+
+# Stylus usage data
+class StylusUsageMark(object):
+    def __init__(self, stamp, count):
+        self.stamp = stamp
+        self.count = count
+
+
+class StylusUsageReport(object):
+    def __init__(self, sur):
+        self.sur = sur
+
+    def get(self, sid):
+        return self.sur.get(sid)
+
+    @classmethod
+    def save(cls, data, path):
+        fd = Tab.TabWriter(path, ['SID', 'DATE', 'COUNT'])
+        for sid, marks in data.sur.iteritems():
+            for mark in marks:
+                fd.write({'SID': sid,
+                          'DATE': mark.stamp,
+                          'COUNT': mark.count})
+
+    @classmethod
+    def load(cls, path):
+        fd = Tab.TabReader(path, ['SID', 'DATE', 'COUNT'],
+                           types={'DATE': strdt, 'COUNT': int})
+        sur = collections.defaultdict(list)
+        for row in fd:
+            mark = StylusUsageMark(row['DATE'], row['COUNT'])
+            sur[row['SID']].append(mark)
+
+        return StylusUsageReport(sur)

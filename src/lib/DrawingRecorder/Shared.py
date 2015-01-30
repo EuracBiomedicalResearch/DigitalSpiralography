@@ -6,6 +6,7 @@ from . import Consts
 
 # system modules
 import datetime
+import dateutil.parser
 import time
 import threading
 from PyQt4 import QtCore, QtGui
@@ -51,6 +52,9 @@ def background_op(message, func, parent=None):
 def dtts(dt):
     return int(time.mktime(dt.timetuple()))
 
-
 def tsdt(ts):
     return datetime.datetime.fromtimestamp(ts)
+
+def strdt(s):
+    date = dateutil.parser.parse(s)
+    return tsdt(dtts(date))

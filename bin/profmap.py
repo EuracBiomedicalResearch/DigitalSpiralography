@@ -30,6 +30,7 @@ def __main__():
     ap = argparse.ArgumentParser(description='Plot the stylus profile evolution map')
     ap.add_argument('-o', dest='output', help='Output image file', required=True)
     ap.add_argument('-s', dest='sid', help='Stylus ID to plot')
+    ap.add_argument('-r', dest='sur', help='Stylus usage report to load')
     ap.add_argument('-m', dest='max', help='Maximum weight (default to auto)')
     ap.add_argument('-S', dest='start', type=date,
                     help='Starting time range (YYYY-MM-DD, default to first measurement)')
@@ -38,7 +39,7 @@ def __main__():
     ap.add_argument('files', nargs='+', help='Stylus profiles')
     args = ap.parse_args()
 
-    pmap = Profile.ProfileMapper(args.files)
+    pmap = Profile.ProfileMapper(args.files, args.sur)
     sids = pmap.sids()
     if args.sid is not None and args.sid not in sids:
         ap.error("stylus {sid} not available (loaded: {sids})".format(
@@ -104,12 +105,21 @@ def __main__():
 
     # place xticks at the measurement dates
     xlocs = [(t - tr[0]).total_seconds() for t in sm.times]
+    if args.start is not None:
+        start = (args.start - tr[0]).total_seconds()
+        if abs(start - xlocs[-1]) > 86400:
+            xlocs.append(start)
+    if args.end is not None:
+        end = (args.end - tr[1]).total_seconds()
+        if abs(end - xlocs[-1]) > 86400:
+            xlocs.append(end)
     xlabels = []
     for x in xlocs:
         t = datetime.datetime.fromtimestamp(time.mktime(tr[0].timetuple()) + x)
         xlabels.append(t.strftime("%Y-%m-%d"))
     plt.xticks(xlocs, xlabels, rotation=45, horizontalalignment='right')
 
+    # general parameters
     plt.title('{sid} profile map'.format(sid=args.sid))
     plt.ylabel('Weight (g)')
     plt.margins(0.05)
