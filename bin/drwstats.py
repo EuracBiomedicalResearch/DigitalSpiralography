@@ -66,7 +66,9 @@ def recordStats(record, cmts):
             "PROG_ORIG_FMT": record.extra_data.get('orig_format'),
             "INST_UUID": record.extra_data['installation_uuid'],
             "INST_DATE": record.extra_data['installation_stamp'],
-            "INST_RECNO": record.extra_data['total_recordings']}
+            "INST_RECNO": record.extra_data['total_recordings'],
+            "PROJ_ID": record.config.project_id,
+            "PROJ_NAME": record.config.project_name}
 
     if cmts:
         comments = re.sub(r'[\t\n ]+', ' ', record.comments)
