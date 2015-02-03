@@ -14,7 +14,7 @@ class TabException(IOError):
 class TabReader(object):
     def __init__(self, fd_or_path, columns=None, types=None):
         self._fd = io.open(fd_or_path, 'r', encoding='utf-8') \
-                   if type(fd_or_path) is str else fd_or_path
+                   if isinstance(fd_or_path, basestring) else fd_or_path
         self._types = types if types is not None else {}
         self._lno = 1
 
@@ -48,8 +48,8 @@ class TabReader(object):
         row = {}
         for i, v in enumerate(cols):
             col = self._cols[i]
-            typ = self._types.get(col, str)
-            v = typ(v) if typ is str or len(v) != 0 else None
+            typ = self._types.get(col, unicode)
+            v = typ(v) if isinstance(typ, basestring) or len(v) != 0 else None
             row[col] = v
 
         return row
@@ -72,7 +72,7 @@ def _check_str(v):
 class TabWriter(object):
     def __init__(self, fd_or_path, columns):
         self._fd = io.open(fd_or_path, 'w', encoding='utf-8') \
-                   if type(fd_or_path) is str else fd_or_path
+                   if isinstance(fd_or_path, basestring) else fd_or_path
         self._cols = columns
 
         # write header
