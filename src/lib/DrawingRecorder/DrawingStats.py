@@ -103,6 +103,16 @@ def set(record, data, ignore_unknown=True, force=False):
                 record.pat_type = v
             else:
                 raise ValueError('{} is not a valid patient type'.format(v))
+        elif k == 'PROJ_ID':
+            record.config.project_id = v
+        elif k == 'PROJ_NAME':
+            record.config.project_name = v
+        elif k == 'DRW_DSC':
+            record.drawing.str = v
+        elif k == 'COMMENTS':
+            record.comments = v
+        elif k == 'OPERATOR':
+            record.oid = v
         else:
             raise ValueError('{} cannot be set'.format(k))
 
