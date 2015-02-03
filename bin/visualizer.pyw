@@ -336,11 +336,11 @@ class MainWindow(QtGui.QMainWindow):
         name = translate("visualizer", "Software version")
         self._append_prop(name, record.extra_data['version'])
         name = translate("visualizer", "Software version (original)")
-        self._append_prop(name, record.extra_data.get('orig_version', record.extra_data['version']))
+        self._append_prop(name, record.extra_data.get('orig', {}).get('version'))
         name = translate("visualizer", "Format version")
         self._append_prop(name, record.extra_data['format'])
         name = translate("visualizer", "Format version (original)")
-        self._append_prop(name, record.extra_data.get('format', record.extra_data['format']))
+        self._append_prop(name, record.extra_data.get('orig', {}).get('format'))
 
         name = translate("visualizer", "Inst. UUID")
         self._append_prop(name, record.extra_data['installation_uuid'])

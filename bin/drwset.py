@@ -10,54 +10,17 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
+from DrawingRecorder import DrawingStats
+from DrawingRecorder import Tab
 
 # system modules
 import argparse
-import datetime
-
-
-# utilities
-def extra_set(record, key, value):
-    if key not in record.extra_data:
-        record.extra_data[key] = value
-
-
-# commands
-class CmdPatType(object):
-    narg = 1
-    help = 'Set patient type (1 arg: ID)'
-
-    @classmethod
-    def handler(cls, record, args):
-        extra_set(record, 'orig_pat_type', record.pat_type)
-        record.pat_type = args[0]
-
-
-class CmdAddCmt(object):
-    narg = 1
-    help = 'Add/append comment text (1 arg: text)'
-
-    @classmethod
-    def handler(cls, record, args):
-        stamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        cmt = '{}: {}'.format(stamp, args[0])
-        if not record.comments:
-            record.comments = cmt
-        else:
-            record.comments += "\n"
-            record.comments += cmt
-
-
-# command map
-COMMANDS = {'addcmt': CmdAddCmt,
-            'pattype': CmdPatType}
 
 
 def __main__():
-    # argument parser
+    # arguments
     ap = argparse.ArgumentParser(description='Drawing file batch converter/manipulator',
                                  formatter_class=argparse.RawTextHelpFormatter)
-
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
     grp = ap.add_mutually_exclusive_group()
@@ -67,35 +30,37 @@ def __main__():
                      help='Write a simple text file for inspection')
     ap.add_argument('-i', '--input', required=True, help='drawing file')
     ap.add_argument('-o', '--output', required=True, help='output file')
-
-    if not COMMANDS:
-        cmd_help = argparse.SUPPRESS
-    else:
-        cmd_help = 'command (and arguments) to apply'
-        ap.epilog = 'available commands:\n'
-        for cmd, cls in COMMANDS.iteritems():
-            ap.epilog += "  {}:\t\t{}\n".format(cmd, cls.help)
-    ap.add_argument('-c', dest='cmds', metavar='command', help=cmd_help,
-                    default=[], nargs='+', action='append')
-
-    # validate
+    grp = ap.add_mutually_exclusive_group(required=True)
+    grp.add_argument('--stats', help='Apply updated output from drwstats')
+    grp.add_argument('--set', nargs=2, metavar=('KEY', 'VALUE'), action='append',
+                     help='Set a single field (can be repeated)')
     args = ap.parse_args()
-    for cmd in args.cmds:
-        if cmd[0] not in COMMANDS:
-            ap.error('invalid command {}'.format(cmd[0]))
-        if len(cmd) - 1 != COMMANDS[cmd[0]].narg:
-            ap.error('invalid number of arguments for command {}'.format(cmd[0]))
 
     # load
     record = Data.DrawingRecord.load(args.input, args.fast)
-    extra_set(record, 'orig_version', record.extra_data['version'])
-    extra_set(record, 'orig_format', record.extra_data['format'])
 
     # process
-    if args.cmds:
-        for cmd in args.cmds:
-            COMMANDS[cmd[0]].handler(record, cmd[1:])
-        record.ts_updated = datetime.datetime.now()
+    if args.stats is None:
+        data = dict(args.set)
+        try:
+            DrawingStats.set(record, data)
+        except ValueError as e:
+            ap.error(e)
+    else:
+        data = None
+        fd = Tab.TabReader(args.stats, ['FILE'])
+        for row in fd:
+            if row['FILE'] == args.input:
+                data = row
+                break
+        if data is None:
+            print('WARNING: input file not been updated (no matching entry in {})'.format(args.stats),
+                  file=sys.stderr)
+        else:
+            try:
+                DrawingStats.set(record, data)
+            except ValueError as e:
+                ap.error(e)
 
     # save
     if args.dump:

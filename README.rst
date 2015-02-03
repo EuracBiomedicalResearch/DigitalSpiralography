@@ -503,7 +503,6 @@ Chunks introduced with format 1.1:
 
   + ``blood_drawn`` (optional): reflects the new "Blood drawn on drawing arm"
     introduced in DrawingRecorder 1.2.
-
   + ``operator`` (optional): the name of the operator assisting during the
     recording (introduced in DrawingRecorder 1.2, moved in 1.4).
 
@@ -530,6 +529,8 @@ Chunks introduced with format 1.3:
 
 * ``extra_data``:
 
+  These fields were introduced in DrawingRecorder 1.4 and moved in 1.5:
+
   + ``orig_format``: original file format version before the file has been
     re-saved. This field is created by ``drwset`` when a file has been
     upgraded from an older format, and is never overwritten.
@@ -539,6 +540,17 @@ Chunks introduced with format 1.3:
   + ``orig_pat_type``: original patient type before being modified by
     ``drwset``. This field is created by ``drwset`` when the patient type has been
     manually reset and is never overwritten.
+
+Chunks introduced with format 1.4:
+
+* ``extra_data/orig``:
+
+  Dictionary of initial values which have been changed when writing/updating an
+  existing file. Existing values are never replaced. Keys include:
+
+  + ``format`` moved from ``extra_data/orig_format`` in DrawingRecorder 1.5.
+  + ``version`` moved from ``extra_data/orig_version`` in DrawingRecorder 1.5.
+  + Any field name from the output of ``drwstats``.
 
 
 Profiler ``prof.yaml.gz`` File format

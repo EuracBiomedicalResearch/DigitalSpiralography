@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Drawing structures/analysis"""
+"""Data structures/serialization support"""
 
 from __future__ import print_function
 
@@ -248,6 +248,15 @@ class DrawingRecord(object):
 
     @classmethod
     def save(cls, record, path):
+        # original format/version
+        for k in ['format', 'version']:
+            if k in record.extra_data:
+                if 'orig' not in record.extra_data:
+                    record.extra_data['orig'] = {}
+                if k not in record.extra_data['orig']:
+                    record.extra_data['orig'][k] = record.extra_data[k]
+                del record.extra_data[k]
+
         # basic data to save
         data = {"format": Consts.FORMAT_VERSION,
                 "type": Consts.FF_RECORDING,
@@ -339,7 +348,17 @@ class DrawingRecord(object):
         extra_data = data['extra_data']
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
-        extra_data['type'] = data.get('type') # optional (fmt 1.2)
+
+        # original data (optional, moved in fmt 1.4)
+        for old_k, new_k in [('orig_format', 'format'),
+                             ('orig_version', 'version'),
+                             ('pat_type', 'pat_type_id')]:
+            if old_k in extra_data:
+                if 'orig' not in extra_data:
+                    extra_data['orig'] = {}
+                old_v = extra_data.pop(old_k)
+                if new_k not in extra_data['orig']:
+                    extra_data['orig'][new_k] = old_v
 
         # drawing
         drawing = Drawing.Drawing(data['drawing']['id'],
@@ -486,7 +505,6 @@ class StylusProfile(object):
         extra_data = data['extra_data']
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
-        extra_data['type'] = data['type']
 
         # final object
         return StylusProfile(data['ts_created'], data['ts_updated'],
