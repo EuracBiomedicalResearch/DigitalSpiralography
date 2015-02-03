@@ -30,7 +30,7 @@ def __main__():
                      help='Write a simple text file for inspection')
     ap.add_argument('-i', '--input', required=True, help='drawing file')
     ap.add_argument('-o', '--output', required=True, help='output file')
-    grp = ap.add_mutually_exclusive_group(required=True)
+    grp = ap.add_mutually_exclusive_group()
     grp.add_argument('--stats', help='Apply updated output from drwstats')
     grp.add_argument('--set', nargs=2, metavar=('KEY', 'VALUE'), action='append',
                      help='Set a single field (can be repeated)')
@@ -40,13 +40,13 @@ def __main__():
     record = Data.DrawingRecord.load(args.input, args.fast)
 
     # process
-    if args.stats is None:
+    if args.set:
         data = dict(args.set)
         try:
             DrawingStats.set(record, data)
         except ValueError as e:
             ap.error(e)
-    else:
+    elif args.stats:
         data = None
         fd = Tab.TabReader(args.stats, ['FILE'])
         for row in fd:
