@@ -543,6 +543,7 @@ Chunks introduced with format 1.3:
 
 Chunks introduced with format 1.4:
 
+* ``tz``: timezone offset in seconds from UTC
 * ``extra_data/orig``:
 
   Dictionary of initial values which have been changed when writing/updating an
@@ -576,6 +577,10 @@ Ancillary data (all keys are mandatory):
 * ``ts_created``: profile creation timestamp
 * ``ts_updated``: profile update (last change) timestamp
 * ``extra_data``: provisional dictionary for arbitrary data.
+
+Chunks introduced with format 1.4:
+
+* ``tz``: timezone offset in seconds from UTC
 
 
 Coordinate projection types

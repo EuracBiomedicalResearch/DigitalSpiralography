@@ -19,6 +19,7 @@ import collections
 import datetime
 import gzip
 import numpy as np
+import time
 import yaml
 
 
@@ -197,8 +198,8 @@ class RecordingData(object):
 
 class DrawingRecord(object):
     def __init__(self, config, oid, aid, drawing, calibration, calibration_age, recording,
-                 cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand,
-                 extra_data=None, comments=None, ts_created=None, ts_updated=None):
+                 cycle, pat_type, pat_hand_cnt, pat_handedness, pat_hand, extra_data=None,
+                 comments=None, ts_created=None, ts_updated=None, tz=None):
         self.config = config
         self.oid = oid
         self.aid = aid
@@ -214,7 +215,8 @@ class DrawingRecord(object):
         self.extra_data = extra_data if extra_data is not None else {}
         self.comments = comments
         self.ts_created = ts_created if ts_created is not None else datetime.datetime.now()
-        self.ts_updated = ts_updated if ts_updated is not None else copy(self.ts_created)
+        self.ts_updated = ts_updated if ts_created is not None else copy(self.ts_created)
+        self.tz = tz if ts_created is not None else time.timezone
 
 
     def check_warnings(self):
@@ -294,7 +296,8 @@ class DrawingRecord(object):
                 "extra_data": record.extra_data,
                 "comments": record.comments,
                 "ts_created": record.ts_created,
-                "ts_updated": record.ts_updated}
+                "ts_updated": record.ts_updated,
+                "tz": record.tz}
 
         # avoid saving unicode in the FNAME header
         fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
@@ -399,6 +402,11 @@ class DrawingRecord(object):
         if ts_created is None:
             ts_created = copy(recording.events[-1].stamp) if recording.events else copy(calibration.stamp)
         ts_updated = data.get('ts_updated')
+        if ts_updated is None:
+            ts_updated = copy(ts_created)
+
+        # timezone (optional, fmt 1.4)
+        tz = data.get('tz')
 
         # operator (moved, fmt 1.3)
         oid = data.get('operator')
@@ -421,7 +429,8 @@ class DrawingRecord(object):
                              _to_type(PAT_HANDEDNESS, data['pat_handedness']),
                              _to_type(PAT_HAND, data['pat_hand']),
                              extra_data, data['comments'],
-                             ts_created, ts_updated)
+                             ts_created, ts_updated, tz)
+
 
 
 # Stylus profile data
@@ -441,15 +450,16 @@ class StylusResponseData(object):
 
 class StylusProfile(object):
     def __init__(self, ts_created=None, ts_updated=None, oid=None, sid=None, tid=None,
-                 data=None, fit=None, extra_data=None):
+                 data=None, fit=None, extra_data=None, tz=None):
         self.ts_created = ts_created if ts_created is not None else datetime.datetime.now()
-        self.ts_updated = ts_updated if ts_updated is not None else copy(self.ts_created)
+        self.ts_updated = ts_updated if ts_created is not None else copy(self.ts_created)
         self.oid = oid
         self.sid = sid
         self.tid = tid
         self.data = data if data is not None else []
         self.fit = fit if fit is not None else []
         self.extra_data = extra_data if extra_data is not None else {}
+        self.tz = tz if ts_created is not None else time.timezone
 
 
     @classmethod
@@ -465,7 +475,8 @@ class StylusProfile(object):
                 "tablet_id": profile.tid,
                 "data": map(StylusResponseData.serialize, profile.data),
                 "fit": profile.fit[0].tolist() if profile.fit is not None else None,
-                "extra_data": profile.extra_data}
+                "extra_data": profile.extra_data,
+                "tz": profile.tz}
 
         # avoid saving unicode in the FNAME header
         fd = gzip.GzipFile(profile.sid, 'wb', fileobj=open(path, 'wb', 0))
@@ -506,11 +517,14 @@ class StylusProfile(object):
         extra_data['format'] = data['format']
         extra_data['version'] = data['version']
 
+        # timezone (optional, fmt 1.4)
+        tz = data.get('tz')
+
         # final object
         return StylusProfile(data['ts_created'], data['ts_updated'],
                              data['operator'], data['stylus_id'], data['tablet_id'],
                              map(StylusResponseData.deserialize, data['data']),
-                             (np.asarray(data['fit'])), extra_data)
+                             (np.asarray(data['fit'])), extra_data, tz)
 
 
 

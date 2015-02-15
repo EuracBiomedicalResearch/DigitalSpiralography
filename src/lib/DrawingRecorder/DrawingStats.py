@@ -63,7 +63,8 @@ def get(record, cmts=False):
             "INST_DATE": record.extra_data['installation_stamp'],
             "INST_RECNO": record.extra_data['total_recordings'],
             "PROJ_ID": record.config.project_id,
-            "PROJ_NAME": record.config.project_name}
+            "PROJ_NAME": record.config.project_name,
+            "TZ": record.tz}
 
     if cmts:
         comments = re.sub(r'[\t\n ]+', ' ', record.comments)
@@ -113,6 +114,8 @@ def set(record, data, ignore_unknown=True, force=False):
             record.comments = v
         elif k == 'OPERATOR':
             record.oid = v
+        elif k == 'TZ':
+            record.tz = v
         else:
             raise ValueError('{} cannot be set'.format(k))
 

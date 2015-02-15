@@ -285,6 +285,8 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop(name, record.ts_created)
         name = translate("visualizer", "File updated")
         self._append_prop(name, record.ts_updated)
+        name = translate("visualizer", "File timezone")
+        self._append_prop(name, record.tz)
 
         name = translate("visualizer", "Rec. date")
         self._append_prop(name, record.recording.session_start)
