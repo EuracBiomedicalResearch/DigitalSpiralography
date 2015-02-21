@@ -216,7 +216,7 @@ class DrawingRecord(object):
         self.comments = comments
         self.ts_created = ts_created if ts_created is not None else datetime.datetime.now()
         self.ts_updated = ts_updated if ts_created is not None else copy(self.ts_created)
-        self.tz = tz if ts_created is not None else time.timezone
+        self.tz = tz if ts_created is not None else -time.timezone
 
 
     def check_warnings(self):
@@ -459,7 +459,7 @@ class StylusProfile(object):
         self.data = data if data is not None else []
         self.fit = fit if fit is not None else []
         self.extra_data = extra_data if extra_data is not None else {}
-        self.tz = tz if ts_created is not None else time.timezone
+        self.tz = tz if ts_created is not None else -time.timezone
 
 
     @classmethod
