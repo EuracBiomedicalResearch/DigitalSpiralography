@@ -18,7 +18,6 @@ from DrawingRecorder.UI import translate
 # system modules
 import argparse
 import math
-import threading
 from PyQt4 import QtCore, QtGui
 
 

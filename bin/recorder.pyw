@@ -23,7 +23,6 @@ from DrawingRecorder.UI import translate
 import argparse
 import datetime
 import os
-import threading
 import uuid
 from PyQt4 import QtCore, QtGui
 
