@@ -99,11 +99,33 @@ def set(record, data, ignore_unknown=True, force=False):
                 record.calibration.stylus_id = v
             else:
                 raise ValueError('{} is not a valid stylus ID'.format(v))
+        elif k == 'REC_CYCLE':
+            v = int(v)
+            if force or (v > 0 and v <= (record.config.cycle_count * (record.pat_hand_cnt or 2))):
+                record.cycle = v
+            else:
+                raise ValueError('{} is not a valid cycle count'.format(v))
         elif k == 'PAT_TYPE_ID':
             if force or not record.config.pat_types or v in record.config.pat_types:
                 record.pat_type = v
             else:
                 raise ValueError('{} is not a valid patient type'.format(v))
+        elif k == 'PAT_HAND_CNT':
+            v = int(v)
+            if force or (v > 0 and v <= 2):
+                record.pat_hand_cnt = v
+            else:
+                raise ValueError('{} in not a valid hand count'.format(v))
+        elif k == 'PAT_HAND':
+            if force or (v in Data.PAT_HAND.values()):
+                record.pat_hand = Data.PAT_HAND.keys()[Data.PAT_HAND.values().index(v)]
+            else:
+                raise ValueError('{} in not a valid hand'.format(v))
+        elif k == 'PAT_HANDEDNESS':
+            if force or (v in Data.PAT_HANDEDNESS.values()):
+                record.pat_handedness = Data.PAT_HANDEDNESS.keys()[Data.PAT_HANDEDNESS.values().index(v)]
+            else:
+                raise ValueError('{} in not a valid handedness'.format(v))
         elif k == 'PROJ_ID':
             record.config.project_id = v
         elif k == 'PROJ_NAME':
@@ -115,7 +137,7 @@ def set(record, data, ignore_unknown=True, force=False):
         elif k == 'OPERATOR':
             record.oid = v
         elif k == 'TZ':
-            record.tz = v
+            record.tz = int(v)
         else:
             raise ValueError('{} cannot be set'.format(k))
 
