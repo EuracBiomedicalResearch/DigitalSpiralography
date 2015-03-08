@@ -141,11 +141,12 @@ class blocked_signals(object):
 
 # main application
 class MainWindow(QtGui.QMainWindow):
-    def __init__(self):
+    def __init__(self, fast_load=False):
         super(MainWindow, self).__init__()
         self._ui = UI.load_ui(self, "visualizer.ui")
 
         # defaults
+        self.fast_load = fast_load
         self._showRaw = False
         self._showTime = False
         self._showTraces = True
@@ -550,12 +551,12 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.view.scale(delta, delta)
 
 
-    def load(self, path, fast=False):
+    def load(self, path):
         try:
             # perform the loading in background thread
             record = Shared.background_op(
                 translate("visualizer", "Loading, please wait..."),
-                lambda: Data.DrawingRecord.load(path, fast))
+                lambda: Data.DrawingRecord.load(path, self.fast_load))
         except Exception as e:
             msg = translate("visualizer",
                             "Cannot load recording {path}: {reason}")
@@ -645,10 +646,10 @@ class Application(QtGui.QApplication):
         args = ap.parse_args(map(unicode, args[1:]))
 
         # initialize
-        self.main_window = MainWindow()
+        self.main_window = MainWindow(args.fast)
         self.main_window.show()
         if args.file:
-            self.main_window.load(args.file, args.fast)
+            self.main_window.load(args.file)
 
 
 # main module
