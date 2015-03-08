@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 # local modules
 from DrawingRecorder import Data
 from DrawingRecorder import PdUtil
+from DrawingRecorder.Shared import tsdt
 
 # system modules
 import argparse
@@ -25,16 +26,19 @@ def __main__():
     args = ap.parse_args()
 
     data = pd.DataFrame({'SID': pd.Series(dtype=str),
-                         'TS': pd.Series(dtype=int)})
+                         'TS': pd.Series(dtype=int),
+                         'TZ': pd.Series(dtype=int)})
 
     # load/aggregate all files
     for path in args.files:
         tmp = PdUtil.read_tab(path)
         data = pd.merge(data, pd.DataFrame({'SID': tmp['CAL_SID'],
-                                            'TS': tmp['REC_TS'].astype(int)}),
-                        on=['SID', 'TS'], how='outer')
+                                            'TS': tmp['REC_TS'].astype(int),
+                                            'TZ': tmp['TZ'].astype(int)}),
+                        on=['SID', 'TS', 'TZ'], how='outer')
 
-    data.set_index(pd.DatetimeIndex(pd.to_datetime(data['TS'], unit='s'), tz='UTC'), inplace=True)
+    idx = [tsdt(x[1]['TS'], int(x[1]['TZ'])).replace(tzinfo=None) for x in data.iterrows()]
+    data.set_index(pd.DatetimeIndex(idx), inplace=True)
     data = data.groupby('SID')
 
     # generate counters

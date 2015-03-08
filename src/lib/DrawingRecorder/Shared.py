@@ -12,7 +12,7 @@ import threading
 from PyQt4 import QtCore, QtGui
 
 
-# support functions
+# Geometry support functions
 def poly2qpoly(poly):
     ret = QtGui.QPolygonF()
     for v in poly:
@@ -24,6 +24,7 @@ def size2qpoly(w, h):
     return poly2qpoly([(0, 0), (w, 0), (w, h), (0, h)])
 
 
+# General QT functions
 def background_op(message, func, parent=None):
     pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
     pd.setWindowModality(QtCore.Qt.ApplicationModal)
@@ -49,12 +50,20 @@ def background_op(message, func, parent=None):
     return ret['ret']
 
 
+# Timestamp handling
 def dtts(dt):
+    """Datetime to UTC timestamp"""
     return int(time.mktime(dt.timetuple()))
 
-def tsdt(ts):
-    return datetime.datetime.fromtimestamp(ts)
+def tsdt(ts, tzoffset=None):
+    """UTC timestamp to (localized) datetime"""
+    tzinfo = dateutil.tz.tzoffset(None, tzoffset) if tzoffset is not None else None
+    return datetime.datetime.fromtimestamp(ts, tzinfo)
 
-def strdt(s):
+def strdt(s, tzoffset=None):
+    """String to (localized) datetime"""
     date = dateutil.parser.parse(s)
-    return tsdt(dtts(date))
+    if date.tzinfo is None and tzoffset is not None:
+        tzinfo = dateutil.tz.tzoffset(None, tzoffset)
+        date = tzinfo.fromutc(date.replace(tzinfo=tzinfo))
+    return date
