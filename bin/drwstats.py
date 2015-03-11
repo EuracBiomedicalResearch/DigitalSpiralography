@@ -33,17 +33,22 @@ def __main__():
 
     fd = None
     for fn in args.files:
-        # drawing record
-        record = Data.DrawingRecord.load(fn, args.fast)
-        stats = DrawingStats.get(record, args.cmts)
-        stats['FILE'] = fn
+        try:
+            # drawing record
+            record = Data.DrawingRecord.load(fn, args.fast)
+            stats = DrawingStats.get(record, args.cmts)
+            stats['FILE'] = fn
 
-        # header
-        if fd is None:
-            fd = Tab.TabWriter(sys.stdout, sorted(stats.keys()))
+            # header
+            if fd is None:
+                fd = Tab.TabWriter(sys.stdout, sorted(stats.keys()))
 
-        # data
-        fd.write(stats)
+            # data
+            fd.write(stats)
+
+        except:
+            logging.error('uncaught exception while analyzing {fn}'.format(fn=fn))
+            raise
 
 
 if __name__ == '__main__':
