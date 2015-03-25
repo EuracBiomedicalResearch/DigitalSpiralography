@@ -245,6 +245,9 @@ class DrawingRecord(object):
     @classmethod
     def dump(cls, record, path):
         with open(path, 'wb') as fd:
+            record._type = Consts.FF_RECORDING
+            record._format = Consts.FORMAT_VERSION
+            record._version = Consts.APP_VERSION
             cPickle.dump(record, fd, cPickle.HIGHEST_PROTOCOL)
 
 
@@ -325,7 +328,12 @@ class DrawingRecord(object):
         if fast:
             with open(path, "rb") as fd:
                 try:
-                    return cPickle.load(fd)
+                    data = cPickle.load(fd)
+                    if data._type != Consts.FF_RECORDING or \
+                       data._format != Consts.FORMAT_VERSION or \
+                       data._version != Consts.APP_VERSION:
+                        raise Exception('Cannot load dump file produced by a different software version)', path)
+                    return data
                 except cPickle.UnpicklingError:
                     pass
 
