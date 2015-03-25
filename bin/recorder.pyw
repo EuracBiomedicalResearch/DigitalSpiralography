@@ -497,8 +497,14 @@ class MainWindow(QtGui.QMainWindow):
     def new_recording(self, oid, aid,
                       pat_type=None, pat_hand_cnt=None, pat_handedness=None, pat_hand=None,
                       blood_drawn=None, cycle_state=(1,1)):
+        # setup a good description
+        desc = None
+        if pat_hand is not None:
+            desc = translate("recorder", "{hand} HAND").format(
+                hand=translate("types", Data.PAT_HAND_DSC[pat_hand]).upper())
+
         # use the current calibration to take a new recording
-        self._drawing_window.reset(DrawingWindow.Mode.Record)
+        self._drawing_window.reset(DrawingWindow.Mode.Record, desc)
         gc.collect()
         if not self._drawing_window.exec_():
             return

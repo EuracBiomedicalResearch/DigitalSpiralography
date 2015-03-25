@@ -165,10 +165,15 @@ class CalibrationHandler(Handler):
 
 
 class RecordingHandler(Handler):
-    def __init__(self, dw):
+    def __init__(self, dw, desc=None):
         self.dw = dw
         self.dw.reset_recording()
-        self.dw._main_text.setText(translate("rec", "RECORDING"))
+
+        main_text = translate("rec", "RECORDING")
+        if desc is not None:
+            main_text += ": " + desc
+        self.dw._main_text.setText(main_text)
+
         self.dw._sub_text.setText(
             translate("rec",
                       "Recording starts automatically as soon as the pen touches the tablet\n"
@@ -490,12 +495,12 @@ class DrawingWindow(QtGui.QMainWindow):
         self.handler.keyEvent(ev)
 
 
-    def reset(self, mode):
+    def reset(self, mode, desc=None):
         self.mode = mode
         if mode == Mode.Calibrate:
             self.handler = CalibrationHandler(self)
         elif mode == Mode.Record:
-            self.handler = RecordingHandler(self)
+            self.handler = RecordingHandler(self, desc)
 
 
     def resizeEvent(self, ev):
