@@ -196,9 +196,11 @@ class EndRecording(QtGui.QDialog):
             self._ui.warnings.setText("-")
         self._ui.warnings.setFont(font)
 
+        self._orig_pat_type = record.pat_type
         self.pat_type = record.pat_type
         _set_type(self._ui.pat_type, self.pat_type)
 
+        self._orig_pat_hand_cnt = record.pat_hand_cnt
         self.pat_hand_cnt = record.pat_hand_cnt
         if self.pat_hand_cnt == 1:
             self._ui.hand_cnt_1.setChecked(True)
@@ -207,6 +209,7 @@ class EndRecording(QtGui.QDialog):
         else:
             _reset_grp_state(self._ui.hand_cnt_grp)
 
+        self._orig_pat_handedness = record.pat_handedness
         self.pat_handedness = record.pat_handedness
         if self.pat_handedness == PatHandedness.left:
             self._ui.handedness_left.setChecked(True)
@@ -221,6 +224,7 @@ class EndRecording(QtGui.QDialog):
             font = btn.font()
             font.setBold(False)
             btn.setFont(font)
+        self._orig_pat_hand = record.pat_hand
         self.pat_hand = record.pat_hand
         if self.pat_hand == PatHand.left:
             self._ui.hand_left.setChecked(True)
@@ -236,6 +240,7 @@ class EndRecording(QtGui.QDialog):
             _reset_grp_state(self._ui.hand_grp)
 
         self.blood_drawn = record.extra_data.get("blood_drawn", None)
+        self._orig_blood_drawn = self.blood_drawn
         if self.blood_drawn == True:
             self._ui.blood_drawn.setChecked(True)
         elif self.blood_drawn == False:
@@ -252,10 +257,11 @@ class EndRecording(QtGui.QDialog):
         self._ui.preview.setPixmap(preview)
 
         self.next_hand = None
-        allow_next = (cycle_state[0] < cycle_state[1])
-        self._ui.next_hand_lbl.setVisible(allow_next)
-        self._ui.next_hand_btn.setEnabled(allow_next)
-        if allow_next:
+        self.cycle_state = cycle_state
+        self.allow_next = (cycle_state[0] < cycle_state[1])
+        self._ui.next_hand_lbl.setVisible(self.allow_next)
+        self._ui.next_hand_btn.setEnabled(self.allow_next)
+        if self.allow_next:
             msg = translate("recorder", "Spiral {cycle}/{total}")
             msg = msg.format(cycle=cycle_state[0], total=cycle_state[1])
             self._ui.next_hand_lbl.setText(msg)
@@ -359,6 +365,40 @@ class EndRecording(QtGui.QDialog):
             msg = msg.format(path=self.save_path)
             QtGui.QMessageBox.critical(self, title, msg)
             return
+
+        # sanity checking
+        if len(self.comments) < 3 and self.config.require_change_comments:
+            # .. parameter consistency
+            if self.cycle_state[0] > 1:
+                broken_param = None
+                if self.pat_type != self._orig_pat_type:
+                    broken_param = translate("recorder", "Patient type", "param_changed")
+                elif self.pat_handedness != self._orig_pat_handedness:
+                    broken_param = translate("recorder", "Patient handedness", "param_changed")
+                elif self.pat_hand_cnt != self._orig_pat_hand_cnt:
+                    broken_param = translate("recorder", "Patient hand count", "param_changed")
+                elif self.pat_hand != self._orig_pat_hand:
+                    broken_param = translate("recorder", "Drawing hand", "param_changed")
+                elif self._orig_blood_drawn is not None and self.blood_drawn != self._orig_blood_drawn:
+                    broken_param = translate("recorder", "Blood drawn state", "param_changed")
+                if broken_param is not None:
+                    title = translate("recorder", "Patient parameters changed", "param_changed")
+                    msg = translate("recorder", "{parameter} was changed, "
+                                    "but no reason is given in the comments!\n\n"
+                                    "Please write a reason in the comments!",
+                                    "param_changed")
+                    msg = msg.format(parameter=broken_param)
+                    QtGui.QMessageBox.warning(self, title, msg)
+                    return
+
+            # .. ensure we really want to stop cycling
+            if self.allow_next and not next_hand:
+                title = translate("recorder", "Incomplete session")
+                msg = translate("recorder", "Not all required drawings were collected "
+                                "and no reason is given in the comments!\n\n"
+                                "Please write a reason in the comments!")
+                QtGui.QMessageBox.warning(self, title, msg)
+                return
 
         self.next_hand = next_hand
         self.done(QtGui.QDialog.Accepted)
@@ -499,9 +539,10 @@ class MainWindow(QtGui.QMainWindow):
                       blood_drawn=None, cycle_state=(1,1)):
         # setup a good description
         desc = None
-        if pat_hand is not None:
-            desc = translate("recorder", "{hand} HAND").format(
-                hand=translate("types", Data.PAT_HAND_DSC[pat_hand]).upper())
+        if pat_hand == PatHand.left:
+            desc = translate("recorder", "LEFT HAND", "rec_desc")
+        elif pat_hand == PatHand.right:
+            desc = translate("recorder", "RIGHT HAND", "rec_desc")
 
         # use the current calibration to take a new recording
         self._drawing_window.reset(DrawingWindow.Mode.Record, desc)

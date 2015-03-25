@@ -28,6 +28,10 @@ PAT_TYPES: [Case, Control]
 # be left undefined.
 ALLOW_NO_PAT_TYPE: Yes
 
+# REQUIRE_CHANGE_COMMENTS enforces the operator to enter a comment if recording
+# metadata (hand, handedness, etc) changes within the same session.
+REQUIRE_CHANGE_COMMENTS: Yes
+
 # CYCLE_COUNT sets the number of recordings required for each hand. Hands are
 # automatically alternated when the 'Next hand' button is pressed until all
 # required spirals are collected. Setting COUNT to 0 disables 'Next hand'.

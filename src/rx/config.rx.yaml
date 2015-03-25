@@ -11,4 +11,5 @@ required:
     - type: //map
       values: //str
   ALLOW_NO_PAT_TYPE: //bool
+  REQUIRE_CHANGE_COMMENTS: //bool
   CYCLE_COUNT: //int

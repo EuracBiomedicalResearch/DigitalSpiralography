@@ -277,32 +277,32 @@ Versuchen Sie das Papier neu auszurichten. Starte Kalibration neu...</translatio
 <context>
     <name>data</name>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="221"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="232"/>
         <source>Multiple strokes</source>
         <translation>Mehrere Linien</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="230"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="241"/>
         <source>Short recording</source>
         <translation>Kurze Aufnahme</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="235"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="246"/>
         <source>Old calibration data</source>
         <translation>Kalibration veraltet</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="224"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="235"/>
         <source>No data!</source>
         <translation>Keine Daten!</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="97"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="604"/>
         <source>Malformed configuration file</source>
         <translation>Ungültige Konfigurationsdatei</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="484"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="526"/>
         <source>Unsupported file format</source>
         <translation>Nicht unterstütztes Dateiformat</translation>
     </message>
@@ -401,24 +401,24 @@ Versuchen Sie das Papier neu auszurichten. Starte Kalibration neu...</translatio
 <context>
     <name>rec</name>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="171"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="172"/>
         <source>RECORDING</source>
         <translation>AUFNAHME</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="172"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="177"/>
         <source>Recording starts automatically as soon as the pen touches the tablet
 Press TAB to restart, ENTER to stop, ESC to abort recording</source>
         <translation>Die Aufnahme startet automatisch sobald der Stift das Tablet berührt
 Drücken Sie TAB um neuzustarten, ENTER um zu stoppen, ESC um abzubrechen</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="211"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="217"/>
         <source>Waiting for events...</source>
         <translation>Warte auf Ereignisse...</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="237"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="243"/>
         <source>recording: {recording}
 strokes: {strokes}
 events: {events}
@@ -439,7 +439,7 @@ Länge: {length}</translation>
     <message>
         <location filename="../../bin/recorder.pyw" line="106"/>
         <source>The specified drawing ID is invalid</source>
-        <translation>Die angegebene Aufbahme ID ist ungültig</translation>
+        <translation>Die angegebene Aufnahme ID ist ungültig</translation>
     </message>
     <message>
         <location filename="../../bin/recorder.pyw" line="157"/>
@@ -447,87 +447,87 @@ Länge: {length}</translation>
         <translation>Aufnahmen</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="278"/>
+        <location filename="../../bin/recorder.pyw" line="284"/>
         <source>Discard recording</source>
         <translation>Aufnahme verwerfen</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="279"/>
+        <location filename="../../bin/recorder.pyw" line="285"/>
         <source>Are you sure you want to discard the acquired drawing?</source>
         <translation>Sind Sie sicher, dass Sie die Aufnahme verwerfen möchten?</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="280"/>
+        <location filename="../../bin/recorder.pyw" line="286"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="280"/>
+        <location filename="../../bin/recorder.pyw" line="286"/>
         <source>Yes, discard</source>
         <translation>Ja, verwerfen</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="330"/>
+        <location filename="../../bin/recorder.pyw" line="336"/>
         <source>Hand count not set</source>
         <translation>Anzahl der Hände nicht gesetzt</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="331"/>
+        <location filename="../../bin/recorder.pyw" line="337"/>
         <source>Patient hand count must be specified</source>
         <translation>Es muss angegeben werden, ob der Patient beide Hände oder nur eine Hand benutzt</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="336"/>
+        <location filename="../../bin/recorder.pyw" line="342"/>
         <source>Handedness not set</source>
         <translation>Händigkeit nicht gesetzt</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="337"/>
+        <location filename="../../bin/recorder.pyw" line="343"/>
         <source>Patient handedness must be specified</source>
         <translation>Die Händigkeit des Patienten muss angegeben werden</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="342"/>
+        <location filename="../../bin/recorder.pyw" line="348"/>
         <source>Hand not set</source>
         <translation>Aktuelle Hand nicht gesetzt</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="343"/>
+        <location filename="../../bin/recorder.pyw" line="349"/>
         <source>Drawing hand must be specified</source>
         <translation>Aktuelle Hand muss angegeben werden</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="348"/>
+        <location filename="../../bin/recorder.pyw" line="354"/>
         <source>Blood drawn not set</source>
         <translation>Blutabnahme nicht gesetzt</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="349"/>
+        <location filename="../../bin/recorder.pyw" line="355"/>
         <source>Blood drawn state must be specified</source>
         <translation>Es muss angegeben werden, ob dem Patienten auf dem aktuellen Zeichen-Arm Blut abgenommen wurde</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="561"/>
+        <location filename="../../bin/recorder.pyw" line="609"/>
         <source>Save failure</source>
         <translation>Speichern fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="438"/>
+        <location filename="../../bin/recorder.pyw" line="478"/>
         <source>About DrawingRecorder</source>
         <translation>Über DrawingRecorder</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="553"/>
+        <location filename="../../bin/recorder.pyw" line="601"/>
         <source>Saving, please wait...</source>
         <translation>Speichern, bitte warten...</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="356"/>
+        <location filename="../../bin/recorder.pyw" line="362"/>
         <source>The file {path} already exists. Try with a different file name!</source>
         <translation>Die Datei {path} existiert bereits. Geben Sie einen anderen Dateinamen an!</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="440"/>
+        <location filename="../../bin/recorder.pyw" line="480"/>
         <source>Total recordings: {total}
 Inst. UUID: {uuid}
 Inst. Date: {date}</source>
@@ -536,70 +536,142 @@ Inst. UUID: {uuid}
 Inst. Datum: {date}</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="557"/>
+        <location filename="../../bin/recorder.pyw" line="605"/>
         <source>Cannot save recording to {path}: {reason}! Try with a different file name!</source>
         <translation>Kann Aufnahme nicht in {path} abspeichern: {reason}. Geben Sie einen anderen Dateinamen an!</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="318"/>
+        <location filename="../../bin/recorder.pyw" line="324"/>
         <source>Invalid operator</source>
         <translation>Ungültiger Benutzer</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="319"/>
+        <location filename="../../bin/recorder.pyw" line="325"/>
         <source>The specified operator is invalid</source>
         <translation>Der angegebene Benutzer ist ungültig</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="259"/>
+        <location filename="../../bin/recorder.pyw" line="265"/>
         <source>Spiral {cycle}/{total}</source>
         <translation>Spirale {cycle}/{total}</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="324"/>
+        <location filename="../../bin/recorder.pyw" line="330"/>
         <source>Patient type not set</source>
         <translation>Petiententyp nicht gesetzt</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="325"/>
+        <location filename="../../bin/recorder.pyw" line="331"/>
         <source>Patient type must be specified</source>
         <translation>Petiententyp muss angegeben werden</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="472"/>
+        <location filename="../../bin/recorder.pyw" line="512"/>
         <source>Invalid project directory {path}: {reason}</source>
         <translation>Ungültiges Projektverzeichnis {path}: {reason}</translation>
     </message>
     <message>
-        <location filename="../../bin/recorder.pyw" line="475"/>
+        <location filename="../../bin/recorder.pyw" line="515"/>
         <source>Project directory</source>
         <translation>Projektverzeichnis</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="375"/>
+        <source>Patient type</source>
+        <comment>param_changed</comment>
+        <translation>Patiententyp</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="377"/>
+        <source>Patient handedness</source>
+        <comment>param_changed</comment>
+        <translation>Händigkeit</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="379"/>
+        <source>Patient hand count</source>
+        <comment>param_changed</comment>
+        <translation>&quot;Patient benutzt&quot;</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="381"/>
+        <source>Drawing hand</source>
+        <comment>param_changed</comment>
+        <translation>Aktuelle Hand</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="383"/>
+        <source>Blood drawn state</source>
+        <comment>param_changed</comment>
+        <translation>Blutabnahme</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="385"/>
+        <source>Patient parameters changed</source>
+        <comment>param_changed</comment>
+        <translation>Patienteninformationen wurden geändert</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="386"/>
+        <source>{parameter} was changed, but no reason is given in the comments!
+
+Please write a reason in the comments!</source>
+        <comment>param_changed</comment>
+        <translation>{parameter} wurde ohne Angabe eines Grundes geändert!
+
+Bitte geben Sie den Grund im Kommentar-Feld an!</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="396"/>
+        <source>Incomplete session</source>
+        <translation>Unvollständige Aufnahmereihe</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="543"/>
+        <source>LEFT HAND</source>
+        <comment>rec_desc</comment>
+        <translation>LINKE HAND</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="545"/>
+        <source>RIGHT HAND</source>
+        <comment>rec_desc</comment>
+        <translation>RECHTE HAND</translation>
+    </message>
+    <message>
+        <location filename="../../bin/recorder.pyw" line="397"/>
+        <source>Not all required drawings were collected and no reason is given in the comments!
+
+Please write a reason in the comments!</source>
+        <translation>Es wurden nicht alle benötigten Zeichnungen aufgenommen und im Kommentar-Feld wird keine Erklärung dazu angegeben.
+
+Bitte geben Sie den Grund des Abbruchs im Kommentar-Feld an!</translation>
     </message>
 </context>
 <context>
     <name>types</name>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="55"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="61"/>
         <source>Left-handed</source>
         <translation>Linkshänder</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="56"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="62"/>
         <source>Right-handed</source>
         <translation>Rechtshänder</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="57"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="63"/>
         <source>Ambidextrous</source>
         <translation>Beidhändig</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="62"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="68"/>
         <source>Left</source>
         <translation>Links</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="63"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="69"/>
         <source>Right</source>
         <translation>Rechts</translation>
     </message>
@@ -609,12 +681,12 @@ Inst. Datum: {date}</translation>
         <translation>k.A.</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="65"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="71"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/Data.py" line="66"/>
+        <location filename="../lib/DrawingRecorder/Data.py" line="72"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>

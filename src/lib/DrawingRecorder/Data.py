@@ -72,12 +72,13 @@ BOOL_MAP_DSC = {True: translate('types', 'Yes'),
 
 # Configuration
 class Config(object):
-    def __init__(self, project_id=None, project_name=None,
-                 pat_types=None, allow_no_pat_type=True, cycle_count=3):
+    def __init__(self, project_id=None, project_name=None, pat_types=None,
+                 allow_no_pat_type=True, require_change_comments=True, cycle_count=3):
         self.project_id = project_id
         self.project_name = project_name
         self.pat_types = pat_types if pat_types is not None else {}
         self.allow_no_pat_type = allow_no_pat_type
+        self.require_change_comments = require_change_comments
         self.cycle_count = cycle_count
 
     @classmethod
@@ -86,12 +87,14 @@ class Config(object):
                 'project_name': data.project_name,
                 'pat_types': data.pat_types,
                 'allow_no_pat_type': data.allow_no_pat_type,
+                'require_change_comments': data.require_change_comments,
                 'cycle_count': data.cycle_count}
 
     @classmethod
     def deserialize(cls, data):
         return Config(data['project_id'], data['project_name'], data['pat_types'],
-                      data['allow_no_pat_type'], data['cycle_count'])
+                      data['allow_no_pat_type'], data.get('require_change_comments', False),
+                      data['cycle_count'])
 
     @classmethod
     def load(cls, path):
@@ -110,6 +113,7 @@ class Config(object):
         obj.project_id = data['PROJECT_ID']
         obj.project_name = data['PROJECT_NAME']
         obj.allow_no_pat_type = data['ALLOW_NO_PAT_TYPE']
+        obj.require_change_comments = data['REQUIRE_CHANGE_COMMENTS']
         obj.cycle_count = data['CYCLE_COUNT']
         return obj
 

@@ -10,8 +10,8 @@ from PyQt4 import QtCore, QtGui, uic
 
 
 # implementation
-def translate(ctx, msg):
-    return unicode(QtGui.QApplication.translate(ctx, msg))
+def translate(ctx, msg, cmt=None):
+    return unicode(QtGui.QApplication.translate(ctx, msg, cmt))
 
 def init_intl(file):
     path = os.path.join(Paths.INTL, file)
