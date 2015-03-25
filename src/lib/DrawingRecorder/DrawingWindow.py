@@ -178,6 +178,7 @@ class RecordingHandler(Handler):
         # drawing support
         self.item = QtGui.QGraphicsPixmapItem()
         self.item.setParentItem(self.dw._back_group)
+        self.item.setShapeMode(QtGui.QGraphicsPixmapItem.BoundingRectShape)
         self.buffer = QtGui.QPixmap(self.dw.size())
         self.painter = QtGui.QPainter(self.buffer)
         self.painter.setRenderHints(self.dw._view.renderHints())
@@ -286,7 +287,7 @@ class RecordingHandler(Handler):
 
     def terminate(self):
         self.dw._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
-        self.painter = None
+        self.painter.end()
         self.dw._scene.removeItem(self.item)
 
 

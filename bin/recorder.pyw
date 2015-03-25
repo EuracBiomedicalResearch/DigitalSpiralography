@@ -22,6 +22,7 @@ from DrawingRecorder.UI import translate
 # system modules
 import argparse
 import datetime
+import gc
 import os
 import uuid
 from PyQt4 import QtCore, QtGui
@@ -498,6 +499,7 @@ class MainWindow(QtGui.QMainWindow):
                       blood_drawn=None, cycle_state=(1,1)):
         # use the current calibration to take a new recording
         self._drawing_window.reset(DrawingWindow.Mode.Record)
+        gc.collect()
         if not self._drawing_window.exec_():
             return
 
@@ -614,6 +616,9 @@ class MainWindow(QtGui.QMainWindow):
             cycle = record.cycle + 1
             total = pat_hand_cnt * self.config.cycle_count
             cycle_state = (cycle, total)
+
+            # clear memory
+            del record
 
 
 

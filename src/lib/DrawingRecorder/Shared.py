@@ -43,7 +43,8 @@ def background_op(message, func, parent=None):
         QtGui.QApplication.processEvents()
         th.join(Consts.APP_DELAY)
 
-    pd.hide()
+    pd.close()
+    pd.deleteLater()
 
     if 'exception' in ret:
         raise ret['exception']
