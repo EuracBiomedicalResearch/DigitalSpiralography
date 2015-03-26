@@ -117,6 +117,19 @@ Troubleshooting
 Version changes
 ~~~~~~~~~~~~~~~
 
+1.5:
+
+* DrawingRecorder file format 1.4.
+* ``drwstats/drwset`` now produce/parse the same data format and field names.
+* ``profmap`` has been added in order to visualize the stylus profile
+  correction over the study time span.
+* ``surgen`` can read ``drwstats`` output files to generate usage reports that
+  can be input to ``profmap``.
+* DrawingRecorder shows the hand being recorded in the main header after the
+  first patient details have been entered.
+* DrawingRecorder can now require a comment to be given when patient details
+  are being changed by the operator in the same recording session.
+
 1.4:
 
 * DrawingRecorder file format 1.3.
@@ -218,10 +231,21 @@ Installation instructions
 
 As an administrator, install in order:
 
-- python 2.7 (python-2.7.3.msi)
-- PyQt4 (PyQt-Py2.7-x86-gpl-4.9.4-1.exe)
-- PyYAML (PyYAML-3.10.win32-py2.7.exe,
-  use "Run as administrator" to avoid crashes during the setup)
+- Python 2.7 (``python-2.7.3.msi``)
+- PyQt4 (``PyQt-Py2.7-x86-gpl-4.9.4-1.exe``)
+- PyYAML (``PyYAML-3.10.win32-py2.7.exe``)
+- NumPy (``numpy-MKL-1.8.1.win32-py2.7.exe``)
+- SciPy (``scipy-0.14.0c1.win32-py2.7.exe``)
+- pyqtgraph 0.9.8 (``pyqtgraph-0.9.8.win32.exe``)
+
+  * Expand ``pyqtgraph-0.9.8-patches.zip`` into Python's ``site-packages`` path.
+  * Run ``pyqtgraph-recompile.bat``.
+
+- Pip (``pip-install.bat``)
+- Python Dateutil (``python_dateutil-install.bat``)
+
+You'll need to use "Run as Administrator" (also for executing a prompt with
+``CMD.EXE``) in order to make a system-wide installation.
 
 Customize Windows 7 as follows:
 
