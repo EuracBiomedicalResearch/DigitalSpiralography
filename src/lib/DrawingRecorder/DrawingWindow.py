@@ -4,6 +4,7 @@
 # local modules
 import Data
 import Consts
+import Time
 from Shared import timedelta_min_sec
 from UI import translate
 
@@ -420,7 +421,7 @@ class DrawingWindow(QtGui.QMainWindow):
         # handle proximity events like normal tablet events
         if ev.type() == QtCore.QEvent.TabletEnterProximity or \
           ev.type() == QtCore.QEvent.TabletLeaveProximity:
-            self.tabletEventTS(ev, datetime.datetime.now())
+            self.tabletEventTS(ev, Time.now())
             ev.accept()
             return True
 
@@ -479,7 +480,7 @@ class DrawingWindow(QtGui.QMainWindow):
 
 
     def tabletEvent(self, ev):
-        self.tabletEventTS(ev, datetime.datetime.now())
+        self.tabletEventTS(ev, Time.now())
 
 
     def keyPressEvent(self, ev):

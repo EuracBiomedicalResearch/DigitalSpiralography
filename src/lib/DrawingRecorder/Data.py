@@ -8,6 +8,7 @@ from . import Consts
 from . import Drawing
 from . import RxUtil
 from . import Tab
+from . import Time
 from .Shared import dtts, tsdt, strdt
 from .UI import translate
 
@@ -138,7 +139,7 @@ class RecordingEvent(object):
         self.pressure = pressure
         self.tilt_drawing = tilt_drawing
         self.tilt_trans = tilt_trans
-        self.stamp = stamp if stamp is not None else datetime.datetime.now()
+        self.stamp = stamp if stamp is not None else Time.now()
 
 
     @classmethod
