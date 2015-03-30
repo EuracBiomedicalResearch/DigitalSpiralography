@@ -232,6 +232,7 @@ Installation instructions
 As an administrator, install in order:
 
 - Python 2.7 (``python-2.7.3.msi``)
+- Python modules (``install-modules.bat``)
 - PyQt4 (``PyQt-Py2.7-x86-gpl-4.9.4-1.exe``)
 - PyYAML (``PyYAML-3.10.win32-py2.7.exe``)
 - NumPy (``numpy-MKL-1.8.1.win32-py2.7.exe``)
@@ -240,9 +241,6 @@ As an administrator, install in order:
 
   * Expand ``pyqtgraph-0.9.8-patches.zip`` into Python's ``site-packages`` path.
   * Run ``pyqtgraph-recompile.bat``.
-
-- Pip (``pip-install.bat``)
-- Python Dateutil (``python_dateutil-install.bat``)
 
 You'll need to use "Run as Administrator" (also for executing a prompt with
 ``CMD.EXE``) in order to make a system-wide installation.
