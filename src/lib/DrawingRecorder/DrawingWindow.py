@@ -4,6 +4,7 @@
 # local modules
 import Data
 import Consts
+from Shared import timedelta_min_sec
 from UI import translate
 
 # system modules
@@ -234,21 +235,17 @@ class RecordingHandler(Handler):
         # update the indicator
         if self.dw.recording.events:
             stamp = datetime.datetime.now()
-            elapsed = stamp - self.dw.recording.events[0].stamp
+            length = stamp - self.dw.recording.events[0].stamp
             self.dw._main_text.setBrush(
                 QtGui.QBrush(
-                    QtCore.Qt.gray if elapsed.seconds % 2 else QtCore.Qt.red))
-            length = (self.dw.recording.events[-1].stamp -
-                      self.dw.recording.events[0].stamp)
+                    QtCore.Qt.gray if stamp.second % 2 else QtCore.Qt.red))
             msg = translate("rec",
-                            "recording: {recording}\n"
                             "strokes: {strokes}\n"
                             "events: {events}\n"
                             "length: {length}")
-            msg = msg.format(recording=str(elapsed),
-                             strokes=self.dw.recording.strokes,
+            msg = msg.format(strokes=self.dw.recording.strokes,
                              events=len(self.dw.recording.events),
-                             length=str(length))
+                             length=timedelta_min_sec(length))
             self.dw._set_bt_text(msg)
 
 

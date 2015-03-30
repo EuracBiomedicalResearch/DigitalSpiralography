@@ -52,6 +52,14 @@ def background_op(message, func, parent=None):
 
 
 # Timestamp handling
+def timedelta_min_sec(td):
+    total_seconds = td.total_seconds()
+    isec = int(total_seconds)
+    msec = int((total_seconds - isec) * 10)
+    mins = isec / 60
+    secs = isec % 60
+    return "{:02d}:{:02d}.{:01d}".format(mins, secs, msec)
+
 def dtts(dt):
     """Datetime to UTC timestamp"""
     return int(time.mktime(dt.timetuple()))

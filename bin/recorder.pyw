@@ -183,8 +183,8 @@ class EndRecording(QtGui.QDialog):
         if not record.recording.events:
             self._ui.length.setText("-")
         else:
-            self._ui.length.setText(str(record.recording.events[-1].stamp -
-                                    record.recording.events[0].stamp))
+            length = record.recording.events[-1].stamp - record.recording.events[0].stamp
+            self._ui.length.setText(Shared.timedelta_min_sec(length))
 
         warn = record.check_warnings()
         font = self._ui.warnings.font()

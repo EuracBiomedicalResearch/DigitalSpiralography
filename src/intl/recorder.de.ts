@@ -235,41 +235,41 @@
 <context>
     <name>calib</name>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="39"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="40"/>
         <source>CALIBRATION</source>
         <translation>KALIBRATION</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="40"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="41"/>
         <source>Place the pen on the red point and press ENTER
 Press TAB to restart, ESC to abort calibration</source>
         <translation>Setzen Sie den Stift auf den roten Punkt  und drücken Sie ENTER
 Drücken Sie TAB um neu zu beginnen, ESC um die Kalibration abzubrechen</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="78"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="79"/>
         <source>Previewing calibration. To accept the results press ENTER</source>
         <translation>Vorschau Kalibration. Um die Eingabe zu akzeptieren drücken Sie ENTER</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="116"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="117"/>
         <source>No cursor at point!</source>
         <translation>Kein Cursor am Punkt!</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="69"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="70"/>
         <source>CALIBRATION FAILED: {reason}!
 Try refitting the paper. Restarting calibration...</source>
         <translation>KALIBRATION FEHLGESCHLAGEN: {reason}!
 Versuchen Sie das Papier neu auszurichten. Starte Kalibration neu...</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="110"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="111"/>
         <source>Calibrating point {cur}/{tot}</source>
         <translation>Kalibrationspunkt {cur}/{tot}</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="119"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="120"/>
         <source>Pen is tilted!</source>
         <translation>Stift ist schief!</translation>
     </message>
@@ -401,30 +401,28 @@ Versuchen Sie das Papier neu auszurichten. Starte Kalibration neu...</translatio
 <context>
     <name>rec</name>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="172"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="173"/>
         <source>RECORDING</source>
         <translation>AUFNAHME</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="177"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="178"/>
         <source>Recording starts automatically as soon as the pen touches the tablet
 Press TAB to restart, ENTER to stop, ESC to abort recording</source>
         <translation>Die Aufnahme startet automatisch sobald der Stift das Tablet berührt
 Drücken Sie TAB um neuzustarten, ENTER um zu stoppen, ESC um abzubrechen</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="217"/>
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="218"/>
         <source>Waiting for events...</source>
         <translation>Warte auf Ereignisse...</translation>
     </message>
     <message>
-        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="243"/>
-        <source>recording: {recording}
-strokes: {strokes}
+        <location filename="../lib/DrawingRecorder/DrawingWindow.py" line="242"/>
+        <source>strokes: {strokes}
 events: {events}
 length: {length}</source>
-        <translation>Aufnahme: {recording}
-Linien: {strokes}
+        <translation>Linien: {strokes}
 Ereignisse: {events}
 Länge: {length}</translation>
     </message>
