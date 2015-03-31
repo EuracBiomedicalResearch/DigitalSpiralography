@@ -1,5 +1,7 @@
 *.pyc
 *.qm
-/recordings/*.yaml.gz
+/README.html
 /drw/*.pdf
+/recordings/*.yaml.gz
+/test/
 /winsupp/
