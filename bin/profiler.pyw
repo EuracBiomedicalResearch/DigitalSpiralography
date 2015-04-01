@@ -407,7 +407,7 @@ class MainWindow(QtGui.QMainWindow):
         title = translate("profiler", "Load profile")
         ext_name = translate("profiler", "Profiles")
         path = QtGui.QFileDialog.getOpenFileName(
-            self, title, QtCore.QString(), ext_name + " (*.prof.yaml.gz)")
+            self, title, QtCore.QString(), ext_name + " (*.prof.json.gz *.prof.yaml.gz)")
         if path:
             self.load(unicode(path))
 
@@ -442,10 +442,10 @@ class MainWindow(QtGui.QMainWindow):
         # file prompt
         title = translate("profiler", "Save profile")
         ext_name = translate("profiler", "Profiles")
-        path = u"{}_{}_{}.prof.yaml.gz".format(self.data.sid, self.data.tid,
+        path = u"{}_{}_{}.prof.json.gz".format(self.data.sid, self.data.tid,
                                                self.data.ts_updated.strftime("%Y%m%d"))
         path = QtGui.QFileDialog.getSaveFileName(
-            self, title, path, ext_name + " (*.prof.yaml.gz)")
+            self, title, path, ext_name + " (*.prof.json.gz)")
         if not path:
             return
 

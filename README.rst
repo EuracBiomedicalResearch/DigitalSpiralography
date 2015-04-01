@@ -440,9 +440,9 @@ combination increases by approximately 10g.
 File formats
 ~~~~~~~~~~~~
 
-The file formats are stored in self-descriptive GZip-compressed YaML. GZip is
-used both to conserve space (YaML is quite inefficient) and for check-summing
-purposes.
+The file formats are stored in self-descriptive GZip-compressed JSON. Versions
+of DrawingRecorder <= 1.5 used the same structure but YaML encoding. GZip is
+used both to conserve space and for check-summing purposes.
 
 To speed-up loading for repeated processing, ``drwset`` can be used to convert
 an existing file into a "dump" object that loads faster. It's important to note
@@ -466,7 +466,7 @@ A sample file (with explanatory comments) is included in
 this sample file as required.
 
 
-Recorder ``rec.yaml.gz`` File format
+Recorder ``rec.json.gz`` File format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Keys related to drawing/calibration (all keys are mandatory):
@@ -576,7 +576,7 @@ Chunks introduced with format 1.4:
   + Any field name from the output of ``drwstats``.
 
 
-Profiler ``prof.yaml.gz`` File format
+Profiler ``prof.json.gz`` File format
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Keys related to the profile (all keys are mandatory):

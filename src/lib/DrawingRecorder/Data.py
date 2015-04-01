@@ -19,6 +19,7 @@ import cPickle
 import collections
 import datetime
 import gzip
+import json
 import numpy as np
 import time
 import yaml
@@ -38,12 +39,20 @@ def _from_type(type_map, value):
         return type_map[value]
     return value
 
-
 def _to_type(type_map, value):
     for k, v in type_map.iteritems():
         if value == v:
             return k
     return value
+
+def _ts_loads(obj_or_str):
+    if obj_or_str is None or isinstance(obj_or_str, datetime.datetime):
+        return obj_or_str
+    return datetime.datetime.strptime(obj_or_str, "%Y-%m-%d %H:%M:%S.%f")
+
+def _ts_dumps(obj):
+    if obj is None: return None
+    return obj.strftime("%Y-%m-%d %H:%M:%S.%f")
 
 
 # File format event/code maps
@@ -144,7 +153,7 @@ class RecordingEvent(object):
 
     @classmethod
     def serialize(cls, event):
-        data =  {'stamp': event.stamp,
+        data =  {'stamp': _ts_dumps(event.stamp),
                  'type': _from_type(EVENT_MAP, event.typ),
                  'cdraw': list(event.coords_drawing),
                  'ctrans': list(event.coords_trans),
@@ -164,7 +173,7 @@ class RecordingEvent(object):
         coords_drawing = tuple(event['cdraw'])
         coords_trans = tuple(event['ctrans'])
         pressure = event['press']
-        stamp = event['stamp']
+        stamp = _ts_loads(event['stamp'])
 
         # optional elements (format 1.1)
         tilt_drawing = event.get('tdraw')
@@ -283,12 +292,12 @@ class DrawingRecord(object):
                     "operator": record.calibration.oid,
                     "tablet_id": record.calibration.tablet_id,
                     "stylus_id": record.calibration.stylus_id,
-                    "stamp": record.calibration.stamp,
+                    "stamp": _ts_dumps(record.calibration.stamp),
                     "cpoints": map(list, record.calibration.cpoints),
                     "ctilts": map(list, record.calibration.ctilts)},
                 "calibration_age": record.calibration_age,
                 "recording": {
-                    "session_start": record.recording.session_start,
+                    "session_start": _ts_dumps(record.recording.session_start),
                     "rect_size": list(record.recording.rect_size),
                     "rect_drawing": map(list, record.recording.rect_drawing),
                     "rect_trans": map(list, record.recording.rect_trans),
@@ -303,15 +312,15 @@ class DrawingRecord(object):
                 "pat_hand": _from_type(PAT_HAND, record.pat_hand),
                 "extra_data": record.extra_data,
                 "comments": record.comments,
-                "ts_created": record.ts_created,
-                "ts_updated": record.ts_updated,
+                "ts_created": _ts_dumps(record.ts_created),
+                "ts_updated": _ts_dumps(record.ts_updated),
                 "tz": record.tz}
 
         # avoid saving unicode in the FNAME header
         fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
 
         # dump
-        yaml.safe_dump(data, fd, allow_unicode=True, encoding='utf-8')
+        json.dump(data, fd, ensure_ascii=False, check_circular=False)
 
 
     @classmethod
@@ -346,7 +355,10 @@ class DrawingRecord(object):
         data = None
         try:
             fd = gzip.GzipFile(path, 'rb')
-            data = yaml.safe_load(fd)
+            # JSON (DR 1.6)
+            hdr = fd.read(1)
+            fd.seek(0)
+            data = json.load(fd) if hdr == '{' else yaml.safe_load(fd)
         except IOError:
             raise
         except:
@@ -354,7 +366,7 @@ class DrawingRecord(object):
 
         # check version info
         if not data or 'format' not in data or \
-          type(data['format']) != str or \
+          not isinstance(data['format'], basestring) or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_RECORDING) != Consts.FF_RECORDING:
             msg = translate("data", 'Unsupported file format')
@@ -393,7 +405,7 @@ class DrawingRecord(object):
         calibration = CalibrationData(data['calibration'].get('operator'), # optional (fmt 1.2)
                                       data['calibration']['tablet_id'],
                                       data['calibration'].get('stylus_id'), # optional (fmt 1.2)
-                                      cpoints, ctilts, data['calibration']['stamp'])
+                                      cpoints, ctilts, _ts_loads(data['calibration']['stamp']))
 
         # past retries (optional, fmt 1.2)
         retries_events = data['recording'].get('retries_events')
@@ -403,7 +415,7 @@ class DrawingRecord(object):
             retries_events = [map(RecordingEvent.deserialize, el) for el in retries_events]
 
         # recording
-        recording = RecordingData(data['recording']['session_start'],
+        recording = RecordingData(_ts_loads(data['recording']['session_start']),
                                   tuple(data['recording']['rect_size']),
                                   map(tuple, data['recording']['rect_drawing']),
                                   map(tuple, data['recording']['rect_trans']),
@@ -411,10 +423,10 @@ class DrawingRecord(object):
                                   retries_events, data['recording']['strokes'])
 
         # timestamps (optional, fmt 1.3)
-        ts_created = data.get('ts_created')
+        ts_created = _ts_loads(data.get('ts_created'))
         if ts_created is None:
             ts_created = copy(recording.events[-1].stamp) if recording.events else copy(calibration.stamp)
-        ts_updated = data.get('ts_updated')
+        ts_updated = _ts_loads(data.get('ts_updated'))
         if ts_updated is None:
             ts_updated = copy(ts_created)
 
@@ -481,8 +493,8 @@ class StylusProfile(object):
         data = {"format": Consts.FORMAT_VERSION,
                 "type": Consts.FF_PROFILE,
                 "version": Consts.APP_VERSION,
-                "ts_created": profile.ts_created,
-                "ts_updated": profile.ts_updated,
+                "ts_created": _ts_dumps(profile.ts_created),
+                "ts_updated": _ts_dumps(profile.ts_updated),
                 "operator": profile.oid,
                 "stylus_id": profile.sid,
                 "tablet_id": profile.tid,
@@ -495,7 +507,7 @@ class StylusProfile(object):
         fd = gzip.GzipFile(profile.sid, 'wb', fileobj=open(path, 'wb', 0))
 
         # dump
-        yaml.safe_dump(data, fd, allow_unicode=True, encoding='utf-8')
+        json.dump(data, fd, ensure_ascii=False, check_circular=False)
 
 
     @classmethod
@@ -511,7 +523,10 @@ class StylusProfile(object):
         data = None
         try:
             fd = gzip.GzipFile(path, 'rb')
-            data = yaml.safe_load(fd)
+            # JSON (DR 1.6)
+            hdr = fd.read(1)
+            fd.seek(0)
+            data = json.load(fd) if hdr == '{' else yaml.safe_load(fd)
         except IOError:
             raise
         except:
@@ -519,7 +534,7 @@ class StylusProfile(object):
 
         # check version info
         if not data or 'format' not in data or \
-          type(data['format']) != str or \
+          not isinstance(data['format'], basestring) or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_PROFILE) != Consts.FF_PROFILE:
             msg = translate("data", 'Unsupported file format')

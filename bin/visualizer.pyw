@@ -573,7 +573,7 @@ class MainWindow(QtGui.QMainWindow):
         title = translate("visualizer", "Load recording")
         ext_name = translate("visualizer", "Recordings")
         path = QtGui.QFileDialog.getOpenFileName(
-            self, title, QtCore.QString(), ext_name + " (*.yaml.gz)")
+            self, title, QtCore.QString(), ext_name + " (*.rec.json.gz *.yaml.gz)")
         if path:
             self.load(unicode(path))
 
