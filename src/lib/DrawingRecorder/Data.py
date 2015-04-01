@@ -533,11 +533,14 @@ class StylusProfile(object):
         # timezone (optional, fmt 1.4)
         tz = data.get('tz')
 
+        # response fit (without residuals)
+        fit = [np.asarray(data['fit']), None]
+
         # final object
-        return StylusProfile(data['ts_created'], data['ts_updated'],
+        return StylusProfile(_ts_loads(data['ts_created']), _ts_loads(data['ts_updated']),
                              data['operator'], data['stylus_id'], data['tablet_id'],
                              map(StylusResponseData.deserialize, data['data']),
-                             (np.asarray(data['fit'])), extra_data, tz)
+                             fit, extra_data, tz)
 
 
 
