@@ -47,8 +47,7 @@ def __main__():
             fd.write(stats)
 
         except:
-            logging.error('uncaught exception while analyzing {fn}'.format(fn=fn))
-            raise
+            ap.error('uncaught exception while analyzing {fn}'.format(fn=fn))
 
 
 if __name__ == '__main__':
