@@ -117,6 +117,12 @@ Troubleshooting
 Version changes
 ~~~~~~~~~~~~~~~
 
+1.6:
+
+* DrawingRecorder/StylusProfiler now output JSON-encoded files using the same
+  data structure. Saving/loading times are drastically improved.
+* Improved time resolution of the event stream under Windows.
+
 1.5:
 
 * DrawingRecorder file format 1.4.
@@ -241,6 +247,8 @@ As an administrator, install in order:
 
   * Expand ``pyqtgraph-0.9.8-patches.zip`` into Python's ``site-packages`` path.
   * Run ``pyqtgraph-recompile.bat``.
+
+- Recompile DrawingRecorder (``recompile.bat``)
 
 You'll need to use "Run as Administrator" (also for executing a prompt with
 ``CMD.EXE``) in order to make a system-wide installation.
