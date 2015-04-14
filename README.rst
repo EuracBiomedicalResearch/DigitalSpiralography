@@ -117,6 +117,10 @@ Troubleshooting
 Version changes
 ~~~~~~~~~~~~~~~
 
+1.7:
+
+* Fixed file encoding issues when saving unicode data.
+
 1.6:
 
 * DrawingRecorder/StylusProfiler now output JSON-encoded files using the same

@@ -318,9 +318,8 @@ class DrawingRecord(object):
 
         # avoid saving unicode in the FNAME header
         fd = gzip.GzipFile(record.aid, 'wb', fileobj=open(path, 'wb', 0))
-
-        # dump
-        json.dump(data, fd, ensure_ascii=False, check_circular=False)
+        buf = json.dumps(data, ensure_ascii=False, check_circular=False)
+        fd.write(buf.encode('utf-8'))
 
 
     @classmethod
@@ -358,7 +357,8 @@ class DrawingRecord(object):
             # JSON (DR 1.6)
             hdr = fd.read(1)
             fd.seek(0)
-            data = json.load(fd) if hdr == '{' else yaml.safe_load(fd)
+            buf = fd.read().decode('utf-8')
+            data = json.loads(buf) if hdr == '{' else yaml.safe_load(buf)
         except IOError:
             raise
         except:
@@ -505,9 +505,8 @@ class StylusProfile(object):
 
         # avoid saving unicode in the FNAME header
         fd = gzip.GzipFile(profile.sid, 'wb', fileobj=open(path, 'wb', 0))
-
-        # dump
-        json.dump(data, fd, ensure_ascii=False, check_circular=False)
+        buf = json.dumps(data, ensure_ascii=False, check_circular=False)
+        fd.write(buf.encode('utf-8'))
 
 
     @classmethod
@@ -526,7 +525,8 @@ class StylusProfile(object):
             # JSON (DR 1.6)
             hdr = fd.read(1)
             fd.seek(0)
-            data = json.load(fd) if hdr == '{' else yaml.safe_load(fd)
+            buf = fd.read().decode('utf-8')
+            data = json.loads(buf) if hdr == '{' else yaml.safe_load(buf)
         except IOError:
             raise
         except:
