@@ -574,12 +574,14 @@ class DrawingWindow(QtGui.QMainWindow):
 
 
     def accept(self):
-        self.hide()
+        if self.isVisible():
+            self.hide()
+            self.handler.terminate()
         self.result = True
-        self.handler.terminate()
 
 
     def reject(self):
-        self.hide()
+        if self.isVisible():
+            self.hide()
+            self.handler.terminate()
         self.result = False
-        self.handler.terminate()
