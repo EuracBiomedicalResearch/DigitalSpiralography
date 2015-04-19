@@ -8,7 +8,6 @@ from . import Consts
 from . import Drawing
 from . import RxUtil
 from . import Tab
-from . import Time
 from .Shared import dtts, tsdt, strdt
 from .UI import translate
 
@@ -141,14 +140,14 @@ class CalibrationData(object):
 
 class RecordingEvent(object):
     def __init__(self, typ, coords_drawing, coords_trans, pressure,
-                 tilt_drawing, tilt_trans, stamp=None):
+                 tilt_drawing, tilt_trans, stamp):
         self.typ = typ
         self.coords_drawing = coords_drawing
         self.coords_trans = coords_trans
         self.pressure = pressure
         self.tilt_drawing = tilt_drawing
         self.tilt_trans = tilt_trans
-        self.stamp = stamp if stamp is not None else Time.now()
+        self.stamp = stamp
 
 
     @classmethod

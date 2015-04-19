@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 from PyQt4 import QtCore, QtGui
+
+import HiResTime
 from .core import EventSubtypes, QExtTabletEvent
 
 
 class QExtTabletManager(QtCore.QObject):
     _instance = None
     _app = None
-    _events = {QtCore.QEvent.TabletEnterProximity: EventSubtypes.ENTER,
-               QtCore.QEvent.TabletLeaveProximity: EventSubtypes.LEAVE,
-               QtCore.QEvent.TabletMove: EventSubtypes.MOVE,
-               QtCore.QEvent.TabletPress: EventSubtypes.PRESS,
-               QtCore.QEvent.TabletRelease: EventSubtypes.RELEASE}
+    _events = set([QtCore.QEvent.TabletEnterProximity,
+                   QtCore.QEvent.TabletLeaveProximity,
+                   QtCore.QEvent.TabletMove,
+                   QtCore.QEvent.TabletPress,
+                   QtCore.QEvent.TabletRelease])
 
     def __init__(self):
         super(QExtTabletManager, self).__init__()
@@ -27,8 +29,8 @@ class QExtTabletManager(QtCore.QObject):
         return False
 
     def translateEvent(self, event):
-        ev = QExtTabletEvent(self._events[event.type()], event.pressure())
-        return ev
+        return QExtTabletEvent(event.type(), HiResTime.now(), event.pressure(),
+                               event.hiResGlobalPos(), (event.xTilt(), event.yTilt()))
 
     def handleEvent(self, receiver, event):
         win = self._app.activeWindow()

@@ -2,11 +2,11 @@
 """Drawing window"""
 
 # local modules
-import Data
-import Consts
-import Time
-from Shared import timedelta_min_sec
-from UI import translate
+from . import Data
+from . import Consts
+from .Shared import timedelta_min_sec
+from .UI import translate
+import QExtTabletWindow
 
 # system modules
 import math
@@ -23,7 +23,7 @@ class Handler(object):
     def keyEvent(self, ev):
         pass
 
-    def tabletEventTS(self, ev, stamp):
+    def extTabletEvent(self, ev):
         pass
 
     def timerEvent(self, ev):
@@ -144,7 +144,7 @@ class CalibrationHandler(Handler):
             self.keyPressEvent(ev)
 
 
-    def tabletEventTS(self, ev, stamp):
+    def extTabletEvent(self, ev):
         if self.point:
             if not self.dw._drawing_state:
                 col = QtGui.QColor(0, 0, 0, 0)
@@ -250,24 +250,24 @@ class RecordingHandler(Handler):
             self.dw._set_bt_text(msg)
 
 
-    def tabletEventTS(self, ev, stamp):
+    def extTabletEvent(self, ev):
         # record the data
         coords_drawing = self.dw._drawing_pos
         coords_trans = self.dw._trans_pos
         self.dw.recording.append(
             Data.RecordingEvent(
-                ev.type(),
+                ev.subtype,
                 [coords_drawing.x(), coords_drawing.y()],
                 [coords_trans.x(), coords_trans.y()],
-                ev.pressure(), self.dw._drawing_tilt,
-                self.dw._trans_tilt, stamp))
+                ev.pressure, self.dw._drawing_tilt,
+                self.dw._trans_tilt, ev.os_stamp))
 
         if not self.dw._drawing_state:
             self.old_trans_pos = None
         else:
             # new stroke
             if self.old_trans_pos is not None:
-                self.pen.setWidthF(1 + ev.pressure() * (Consts.PEN_MAXWIDTH - 1))
+                self.pen.setWidthF(1 + ev.pressure * (Consts.PEN_MAXWIDTH - 1))
                 self.painter.setPen(self.pen)
                 self.painter.drawLine(self.old_trans_pos, self.dw._trans_pos)
                 self.sched_update_buffer()
@@ -295,7 +295,7 @@ class RecordingHandler(Handler):
 
 
 
-class DrawingWindow(QtGui.QMainWindow):
+class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
     def __init__(self):
         super(DrawingWindow, self).__init__()
 
@@ -418,10 +418,8 @@ class DrawingWindow(QtGui.QMainWindow):
 
 
     def event(self, ev):
-        # handle proximity events like normal tablet events
-        if ev.type() == QtCore.QEvent.TabletEnterProximity or \
-          ev.type() == QtCore.QEvent.TabletLeaveProximity:
-            self.tabletEventTS(ev, Time.now())
+        if ev.type() == QExtTabletWindow.EVENT_TYPE:
+            self.extTabletEvent(ev)
             ev.accept()
             return True
 
@@ -442,45 +440,40 @@ class DrawingWindow(QtGui.QMainWindow):
         return (x, y)
 
 
-    def tabletEventTS(self, ev, stamp):
+    def extTabletEvent(self, ev):
         # only consider pen events and only when visible
-        if ev.pointerType() != QtGui.QTabletEvent.Pen or \
-          self.isVisible() is False:
+        if self.isVisible() is False:
             return
 
         # screen/drawing position
-        self._screen_pos = ev.hiResGlobalPos()
+        self._screen_pos = ev.position
         self._drawing_pos = self._drawing_group.mapFromScene(self._screen_pos)
         self._trans_pos = self._trans_group.mapToScene(self._drawing_pos)
 
         # screen/drawing tilt
-        self._drawing_tilt = (ev.xTilt(), ev.yTilt())
+        self._drawing_tilt = ev.tilt
         self._trans_tilt = self._mapTiltToScene(self._drawing_tilt, self._drawing_pos)
 
         # also update the cursor position within the translated space
         self._cursor.setPos(self._trans_pos)
 
         # update drawing state
-        if ev.type() == QtCore.QEvent.TabletPress:
+        if ev.subtype == QtCore.QEvent.TabletPress:
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE))
             self._tracking_state = True
             self._drawing_state = True
-        elif ev.type() == QtCore.QEvent.TabletRelease:
+        elif ev.subtype == QtCore.QEvent.TabletRelease:
             self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
             self._tracking_state = True
             self._drawing_state = False
-        elif ev.type() == QtCore.QEvent.TabletEnterProximity:
+        elif ev.subtype == QtCore.QEvent.TabletEnterProximity:
             self._tracking_state = True
             self._drawing_state = False
-        elif ev.type() == QtCore.QEvent.TabletLeaveProximity:
+        elif ev.subtype == QtCore.QEvent.TabletLeaveProximity:
             self._tracking_state = False
             self._drawing_state = False
 
-        self.handler.tabletEventTS(ev, stamp)
-
-
-    def tabletEvent(self, ev):
-        self.tabletEventTS(ev, Time.now())
+        self.handler.extTabletEvent(ev)
 
 
     def keyPressEvent(self, ev):
