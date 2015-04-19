@@ -14,6 +14,7 @@ from DrawingRecorder import Consts
 from DrawingRecorder import ID
 from DrawingRecorder import UI
 from DrawingRecorder.UI import translate
+import QExtTabletWindow
 
 # system modules
 import argparse
@@ -49,7 +50,7 @@ class sorting_disabled(object):
 
 
 # main application
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QExtTabletWindow.QExtTabletWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self._ui = UI.load_ui(self, "profiler.ui")
@@ -116,26 +117,17 @@ class MainWindow(QtGui.QMainWindow):
 
     def event(self, ev):
         # just eat all tablet events and update the internal state
-        if ev.type() == QtCore.QEvent.TabletEnterProximity:
-            ev.accept()
-            if not self._tablet:
-                self._enter_proximity()
-            return True
-        elif ev.type() == QtCore.QEvent.TabletLeaveProximity:
-            ev.accept()
+        if ev.type() != QExtTabletWindow.EVENT_TYPE:
+            return super(MainWindow, self).event(ev)
+        ev.accept()
+        if ev.subtype == QExtTabletWindow.EventSubtypes.LEAVE:
             if self._tablet:
                 self._exit_proximity()
-            return True
-        elif ev.type() == QtCore.QEvent.TabletMove or \
-          ev.type() == QtCore.QEvent.TabletPress or \
-          ev.type() == QtCore.QEvent.TabletRelease:
-            ev.accept()
+        else:
             if not self._tablet:
                 self._enter_proximity()
-            self.update_pi(ev.pressure())
-            return True
-
-        return super(MainWindow, self).event(ev)
+            self.update_pi(ev.pressure)
+        return True
 
 
     def update_cb(self, pos):
@@ -524,18 +516,6 @@ class Application(QtGui.QApplication):
         self.main_window.show()
         if args.file:
             self.main_window.load(args.file)
-
-
-    def event(self, ev):
-        # re-send tablet proximity events up the chain
-        active = self.activeWindow()
-        if active and (ev.type() == QtCore.QEvent.TabletEnterProximity or \
-                       ev.type() == QtCore.QEvent.TabletLeaveProximity):
-            return self.sendEvent(active, ev)
-
-        # normal handling
-        return super(Application, self).event(ev)
-
 
 
 # entry point
