@@ -704,9 +704,10 @@ class Application(QtGui.QApplication):
 
     def event(self, ev):
         # re-send tablet proximity events up the chain
-        if ev.type() == QtCore.QEvent.TabletEnterProximity or \
-          ev.type() == QtCore.QEvent.TabletLeaveProximity:
-            return self.sendEvent(self.activeWindow(), ev)
+        active = self.activeWindow()
+        if active and (ev.type() == QtCore.QEvent.TabletEnterProximity or \
+                       ev.type() == QtCore.QEvent.TabletLeaveProximity):
+            return self.sendEvent(active, ev)
 
         # normal handling
         return super(Application, self).event(ev)
