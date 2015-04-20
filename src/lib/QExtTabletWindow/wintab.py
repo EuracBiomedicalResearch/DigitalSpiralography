@@ -41,11 +41,7 @@ if spec < 0x102:
 # Low-level handler
 class QExtTabletManager(QtCore.QObject):
     _instance = None
-    _events = set([QtCore.QEvent.TabletEnterProximity,
-                   QtCore.QEvent.TabletLeaveProximity,
-                   QtCore.QEvent.TabletMove,
-                   QtCore.QEvent.TabletPress,
-                   QtCore.QEvent.TabletRelease])
+    _ctxs = None
 
     def __init__(self):
         super(QExtTabletManager, self).__init__()
@@ -119,6 +115,7 @@ class QExtTabletContext(object):
 
         # Axis
         self.np_axis = wtinfo(self.device_idx, libwintab.DVC_NPRESSURE, libwintab.AXIS())
+        self.or_axis = wtinfo(self.device_idx, libwintab.DVC_ORIENTATION, (libwintab.AXIS * 3)())
         self.x_axis = wtinfo(self.device_idx, libwintab.DVC_X, libwintab.AXIS())
         self.y_axis = wtinfo(self.device_idx, libwintab.DVC_Y, libwintab.AXIS())
 
@@ -153,7 +150,7 @@ class QExtTabletContext(object):
 
         if msg.message == WT_PROXIMITY:
             subtype = EventSubtypes.ENTER if (msg.lParam & 0xFF) else EventSubtypes.LEAVE
-            ev = QExtTabletEvent(subtype, now, 0., QtCore.QPointF(), (0., 0.))
+            ev = QExtTabletEvent(subtype, now, None, None, 0., QtCore.QPointF(), (0., 0.))
             self.window.event(ev)
 
         # process any available packet, irregardless of the message type
@@ -168,8 +165,8 @@ class QExtTabletContext(object):
                 self.cursors[packet.pkCursor] = cursor
             cursor = self.cursors[packet.pkCursor]
 
-            # We copy QT's formulas here to be result-compatible, even though
-            # we undo most of them later. Note that press also lacks bias ajustment(!)
+            # We copy QT's formulas verbatim here to be result-compatible, even though
+            # we undo most of them later. Note that press also lacks bias adjustment(!)
             press = float(packet.pkNormalPressure) / float(self.np_axis.axMax - self.np_axis.axMin)
 
             pos_x = float(packet.pkX - self.x_axis.axMin) / float(self.x_axis.axMax - self.x_axis.axMin)
@@ -179,10 +176,12 @@ class QExtTabletContext(object):
 
             rad_azim = (packet.pkOrientation.orAzimuth / 10.) * (math.pi / 180.)
             tan_alt = tan((abs(packet.pkOrientation.orAltitude / 10.)) * (math.pi / 180.))
-            tilt_x = int(atan(sin(rad_azim) / tan_alt) * (180. / math.pi))
-            tilt_y = int(atan(cos(rad_azim) / tan_alt) * (180. / math.pi))
+            deg_x = atan(sin(rad_azim) / tan_alt)
+            deg_y = atan(cos(rad_azim) / tan_alt)
+            tilt_x = int(deg_x * (180. / math.pi))
+            tilt_y = int(-deg_y * (180. / math.pi))
 
-            # use the primary button state to determine enter/leave events
+            # use the primary button state to determine press/release events
             if not (packet.pkChanged & libwintab.PK_BUTTONS):
                 subtype = EventSubtypes.MOVE
             else:
@@ -195,7 +194,8 @@ class QExtTabletContext(object):
                 else:
                     subtype = EventSubtypes.RELEASE
 
-            ev = QExtTabletEvent(subtype, now, press, pos, (tilt_x, tilt_y))
+            ev = QExtTabletEvent(subtype, now, packet.pkTime, packet.pkSerialNumber,
+                                 press, pos, (tilt_x, tilt_y))
             self.window.event(ev)
 
 

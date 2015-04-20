@@ -16,10 +16,12 @@ class QExtTabletException(Exception):
         super(QExtTabletException, self).__init__(*args, **kwargs)
 
 class QExtTabletEvent(QtCore.QEvent):
-    def __init__(self, subtype, os_stamp, pressure, position, tilt):
+    def __init__(self, subtype, os_stamp, dev_stamp, dev_serial, pressure, position, tilt):
         super(QExtTabletEvent, self).__init__(EVENT_TYPE)
         self.subtype = subtype
         self.os_stamp = os_stamp
+        self.dev_stamp = dev_stamp
+        self.dev_serial = dev_serial
         self.pressure = pressure
         self.position = position
         self.tilt = tilt

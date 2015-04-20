@@ -260,7 +260,8 @@ class RecordingHandler(Handler):
                 [coords_drawing.x(), coords_drawing.y()],
                 [coords_trans.x(), coords_trans.y()],
                 ev.pressure, self.dw._drawing_tilt,
-                self.dw._trans_tilt, ev.os_stamp))
+                self.dw._trans_tilt, ev.os_stamp,
+                ev.dev_stamp, ev.dev_serial))
 
         if not self.dw._drawing_state:
             self.old_trans_pos = None

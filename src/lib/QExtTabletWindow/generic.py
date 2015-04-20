@@ -31,7 +31,7 @@ class QExtTabletManager(QtCore.QObject):
     def handleEvent(self, receiver, event):
         win = self._app.activeWindow()
         if win and win in self._windows:
-            ev = QExtTabletEvent(event.type(), HiResTime.now(), event.pressure(),
+            ev = QExtTabletEvent(event.type(), HiResTime.now(), None, None, event.pressure(),
                                  event.hiResGlobalPos(), (event.xTilt(), event.yTilt()))
             win.event(ev)
 

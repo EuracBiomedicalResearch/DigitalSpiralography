@@ -117,12 +117,20 @@ Troubleshooting
 Version changes
 ~~~~~~~~~~~~~~~
 
+1.8:
+
+* DrawingRecorder file format 1.5.
+* DrawingRecorder now also includes lower-level packet timestamps/serials
+  on Windows which are better suited for analysis.
+
 1.7:
 
+* DrawingRecorder file format 1.4.
 * Fixed file encoding issues when saving unicode data.
 
 1.6:
 
+* DrawingRecorder file format 1.4.
 * DrawingRecorder/StylusProfiler now output JSON-encoded files using the same
   data structure. Saving/loading times are drastically improved.
 * Improved time resolution of the event stream under Windows.
@@ -165,10 +173,11 @@ Version changes
 1.3:
 
 * DrawingRecorder file format 1.2.
-* Several tools for data analysis have been added (``drwstats``,
+* Several tools for data inspection have been added (``drwstats``,
   ``drwrenderer`` and ``drwstackrenderer``).
-* Tools for analysis and DrawingVisualizer can now use 'dump' files to speed-up
-  loading/saving time. ``drwconvert`` can convert between YaML/dump formats.
+* Tools for data inspection and DrawingVisualizer can now use 'dump' files to
+  speed-up loading/saving time. ``drwconvert`` can be used to convert between
+  YaML/dump formats.
 * A simple tool to generate and check IDs with a Verhoeff check digit
   (patient/table/stylus ID) has been added (``genverhoeff``).
 * In DrawingVisualizer, the speed is now sampled to give more accurate results.
@@ -224,11 +233,12 @@ Version changes
 Known issues
 ~~~~~~~~~~~~
 
-* 1.0/1.1: Quantization of event's timestamps: the "stamp" value of the event
-  stream is badly quantized due to it not coming directly from the tablet.
-  Unfortunately QT4 does not offer event timestamps. One must currently derive
-  the device's event rate instead of relying on the timestamp for proper
-  analysis.
+* 1.0-1.7: Timestamp issues: due to internal limitations, the "stamp" value of
+  the event stream has significant jitter as it's originating from the
+  recorder's event loop itself. Until DR 1.6 the effective resolution on
+  Windows platforms was also lower than 10ms. DR 1.6 introduced higher-quality
+  timestamps on Windows, and DR 1.8 also added "dev_stamp" and "dev_serial"
+  which are suitable for accurate time analysis.
 * 1.0: Tablet enter/leave events not properly tracked: proximity events are
   still missing from the event stream, meaning that holes in the "trace"
   require post-processing to be detected, and doing so it not easy due to the
@@ -586,6 +596,13 @@ Chunks introduced with format 1.4:
   + ``format`` moved from ``extra_data/orig_format`` in DrawingRecorder 1.5.
   + ``version`` moved from ``extra_data/orig_version`` in DrawingRecorder 1.5.
   + Any field name from the output of ``drwstats``.
+
+Chunks introduced with format 1.5:
+
+* ``recording/events``:
+
+  + ``dev_stamp`` (optional): accurate event timestamp (in MS)
+  + ``dev_serial`` (optional): event serial number
 
 
 Profiler ``prof.json.gz`` File format

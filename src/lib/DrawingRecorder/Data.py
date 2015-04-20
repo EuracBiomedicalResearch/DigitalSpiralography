@@ -140,7 +140,7 @@ class CalibrationData(object):
 
 class RecordingEvent(object):
     def __init__(self, typ, coords_drawing, coords_trans, pressure,
-                 tilt_drawing, tilt_trans, stamp):
+                 tilt_drawing, tilt_trans, stamp, dev_stamp, dev_serial):
         self.typ = typ
         self.coords_drawing = coords_drawing
         self.coords_trans = coords_trans
@@ -148,6 +148,8 @@ class RecordingEvent(object):
         self.tilt_drawing = tilt_drawing
         self.tilt_trans = tilt_trans
         self.stamp = stamp
+        self.dev_stamp = dev_stamp
+        self.dev_serial = dev_serial
 
 
     @classmethod
@@ -162,6 +164,12 @@ class RecordingEvent(object):
         if event.tilt_drawing is not None:
             data['tdraw'] = list(event.tilt_drawing)
             data['ttrans'] = list(event.tilt_trans)
+
+        # device stamp/serial (fmt 1.5)
+        if event.dev_stamp is not None:
+            data['dev_stamp'] = event.dev_stamp
+        if event.dev_serial is not None:
+            data['dev_serial'] = event.dev_serial
 
         return data
 
@@ -181,8 +189,12 @@ class RecordingEvent(object):
             tilt_drawing = tuple(tilt_drawing)
             tilt_trans = tuple(tilt_trans)
 
+        # device stamp/serial (fmt 1.5)
+        dev_stamp = event.get('dev_stamp')
+        dev_serial = event.get('dev_serial')
+
         return RecordingEvent(typ, coords_drawing, coords_trans, pressure,
-                              tilt_drawing, tilt_trans, stamp)
+                              tilt_drawing, tilt_trans, stamp, dev_stamp, dev_serial)
 
 
 

@@ -375,7 +375,7 @@ def wtinfo(category, index, buffer):
             buffer = ctypes.create_unicode_buffer(size)
         assert(size <= ctypes.sizeof(buffer))
     lib.WTInfoW(category, index, ctypes.byref(buffer))
-    if not isinstance(buffer, ctypes.Structure):
+    if 'value' in dir(buffer):
         buffer = buffer.value
         if type(buffer) is unicode:
             buffer = buffer.rstrip()
