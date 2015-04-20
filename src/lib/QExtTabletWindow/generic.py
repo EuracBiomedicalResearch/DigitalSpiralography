@@ -3,7 +3,7 @@ from __future__ import print_function
 from PyQt4 import QtCore, QtGui
 
 import HiResTime
-from .core import EventSubtypes, QExtTabletEvent
+from .core import QExtTabletEvent
 
 
 class QExtTabletManager(QtCore.QObject):
@@ -28,15 +28,12 @@ class QExtTabletManager(QtCore.QObject):
             return True
         return False
 
-    def translateEvent(self, event):
-        return QExtTabletEvent(event.type(), HiResTime.now(), event.pressure(),
-                               event.hiResGlobalPos(), (event.xTilt(), event.yTilt()))
-
     def handleEvent(self, receiver, event):
         win = self._app.activeWindow()
         if win and win in self._windows:
-            ev = self.translateEvent(event)
-            self._app.sendEvent(win, ev)
+            ev = QExtTabletEvent(event.type(), HiResTime.now(), event.pressure(),
+                                 event.hiResGlobalPos(), (event.xTilt(), event.yTilt()))
+            win.event(ev)
 
     @classmethod
     def register(cls, window):
@@ -47,8 +44,16 @@ class QExtTabletManager(QtCore.QObject):
     def _register(self, window):
         self._windows.add(window)
 
+    @classmethod
+    def unregister(cls, window):
+        del cls._instance._windows[window]
+
 
 class QExtTabletWindow(QtGui.QMainWindow):
     def __init__(self):
         super(QExtTabletWindow, self).__init__()
         QExtTabletManager.register(self)
+
+    def __del__(self):
+        QExtTabletManager.unregister(self)
+        super(QExtTabletWindow, self).__del__()

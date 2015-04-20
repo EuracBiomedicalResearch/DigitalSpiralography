@@ -11,6 +11,10 @@ class EventSubtypes(object):
     ENTER = QtCore.QEvent.TabletEnterProximity
     LEAVE = QtCore.QEvent.TabletLeaveProximity
 
+class QExtTabletException(Exception):
+    def __init__(self, *args, **kwargs):
+        super(QExtTabletException, self).__init__(*args, **kwargs)
+
 class QExtTabletEvent(QtCore.QEvent):
     def __init__(self, subtype, os_stamp, pressure, position, tilt):
         super(QExtTabletEvent, self).__init__(EVENT_TYPE)
