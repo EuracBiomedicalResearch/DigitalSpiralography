@@ -120,6 +120,7 @@ Version changes
 1.8:
 
 * DrawingRecorder file format 1.5.
+* Added ``TabletTester`` to debug tablet-related issues.
 * DrawingRecorder now also includes lower-level packet timestamps/serials
   on Windows which are better suited for analysis.
 

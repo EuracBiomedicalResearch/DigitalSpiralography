@@ -335,10 +335,25 @@ class DrawingRecord(object):
 
     @classmethod
     def save_text(cls, record, path):
-        fd = Tab.TabWriter(path, ["TIME", "X", "Y", "Z", "W", "T"])
-        start = record.recording.events[0].stamp
+        fd = Tab.TabWriter(path, ["TIME", "T2", "TYPE", "X", "Y", "Z", "W", "T"])
+        os_start = record.recording.events[0].stamp
+
+        # look for the first valid device timestamp
+        dev_off = None
         for event in record.recording.events:
-            fd.write({'TIME': (event.stamp - start).total_seconds() * 1000.,
+            if event.dev_stamp is not None:
+                off = (event.stamp - os_start).total_seconds() * 1000.
+                dev_off = event.dev_stamp - off
+                break
+
+        for event in record.recording.events:
+            if dev_off is None or event.dev_stamp is None:
+                time = (event.stamp - os_start).total_seconds() * 1000.
+            else:
+                time = event.dev_stamp - dev_off
+            fd.write({'TIME': time,
+                      'T2': (event.stamp - os_start).total_seconds() * 1000.,
+                      'TYPE': EVENT_MAP[event.typ],
                       'X': event.coords_drawing[0],
                       'Y': event.coords_drawing[1],
                       'Z': event.pressure,

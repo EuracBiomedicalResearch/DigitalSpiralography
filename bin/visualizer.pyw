@@ -48,9 +48,11 @@ def drawArrow(group, pen, start, end, angle=10., ext=Consts.LIFT_RADIUS):
 def speedAtPoint(events, stamp, window):
     w_events = []
     for w_event in events:
-        if abs((w_event.stamp - stamp).total_seconds()) < window:
+        if w_event.dev_stamp is None:
+            continue
+        if abs((w_event.dev_stamp - stamp) / 1000.) < window:
             w_events.append(w_event)
-    w_secs = (w_events[-1].stamp - w_events[0].stamp).total_seconds()
+    w_secs = (w_events[-1].dev_stamp - w_events[0].dev_stamp) / 1000.
     if not w_secs:
         return -1
 
@@ -65,7 +67,10 @@ def speedAtPoint(events, stamp, window):
 
 def sampleSpeed(events, window):
     for event in events:
-        event.speed = speedAtPoint(events, event.stamp, 0.05)
+        if event.dev_stamp is None:
+            event.speed = 0
+        else:
+            event.speed = speedAtPoint(events, event.dev_stamp, 0.05)
 
 def ctrb(x, a, b, ctrl, bias):
     i = (x - a) / (b - a) + bias - 1.
