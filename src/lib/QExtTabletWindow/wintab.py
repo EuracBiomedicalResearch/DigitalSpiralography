@@ -73,8 +73,7 @@ class QExtTabletManager(QtCore.QObject):
 
 
 class QExtCursorData(object):
-    def __init__(self, device_idx, cursor_n):
-        self.device_idx = device_idx
+    def __init__(self, cursor_n):
         self.cursor_idx = libwintab.WTI_CURSORS + cursor_n
         self.name = wtinfo(self.cursor_idx, libwintab.CSR_NAME, unicode)
         self.active = wtinfo(self.cursor_idx, libwintab.CSR_ACTIVE, libwintab.BOOL())
@@ -97,13 +96,8 @@ class QExtCursorData(object):
         self.pointer = CSR_POINTER_MAP.get(cursor_n % 3, QtGui.QTabletEvent.UnknownPointer)
 
 
-class QExtTabletContext(object):
-    def __init__(self, window, device_n):
-        self.window = window
-        self._app = QtCore.QCoreApplication.instance()
-        self.cursors = {}
-
-        # Initialize a new wintab context
+class QExtTabletDevice(object):
+    def __init__(self, device_n):
         devices = wtinfo(libwintab.WTI_INTERFACE, libwintab.IFC_NDEVICES, libwintab.UINT())
         if devices <= device_n:
             raise QExtTabletException("Invalid tablet device: {}".format(device_n))
@@ -113,13 +107,21 @@ class QExtTabletContext(object):
         self.device_name = wtinfo(self.device_idx, libwintab.DVC_NAME, unicode)
         self.device_uid = wtinfo(self.device_idx, libwintab.DVC_PNPID, unicode)
 
-        # Axis
+        # Axis data
         self.np_axis = wtinfo(self.device_idx, libwintab.DVC_NPRESSURE, libwintab.AXIS())
         self.or_axis = wtinfo(self.device_idx, libwintab.DVC_ORIENTATION, (libwintab.AXIS * 3)())
         self.x_axis = wtinfo(self.device_idx, libwintab.DVC_X, libwintab.AXIS())
         self.y_axis = wtinfo(self.device_idx, libwintab.DVC_Y, libwintab.AXIS())
 
-        # Create context
+
+class QExtTabletContext(object):
+    def __init__(self, window, device):
+        self.window = window
+        self.device = device
+        self.cursors = {}
+        self._app = QtCore.QCoreApplication.instance()
+
+        # Initialize a new wintab context
         self.ctx_data = libwintab.LOGCONTEXT()
         wtinfo(libwintab.WTI_DEFCONTEXT, 0, self.ctx_data)
         self.ctx_data.lcMsgBase = libwintab.WT_DEFBASE
@@ -161,16 +163,19 @@ class QExtTabletContext(object):
             if (msg.message == WT_CSRCHANGE and msg.wParam == packet.pkSerialNumber) or \
                packet.pkCursor not in self.cursors:
                 # a cursor update is required
-                cursor = QExtCursorData(self.device_idx, packet.pkCursor)
+                cursor = QExtCursorData(packet.pkCursor)
                 self.cursors[packet.pkCursor] = cursor
             cursor = self.cursors[packet.pkCursor]
 
             # We copy QT's formulas verbatim here to be result-compatible, even though
             # we undo most of them later. Note that press also lacks bias adjustment(!)
-            press = float(packet.pkNormalPressure) / float(self.np_axis.axMax - self.np_axis.axMin)
+            np_axis = self.device.np_axis
+            x_axis = self.device.x_axis
+            y_axis = self.device.y_axis
 
-            pos_x = float(packet.pkX - self.x_axis.axMin) / float(self.x_axis.axMax - self.x_axis.axMin)
-            pos_y = float(packet.pkY - self.y_axis.axMin) / float(self.y_axis.axMax - self.y_axis.axMin)
+            press = float(packet.pkNormalPressure) / float(np_axis.axMax - np_axis.axMin)
+            pos_x = float(packet.pkX - x_axis.axMin) / float(x_axis.axMax - x_axis.axMin)
+            pos_y = float(packet.pkY - y_axis.axMin) / float(y_axis.axMax - y_axis.axMin)
             pos = QtCore.QPointF(geometry.left() + pos_x * geometry.width(),
                                  geometry.top() + (1. - pos_y) * geometry.height())
 
@@ -202,7 +207,7 @@ class QExtTabletContext(object):
 class QExtTabletWindow(QtGui.QMainWindow):
     def __init__(self, device=0):
         super(QExtTabletWindow, self).__init__()
-        self.tablet = QExtTabletContext(self, device)
+        self.tablet = QExtTabletContext(self, QExtTabletDevice(device))
         QExtTabletManager.register(self.tablet)
 
     def __del__(self):
