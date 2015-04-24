@@ -65,19 +65,13 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         # sub text
         self._sub_text = QtGui.QGraphicsTextItem(self._screen_group)
         self._sub_text.setDefaultTextColor(QtCore.Qt.gray)
-        self._sub_text.setHtml("Waiting for first event ...")
         font = self._sub_text.font()
         font.setFamily("Consolas")
         font.setPointSize(Consts.NORM_TEXT_SIZE)
         self._sub_text.setFont(font)
 
         # initial state
-        self.first_ev = None
-        self.last_ev = None
-        self.dev_off = None
-        self.ev_drops = None
-        self.os_hr_max = 0.
-        self.ev_rate = float("nan")
+        self.reset()
         self._drawing_state = False
         self._tracking_state = False
         self._cursor.hide()
@@ -231,9 +225,22 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         self._sub_text.setHtml(msg)
 
 
+    def reset(self):
+        self._sub_text.setHtml("Waiting for first event ...")
+        HiResTime.resync()
+        self.first_ev = None
+        self.last_ev = None
+        self.dev_off = None
+        self.ev_drops = None
+        self.os_hr_max = 0.
+        self.ev_rate = float("nan")
+
+
     def keyEvent(self, ev):
         if ev.key() == QtCore.Qt.Key_Escape:
             self.close()
+        elif ev.key() == QtCore.Qt.Key_Tab:
+            self.reset()
 
 
     def event(self, ev):
