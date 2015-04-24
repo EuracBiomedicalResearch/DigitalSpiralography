@@ -6,7 +6,9 @@ from . import Data
 from . import Consts
 from .Shared import timedelta_min_sec
 from .UI import translate
+
 import QExtTabletWindow
+import HiResTime
 
 # system modules
 import math
@@ -531,6 +533,7 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
 
 
     def exec_(self):
+        HiResTime.resync()
         self.result = None
         self._screen_pos = None
         self._drawing_pos = None
