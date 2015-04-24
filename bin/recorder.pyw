@@ -9,14 +9,15 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
-from DrawingRecorder import ID
+from DrawingRecorder import Consts
 from DrawingRecorder import Data
-from DrawingRecorder.Data import PatHand, PatHandedness
 from DrawingRecorder import DrawingFactory
 from DrawingRecorder import DrawingWindow
+from DrawingRecorder import ID
 from DrawingRecorder import Shared
-from DrawingRecorder import Consts
+from DrawingRecorder import Tablet
 from DrawingRecorder import UI
+from DrawingRecorder.Data import PatHand, PatHandedness
 from DrawingRecorder.UI import translate
 
 # system modules
@@ -406,7 +407,7 @@ class EndRecording(QtGui.QDialog):
 
 
 class MainWindow(QtGui.QMainWindow):
-    def __init__(self, params):
+    def __init__(self, params, device):
         super(MainWindow, self).__init__()
         self._ui = UI.load_ui(self, "main.ui")
 
@@ -421,7 +422,7 @@ class MainWindow(QtGui.QMainWindow):
         self._new_calibration_dialog = NewCalibration()
         self._new_recording_dialog = NewRecording()
         self._end_recording_dialog = EndRecording()
-        self._drawing_window = DrawingWindow.DrawingWindow()
+        self._drawing_window = DrawingWindow.DrawingWindow(device)
         self._dir_browser = QtGui.QFileDialog(self)
         self._dir_browser.setFileMode(QtGui.QFileDialog.Directory)
         self._dir_browser.setOption(QtGui.QFileDialog.ShowDirsOnly)
@@ -689,7 +690,8 @@ class Application(QtGui.QApplication):
                         str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))
 
         # initialize
-        self.main_window = MainWindow(params)
+        device = Tablet.get_tablet_device()
+        self.main_window = MainWindow(params, device)
         self.main_window.show()
         self.lastWindowClosed.connect(self._on_close)
 

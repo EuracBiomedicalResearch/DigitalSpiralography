@@ -297,8 +297,8 @@ class RecordingHandler(Handler):
 
 
 class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
-    def __init__(self):
-        super(DrawingWindow, self).__init__()
+    def __init__(self, device):
+        super(DrawingWindow, self).__init__(device)
 
         # scene setup
         self._scene = QtGui.QGraphicsScene(self)

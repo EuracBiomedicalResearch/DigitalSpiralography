@@ -28,7 +28,7 @@ def size2qpoly(w, h):
 def background_op(message, func, parent=None):
     pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
     pd.setWindowModality(QtCore.Qt.ApplicationModal)
-    pd.show()
+    pd.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)
 
     def background_fn(ret, func):
         try:
@@ -41,7 +41,8 @@ def background_op(message, func, parent=None):
     th.start()
     while th.is_alive():
         QtGui.QApplication.processEvents()
-        th.join(Consts.APP_DELAY)
+        if not th.join(Consts.APP_DELAY):
+            pd.show()
 
     pd.close()
     pd.deleteLater()

@@ -49,8 +49,15 @@ class QExtTabletManager(QtCore.QObject):
         del cls._instance._windows[window]
 
 
+def get_device_count():
+    return 1
+
+def get_device(device_n=0):
+    return device_n
+
+
 class QExtTabletWindow(QtGui.QMainWindow):
-    def __init__(self):
+    def __init__(self, device):
         super(QExtTabletWindow, self).__init__()
         QExtTabletManager.register(self)
 

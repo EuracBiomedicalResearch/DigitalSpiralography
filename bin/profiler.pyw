@@ -9,9 +9,10 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
-from DrawingRecorder import Data
 from DrawingRecorder import Consts
+from DrawingRecorder import Data
 from DrawingRecorder import ID
+from DrawingRecorder import Tablet
 from DrawingRecorder import UI
 from DrawingRecorder.UI import translate
 import QExtTabletWindow
@@ -51,8 +52,8 @@ class sorting_disabled(object):
 
 # main application
 class MainWindow(QExtTabletWindow.QExtTabletWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__()
+    def __init__(self, device):
+        super(MainWindow, self).__init__(device)
         self._ui = UI.load_ui(self, "profiler.ui")
 
         # signals and events
@@ -512,7 +513,8 @@ class Application(QtGui.QApplication):
         args = ap.parse_args(map(unicode, args[1:]))
 
         # initialize
-        self.main_window = MainWindow()
+        device = Tablet.get_tablet_device()
+        self.main_window = MainWindow(device)
         self.main_window.show()
         if args.file:
             self.main_window.load(args.file)

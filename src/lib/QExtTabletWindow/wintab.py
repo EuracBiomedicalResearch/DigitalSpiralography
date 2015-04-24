@@ -204,10 +204,17 @@ class QExtTabletContext(object):
             self.window.event(ev)
 
 
+def get_device_count():
+    return wtinfo(libwintab.WTI_INTERFACE, libwintab.IFC_NDEVICES, libwintab.UINT())
+
+def get_device(device_n=0):
+    return QExtTabletDevice(device_n)
+
+
 class QExtTabletWindow(QtGui.QMainWindow):
-    def __init__(self, device=0):
+    def __init__(self, device):
         super(QExtTabletWindow, self).__init__()
-        self.tablet = QExtTabletContext(self, QExtTabletDevice(device))
+        self.tablet = QExtTabletContext(self, device)
         QExtTabletManager.register(self.tablet)
 
     def __del__(self):

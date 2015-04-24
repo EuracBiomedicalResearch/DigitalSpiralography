@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Consts
+from DrawingRecorder import Tablet
 import HiResTime
 import QExtTabletWindow
 
@@ -21,8 +22,8 @@ from PyQt4 import QtCore, QtGui
 
 
 class MainWindow(QExtTabletWindow.QExtTabletWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__()
+    def __init__(self, device):
+        super(MainWindow, self).__init__(device)
 
         # scene setup
         self._scene = QtGui.QGraphicsScene(self)
@@ -258,7 +259,8 @@ class Application(QtGui.QApplication):
         args = ap.parse_args(map(unicode, args[1:]))
 
         # initialize
-        self.main_window = MainWindow()
+        device = Tablet.get_tablet_device()
+        self.main_window = MainWindow(device)
         self.main_window.show()
 
 
