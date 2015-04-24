@@ -199,7 +199,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
             dev_time = self.dev_off[1] + datetime.timedelta(seconds=(off / 1000.))
             hr_dv_delta = (hr_time - dev_time).total_seconds() * 1000.
             if abs(hr_dv_delta) >= 25.:
-                hr_dv_pc = abs(hr_dv_delta) * 100. / off
+                hr_dv_pc = hr_dv_delta * 100. / off
                 hr_dv_dsc = " [{:.3f}% DV]".format(hr_dv_pc)
 
         msg += "\nOS Time: " + str(os_time)
