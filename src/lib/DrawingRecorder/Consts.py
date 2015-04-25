@@ -8,7 +8,7 @@ from PyQt4 import QtCore
 # Basic versioning
 APP_ORG         = "EURAC"               # application organization
 APP_NAME        = "DrawingRecorder"     # application name
-APP_VERSION     = "1.8"                 # application version
+APP_VERSION     = "1.9"                 # application version
 APP_DELAY       = 1. / 20.              # general refresh delay for lengthy operations
 
 # File formats
