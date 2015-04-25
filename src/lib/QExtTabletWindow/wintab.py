@@ -98,8 +98,7 @@ class QExtCursorData(object):
 
 class QExtTabletDevice(object):
     def __init__(self, device_n):
-        devices = wtinfo(libwintab.WTI_INTERFACE, libwintab.IFC_NDEVICES, libwintab.UINT())
-        if devices <= device_n:
+        if not isinstance(device_n, int) or device_n < 0 or get_device_count() <= device_n:
             raise QExtTabletException("Invalid tablet device: {}".format(device_n))
 
         # Device ID
