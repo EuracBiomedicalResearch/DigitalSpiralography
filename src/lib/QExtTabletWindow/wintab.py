@@ -74,6 +74,7 @@ class QExtTabletManager(QtCore.QObject):
 
 class QExtCursorData(object):
     def __init__(self, cursor_n):
+        self.cursor_n = cursor_n
         self.cursor_idx = libwintab.WTI_CURSORS + cursor_n
         self.name = wtinfo(self.cursor_idx, libwintab.CSR_NAME, unicode)
         self.active = wtinfo(self.cursor_idx, libwintab.CSR_ACTIVE, libwintab.BOOL())
@@ -98,10 +99,11 @@ class QExtCursorData(object):
 
 class QExtTabletDevice(object):
     def __init__(self, device_n):
-        if not isinstance(device_n, int) or device_n < 0 or get_device_count() <= device_n:
+        if not isinstance(device_n, int) or device_n < 0 or get_device_count() < device_n:
             raise QExtTabletException("Invalid tablet device: {}".format(device_n))
 
         # Device ID
+        self.device_n = device_n
         self.device_idx = libwintab.WTI_DEVICES + device_n
         self.device_name = wtinfo(self.device_idx, libwintab.DVC_NAME, unicode)
         self.device_uid = wtinfo(self.device_idx, libwintab.DVC_PNPID, unicode)
@@ -125,9 +127,12 @@ class QExtTabletContext(object):
         wtinfo(libwintab.WTI_DEFCONTEXT, 0, self.ctx_data)
         self.ctx_data.lcMsgBase = libwintab.WT_DEFBASE
         self.ctx_data.lcOptions |= libwintab.CXO_MESSAGES | libwintab.CXO_CSRMESSAGES
+        self.ctx_data.lcDevice = self.device.device_n
         self.ctx_data.lcPktData = libwintab.PKT_FIELDS
         self.ctx_data.lcPktMode = 0
         self.ctx_data.lcMoveMask = libwintab.PKT_FIELDS
+
+        # NOTE: this has only effect when the virtual context is selected
         self.ctx_data.lcOutOrgX = self.ctx_data.lcOutOrgY = self.ctx_data.lcOutOrgZ = 0
         self.ctx_data.lcOutExtX = self.ctx_data.lcInExtX
         self.ctx_data.lcOutExtY = self.ctx_data.lcInExtY
@@ -207,7 +212,8 @@ def get_device_count():
     return wtinfo(libwintab.WTI_INTERFACE, libwintab.IFC_NDEVICES, libwintab.UINT())
 
 def get_device(device_n=0):
-    return QExtTabletDevice(device_n)
+    # NOTE: wintab devices start at 1, with 0 being the virtual "catch all" device.
+    return QExtTabletDevice(device_n + 1)
 
 
 class QExtTabletWindow(QtGui.QMainWindow):
