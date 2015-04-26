@@ -15,6 +15,7 @@ from DrawingRecorder import Tab
 
 # system modules
 import argparse
+import logging
 
 
 def __main__():
@@ -35,6 +36,7 @@ def __main__():
     grp.add_argument('--set', nargs=2, metavar=('KEY', 'VALUE'), action='append',
                      help='Set a single field (can be repeated)')
     args = ap.parse_args()
+    logging.basicConfig(format='%(levelname)s: %(message)s')
 
     # load
     record = Data.DrawingRecord.load(args.input, args.fast)
@@ -45,7 +47,8 @@ def __main__():
         try:
             DrawingStats.set(record, data)
         except ValueError as e:
-            ap.error(e)
+            logging.error(e)
+            sys.exit(1)
     elif args.stats:
         data = None
         fd = Tab.TabReader(args.stats, ['FILE'])
@@ -54,13 +57,13 @@ def __main__():
                 data = row
                 break
         if data is None:
-            print('WARNING: input file not been updated (no matching entry in {})'.format(args.stats),
-                  file=sys.stderr)
+            logging.warning('input file not been updated (no matching entry in {})'.format(args.stats))
         else:
             try:
                 DrawingStats.set(record, data)
             except ValueError as e:
-                ap.error(e)
+                logging.error(e)
+                sys.exit(1)
 
     # save
     if args.dump:

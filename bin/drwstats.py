@@ -16,6 +16,7 @@ from DrawingRecorder import Tab
 # system modules
 import argparse
 import codecs
+import logging
 import sys
 
 
@@ -30,6 +31,7 @@ def __main__():
                     help='Include extra COMMENTS attribute to the output')
     ap.add_argument('files', nargs='+', help='drawing file/s')
     args = ap.parse_args()
+    logging.basicConfig(format='%(levelname)s: %(message)s')
 
     fd = None
     for fn in args.files:
@@ -47,7 +49,8 @@ def __main__():
             fd.write(stats)
 
         except:
-            ap.error('uncaught exception while analyzing {fn}'.format(fn=fn))
+            logging.critical('uncaught exception while analyzing {fn}'.format(fn=fn))
+            raise
 
 
 if __name__ == '__main__':
