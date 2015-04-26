@@ -11,11 +11,6 @@ import collections
 import bisect
 import datetime
 import numpy as np
-import scipy.optimize
-
-
-def resp_curve(x, a, b, c):
-    return x * a + x ** 2 * b + x ** 3 * c
 
 
 def _closest_time_pair(times, t):
@@ -34,10 +29,10 @@ class ProfileCurve(object):
         data = sorted(prof.data, key=lambda x: x.pressure)
         x = np.array(map(lambda x: x.pressure, data))
         y = np.array(map(lambda x: x.weight, data))
-        self.param, _ = scipy.optimize.curve_fit(resp_curve, x, y)
+        self.param = np.polyfit(x, y, 3)
 
     def __call__(self, v):
-        return resp_curve(v, *self.param)
+        return np.polyval(self.param, v)
 
 
 class ProfileCurve2(object):
@@ -70,9 +65,10 @@ class ProfileMap(object):
 
 
     def weight_range(self):
-        ws = [c(1.) for c in self.curves]
-        return (reduce(min, ws, ws[0]),
-                reduce(max, ws, ws[0]))
+        ws_min = [c(0.) for c in self.curves]
+        ws_max = [c(1.) for c in self.curves]
+        return (reduce(min, ws_min, ws_min[0]),
+                reduce(max, ws_max, ws_max[0]))
 
 
     def time_range(self):
@@ -107,6 +103,14 @@ class ProfileMapper(object):
         self.profs = collections.defaultdict(list)
         for fn in profs:
             prof = Data.StylusProfile.load(fn)
+            prof.fit = None
+
+            # discard artificial 0./0. when mapping in order to correct
+            # detect sensor bias shifting over time
+            if len(prof.data) > 3 and prof.data[0].pressure == 0. \
+               and prof.data[0].weight == 0.:
+                prof.data = prof.data[1:]
+
             self.profs[prof.sid].append(prof)
 
         # stylus usage report
@@ -125,7 +129,8 @@ class ProfileMapper(object):
         return self.profs.keys()
 
     def sid_map(self, sid):
-        return self.profs[sid]
+        return self.profs.get(sid)
 
     def map_at_time(self, sid, time):
-        return self.profs[sid].map_at_time(time)
+        pmap = self.sid_map(sid)
+        return pmap and pmap.map_at_time(time)

@@ -31,7 +31,8 @@ def __main__():
     ap.add_argument('-o', dest='output', help='Output image file', required=True)
     ap.add_argument('-s', dest='sid', help='Stylus ID to plot')
     ap.add_argument('-r', dest='sur', help='Stylus usage report to load')
-    ap.add_argument('-m', dest='max', help='Maximum weight (default to auto)')
+    ap.add_argument('-z', dest='min', type=float, help='Minimum weight (default to auto)')
+    ap.add_argument('-m', dest='max', type=float, help='Maximum weight (default to auto)')
     ap.add_argument('-S', dest='start', type=date,
                     help='Starting time range (YYYY-MM-DD, default to first measurement)')
     ap.add_argument('-E', dest='end', type=date,
@@ -55,10 +56,16 @@ def __main__():
     wr = list(sm.weight_range())
     tr = list(sm.time_range())
 
-    if args.max is not None:
-        wr[1] = int(args.max)
+    wrd = (wr[1] - wr[0]) / 10
+    if args.min is not None:
+        wr[0] = args.min
     else:
-        wr[1] = wr[1] * 1.1
+        wr[0] = wr[0] - wrd
+
+    if args.max is not None:
+        wr[1] = args.max
+    else:
+        wr[1] = wr[1] + wrd
 
     trd = (tr[1] - tr[0]) / 10
     if args.start is not None:
@@ -72,7 +79,7 @@ def __main__():
 
     # calculate the response field
     nx = max(100, int((tr[1] - tr[0]).total_seconds() / 86400.))
-    ny = max(100, int(wr[1]))
+    ny = max(100, int((wr[1] - wr[0])))
     xi, yi = np.meshgrid(np.linspace(0, (tr[1] - tr[0]).total_seconds(), nx),
                          np.linspace(0, 1, ny))
     z = np.empty([ny, nx])
@@ -83,6 +90,8 @@ def __main__():
             v = yi[y, x]
             z[y, x] = curve(v)
     plt.pcolor(xi, z, yi, cmap='cool_r')
+    if wr[0] < 0:
+        plt.plot([xi[0, 0], xi[0, -1]], [0, 0], '--', color='k', alpha=0.5)
 
     # isolines
     istep = 50. / sm.weight_range()[1]
@@ -123,7 +132,7 @@ def __main__():
     plt.title('{sid} profile map'.format(sid=args.sid))
     plt.ylabel('Weight (g)')
     plt.margins(0.05)
-    plt.ylim(0, wr[1])
+    plt.ylim(wr[0], wr[1])
     plt.grid()
     plt.tick_params(right=True, labelright=True)
     plt.savefig(args.output, bbox_inches='tight')
