@@ -28,7 +28,7 @@ def get(record, cmts=False):
             "PAT_TYPE_ID": record.pat_type,
             "PAT_TYPE_DSC": record.config.pat_types.get(record.pat_type),
             "PAT_HANDEDNESS": Data.PAT_HANDEDNESS.get(record.pat_handedness, record.pat_handedness),
-            "PAT_HAND": Data.PAT_HAND.get(record.pat_hand, record.pat_hand),
+            "REC_HAND": Data.PAT_HAND.get(record.pat_hand, record.pat_hand),
             "PAT_HAND_CNT": record.pat_hand_cnt,
             "OPERATOR": record.oid,
             "BLOOD_DRAWN": record.extra_data.get('blood_drawn'),
@@ -116,7 +116,7 @@ def set(record, data, ignore_unknown=True, force=False):
                 record.pat_hand_cnt = v
             else:
                 raise ValueError('{} in not a valid hand count'.format(v))
-        elif k == 'PAT_HAND':
+        elif k == 'REC_HAND':
             if force or (v in Data.PAT_HAND.values()):
                 record.pat_hand = Data.PAT_HAND.keys()[Data.PAT_HAND.values().index(v)]
             else:

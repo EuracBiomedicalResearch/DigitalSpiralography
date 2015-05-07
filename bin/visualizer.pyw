@@ -267,7 +267,7 @@ class MainWindow(QtGui.QMainWindow):
         self._append_prop(name, record.pat_hand_cnt)
         name = translate("visualizer", "Pat. handedness")
         self._append_prop_map(name, Data.PAT_HANDEDNESS_DSC, record.pat_handedness)
-        name = translate("visualizer", "Pat. hand")
+        name = translate("visualizer", "Rec. hand")
         self._append_prop_map(name, Data.PAT_HAND_DSC, record.pat_hand)
 
         name = translate("visualizer", "Operator")
