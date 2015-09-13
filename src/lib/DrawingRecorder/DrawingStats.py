@@ -110,6 +110,8 @@ def set(record, data, ignore_unknown=True, force=False):
                 record.pat_type = v
             else:
                 raise ValueError('{} is not a valid patient type'.format(v))
+        elif k == 'PAT_TYPE_DSC':
+            record.config.pat_types[record.pat_type] = v
         elif k == 'PAT_HAND_CNT':
             v = int(v)
             if force or (v > 0 and v <= 2):
@@ -136,6 +138,8 @@ def set(record, data, ignore_unknown=True, force=False):
             record.comments = v
         elif k == 'OPERATOR':
             record.oid = v
+        elif k == 'CAL_OPERATOR':
+            record.calibration.oid = v
         elif k == 'TZ':
             record.tz = int(v)
         else:
