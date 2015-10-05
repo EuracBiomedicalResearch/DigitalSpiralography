@@ -58,16 +58,14 @@ def renderPatch(record, ax, c, pressure):
         pos = flip_y(event.coords_unit)
 
         # set drawing status
-        if event.typ == QtCore.QEvent.TabletPress or event.pressure:
-            drawing = True
-        elif event.typ == QtCore.QEvent.TabletRelease:
-            drawing = False
-        elif event.typ == QtCore.QEvent.TabletEnterProximity:
-            old_pos = None
-            drawing = False
-        elif event.typ == QtCore.QEvent.TabletLeaveProximity:
+        if event.typ == QtCore.QEvent.TabletEnterProximity or \
+           event.typ == QtCore.QEvent.TabletLeaveProximity:
             drawing = False
             pos = None
+        elif event.pressure > 0:
+            drawing = True
+        elif event.typ == QtCore.QEvent.TabletRelease or event.pressure == 0.:
+            drawing = False
 
         if old_pos and drawing and pos:
             verts = [old_pos, pos]

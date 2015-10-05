@@ -455,14 +455,14 @@ class MainWindow(QtGui.QMainWindow):
                 pos = (pos.x(), pos.y())
 
             # set drawing status
-            if event.typ == QtCore.QEvent.TabletPress or event.pressure:
-                drawing = True
-            elif event.typ == QtCore.QEvent.TabletRelease:
-                drawing = False
-            elif event.typ == QtCore.QEvent.TabletEnterProximity or \
-              event.typ == QtCore.QEvent.TabletLeaveProximity:
+            if event.typ == QtCore.QEvent.TabletEnterProximity or \
+               event.typ == QtCore.QEvent.TabletLeaveProximity:
                 drawing = False
                 pos = None
+            elif event.pressure > 0.:
+                drawing = True
+            elif event.typ == QtCore.QEvent.TabletRelease or event.pressure == 0.:
+                drawing = False
 
             if old_pos:
                 if drawing:
