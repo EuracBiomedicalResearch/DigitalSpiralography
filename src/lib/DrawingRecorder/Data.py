@@ -340,12 +340,20 @@ class DrawingRecord(object):
         fd = Tab.TabWriter(path, ["TIME", "X", "Y", "Z", "W", "T"])
         start = record.recording.events[0].stamp
         for event in record.recording.events:
+            if event.typ in {QtCore.QEvent.TabletEnterProximity, QtCore.QEvent.TabletLeaveProximity}:
+                coords = (None, None)
+                tilt = (None, None)
+                press = None
+            else:
+                coords = event.coords_drawing
+                tilt = event.tilt_drawing if event.tilt_drawing else (None, None)
+                press = event.pressure
             fd.write({'TIME': (event.stamp - start).total_seconds() * 1000.,
-                      'X': event.coords_drawing[0],
-                      'Y': event.coords_drawing[1],
-                      'Z': event.pressure,
-                      'W': event.tilt_drawing[0] if event.tilt_drawing else None,
-                      'T': event.tilt_drawing[1] if event.tilt_drawing else None})
+                      'X': coords[0],
+                      'Y': coords[1],
+                      'Z': press,
+                      'W': tilt[0],
+                      'T': tilt[1]})
 
 
     @classmethod
