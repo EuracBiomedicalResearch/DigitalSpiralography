@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
+from DrawingRecorder import Drawing
 from DrawingRecorder import DrawingFactory
 
 # Qt
@@ -78,10 +79,12 @@ def renderPatch(record, ax, c, pressure):
         old_stamp = stamp
 
 
-def remapSpiral(record):
+def remapSpiral(record, cal_mode):
     # offline recalibration
     drawing = DrawingFactory.from_id(record.drawing.id)
-    aff, error = drawing.calibrate(record.calibration.cpoints)
+    aff, error = drawing.calibrate(record.calibration.cpoints,
+                                   record.recording.rect_drawing,
+                                   cal_mode)
     if error: raise Exception("calibration error: {error}".format(error=error))
 
     # remap to unit coordinates
@@ -90,7 +93,7 @@ def remapSpiral(record):
         event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
 
 
-def renderSpirals(files, output, fast, pressure, desc, ticks):
+def renderSpirals(files, output, fast, pressure, desc, ticks, cal_mode):
     fig = plt.figure()
     fig.set_size_inches((7.35,9))
 
@@ -135,7 +138,7 @@ def renderSpirals(files, output, fast, pressure, desc, ticks):
                       '-', color='gray', alpha=0.5)
 
         sys.stderr.write("\b" + str(next(step)))
-        remapSpiral(record)
+        remapSpiral(record, cal_mode)
 
         sys.stderr.write("\b" + str(next(step)))
         renderPatch(record, s_ax, c, pressure)
@@ -153,6 +156,8 @@ def renderSpirals(files, output, fast, pressure, desc, ticks):
 
 
 def __main__():
+    cal_choices = {'full': Drawing.CalibrationMode.Full,
+                   'extent': Drawing.CalibrationMode.Extent}
     ap = argparse.ArgumentParser(description='Batch drawing stack renderer')
     ap.add_argument('-o', dest='output', required=True, help='output file')
     ap.add_argument('-t', dest='ticks', nargs=3, help='colorbar low/med/high values')
@@ -161,10 +166,13 @@ def __main__():
                     help='simulate pressure level')
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
+    ap.add_argument('--cal', choices=cal_choices.keys(), default='full',
+                    help='Calibration method')
     ap.add_argument('files', nargs='+', help='drawing file/s')
     args = ap.parse_args()
     renderSpirals(args.files, args.output, args.fast,
-                  args.pressure, args.desc, args.ticks)
+                  args.pressure, args.desc, args.ticks,
+                  cal_choices.get(args.cal))
 
 if __name__ == '__main__':
     __main__()

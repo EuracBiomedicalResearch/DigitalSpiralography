@@ -12,7 +12,7 @@ APP_VERSION     = "1.9"                 # application version
 APP_DELAY       = 1. / 20.              # general refresh delay for lengthy operations
 
 # File formats
-FORMAT_VERSION  = "1.5"                 # file format version
+FORMAT_VERSION  = "1.6"                 # file format version
 FF_RECORDING    = "rec"                 # recording type
 FF_PROFILE      = "prof"                # profiling type
 

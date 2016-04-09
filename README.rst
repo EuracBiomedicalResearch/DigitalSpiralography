@@ -117,6 +117,10 @@ Troubleshooting
 Version changes
 ~~~~~~~~~~~~~~~
 
+1.9:
+
+* DrawingRecorder file format 1.6.
+
 1.8:
 
 * DrawingRecorder file format 1.5.
@@ -604,6 +608,10 @@ Chunks introduced with format 1.5:
 
   + ``dev_stamp`` (optional): accurate event timestamp (in MS)
   + ``dev_serial`` (optional): event serial number
+
+Chunks introduced with format 1.6:
+
+* ``drawing/area_dim``: Physical dimensions of the drawing area (in mm).
 
 
 Profiler ``prof.json.gz`` File format

@@ -6,6 +6,7 @@ from __future__ import print_function
 # local modules
 from . import Consts
 from . import Drawing
+from . import DrawingFactory
 from . import RxUtil
 from . import Tab
 from .Shared import dtts, tsdt, strdt
@@ -298,7 +299,8 @@ class DrawingRecord(object):
                     "id": record.drawing.id,
                     "str": record.drawing.str,
                     "points": map(list, record.drawing.points),
-                    "cpoints": map(list, record.drawing.cpoints)},
+                    "cpoints": map(list, record.drawing.cpoints),
+                    "area_dim": list(record.drawing.area_dim)},
                 "calibration": {
                     "operator": record.calibration.oid,
                     "tablet_id": record.calibration.tablet_id,
@@ -399,11 +401,19 @@ class DrawingRecord(object):
                 if new_k not in extra_data['orig']:
                     extra_data['orig'][new_k] = old_v
 
+        # area_dim (optional, fmt 1.6)
+        area_dim = data['drawing'].get('area_dim')
+        if area_dim is not None:
+            area_dim = tuple(area_dim)
+        else:
+            area_dim = DrawingFactory.from_id(data['drawing']['id']).area_dim
+
         # drawing
         drawing = Drawing.Drawing(data['drawing']['id'],
                                   data['drawing']['str'],
                                   map(tuple, data['drawing']['points']),
-                                  map(tuple, data['drawing']['cpoints']))
+                                  map(tuple, data['drawing']['cpoints']),
+                                  area_dim)
 
         # calibration
         cpoints = map(tuple, data['calibration']['cpoints'])

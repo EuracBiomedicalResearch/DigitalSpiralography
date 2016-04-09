@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath(os.path.join(__file__, '../../src/lib')))
 
 # local modules
 from DrawingRecorder import Data
+from DrawingRecorder import Drawing
 from DrawingRecorder import DrawingFactory
 
 # Qt
@@ -152,10 +153,12 @@ def renderStd(record, cpoints):
     return fig
 
 
-def renderSpiral(record, output, paper, no_detail):
+def renderSpiral(record, output, paper, no_detail, cal_mode):
     # offline recalibration
     drawing = DrawingFactory.from_id(record.drawing.id)
-    aff, error = drawing.calibrate(record.calibration.cpoints)
+    aff, error = drawing.calibrate(record.calibration.cpoints,
+                                   record.recording.rect_drawing,
+                                   cal_mode)
     if error: raise Exception("calibration error: {error}".format(error=error))
 
     # remap to unit coordinates
@@ -178,9 +181,13 @@ def renderSpiral(record, output, paper, no_detail):
 
 
 def __main__():
+    cal_choices = {'full': Drawing.CalibrationMode.Full,
+                   'extent': Drawing.CalibrationMode.Extent}
     ap = argparse.ArgumentParser(description='Batch drawing renderer')
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
+    ap.add_argument('--cal', choices=cal_choices.keys(), default='full',
+                    help='Calibration method')
     ap.add_argument('-p', dest='paper', action='store_true',
                     help='paper-like rendering')
     ap.add_argument('-n', dest='no_detail', action='store_true',
@@ -190,7 +197,8 @@ def __main__():
     args = ap.parse_args()
 
     record = Data.DrawingRecord.load(args.file, args.fast)
-    renderSpiral(record, args.output, args.paper, args.no_detail)
+    renderSpiral(record, args.output, args.paper,
+                 args.no_detail, cal_choices.get(args.cal))
 
 
 if __name__ == '__main__':
