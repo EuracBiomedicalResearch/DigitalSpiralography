@@ -338,6 +338,9 @@ class DrawingRecord(object):
     @classmethod
     def save_text(cls, record, path):
         fd = Tab.TabWriter(path, ["TIME", "X", "Y", "Z", "W", "T"])
+        if len(record.recording.events) == 0:
+            return
+
         start = record.recording.events[0].stamp
         for event in record.recording.events:
             if event.typ in {QtCore.QEvent.TabletEnterProximity, QtCore.QEvent.TabletLeaveProximity}:
