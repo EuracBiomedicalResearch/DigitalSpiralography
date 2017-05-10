@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Stylus profile evolution map"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -94,7 +92,7 @@ def __main__():
         plt.plot([xi[0, 0], xi[0, -1]], [0, 0], '--', color='k', alpha=0.5)
 
     # isolines
-    istep = 50. / sm.weight_range()[1]
+    istep = 25. / sm.weight_range()[1]
     for y in [1.] + list(np.arange(0, 1, istep)):
         yt = []
         for x in range(nx):
@@ -108,8 +106,8 @@ def __main__():
         prof = sm.profs[i]
         curve = sm.curves[i]
         x = [(prof.ts_created - tr[0]).total_seconds()] * len(prof.data)
-        y = np.array(map(lambda x: x.weight, prof.data))
-        z = np.array(map(lambda x: x.pressure, prof.data))
+        y = np.array([x.weight for x in prof.data])
+        z = np.array([x.pressure for x in prof.data])
         plt.scatter(x, y, c=z, cmap='jet')
 
     # place xticks at the measurement dates

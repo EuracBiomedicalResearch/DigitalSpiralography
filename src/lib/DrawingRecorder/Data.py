@@ -20,13 +20,18 @@ import datetime
 import gzip
 import json
 import numpy as np
+import sys
 import time
 import yaml
 
+# stubs for python 2.7
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
+
+if sys.version_info.major >= 3:
+    basestring = str
 
 
 # basic types
@@ -534,7 +539,7 @@ class StylusProfile(object):
                 "operator": profile.oid,
                 "stylus_id": profile.sid,
                 "tablet_id": profile.tid,
-                "data": map(StylusResponseData.serialize, profile.data),
+                "data": list(map(StylusResponseData.serialize, profile.data)),
                 "fit": profile.fit[0].tolist() if profile.fit is not None else None,
                 "extra_data": profile.extra_data,
                 "tz": profile.tz}
@@ -590,7 +595,7 @@ class StylusProfile(object):
         # final object
         return StylusProfile(_ts_loads(data['ts_created']), _ts_loads(data['ts_updated']),
                              data['operator'], data['stylus_id'], data['tablet_id'],
-                             map(StylusResponseData.deserialize, data['data']),
+                             list(map(StylusResponseData.deserialize, data['data'])),
                              fit, extra_data, tz)
 
 

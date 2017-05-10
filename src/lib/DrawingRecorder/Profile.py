@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """Stylus profile correction/interpolators"""
 
-from __future__ import print_function
+from __future__ import print_function, generators
 
 # local modules
 from . import Data
 
 # system modules
+from functools import reduce
 import collections
 import bisect
 import datetime
@@ -27,8 +28,8 @@ class ProfileCurve(object):
     def __init__(self, prof):
         assert(len(prof.data) > 5)
         data = sorted(prof.data, key=lambda x: x.pressure)
-        x = np.array(map(lambda x: x.pressure, data))
-        y = np.array(map(lambda x: x.weight, data))
+        x = np.array([x.pressure for x in data])
+        y = np.array([x.weight for x in data])
         self.param = np.polyfit(x, y, 3)
 
     def __call__(self, v):
@@ -51,7 +52,7 @@ class ProfileMap(object):
     def __init__(self, sid, profs, marks):
         self.profs = sorted(profs, key=lambda p: p.ts_created)
         self.times = [p.ts_created for p in self.profs]
-        self.curves = map(ProfileCurve, self.profs)
+        self.curves = list(map(ProfileCurve, self.profs))
 
         if marks is not None:
             marks = sorted(marks, key=lambda m: m.stamp)
@@ -120,13 +121,13 @@ class ProfileMapper(object):
             self.sur = Data.StylusUsageReport.load(sur)
 
         # initialize each sid independently
-        for sid, profs in self.profs.iteritems():
+        for sid, profs in self.profs.items():
             marks = self.sur.get(sid) if self.sur else None
             self.profs[sid] = ProfileMap(sid, profs, marks)
 
     def sids(self):
         """Return the list of available stylus IDs"""
-        return self.profs.keys()
+        return list(self.profs.keys())
 
     def sid_map(self, sid):
         return self.profs.get(sid)

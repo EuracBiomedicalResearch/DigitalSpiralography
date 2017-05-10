@@ -36,7 +36,11 @@ class TabReader(object):
 
 
     def __iter__(self):
-        return self
+        while True:
+            row = self.read()
+            if row is None:
+                break
+            yield row
 
 
     def read(self):
@@ -56,13 +60,6 @@ class TabReader(object):
             v = typ(v) if isinstance(typ, basestring) or len(v) != 0 else None
             row[col] = v
 
-        return row
-
-
-    def next(self):
-        row = self.read()
-        if row is None:
-            raise StopIteration()
         return row
 
 
