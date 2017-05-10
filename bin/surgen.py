@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Stylus usage report generator"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -44,12 +42,12 @@ def __main__():
     # generate counters
     sur = {}
     for sid, group in data:
-        group = group.resample(args.freq, how='count')
+        group = group.resample(args.freq).count()
         rep = []
         acc = 0
         for i, cnt in group['TS'].iteritems():
             if cnt:
-                rep.append(Data.StylusUsageMark(i.to_datetime(), int(acc)))
+                rep.append(Data.StylusUsageMark(i.to_pydatetime(), int(acc)))
                 acc += int(cnt)
         sur[sid] = rep
 

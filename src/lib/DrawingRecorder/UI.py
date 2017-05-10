@@ -5,8 +5,11 @@
 from . import Paths
 
 # system modules
-import os
+import os, sys
 from PyQt4 import QtCore, QtGui, uic
+
+if sys.version_info.major >= 3:
+    unicode = str
 
 
 # implementation

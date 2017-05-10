@@ -2,7 +2,7 @@
 """Drawing factory"""
 
 # local modules
-import Drawing
+from . import Drawing
 
 
 # drawing ID/s constructors table

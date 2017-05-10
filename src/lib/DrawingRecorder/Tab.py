@@ -2,7 +2,11 @@
 """Tabular file handling"""
 
 from __future__ import print_function
-import io
+import io, sys
+
+if sys.version_info.major >= 3:
+    basestring = str
+    unicode = str
 
 
 class TabException(IOError):

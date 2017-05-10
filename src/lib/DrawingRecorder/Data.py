@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Data structures/serialization support"""
 
-from __future__ import print_function
+from __future__ import print_function, generators
 
 # local modules
 from . import Consts
@@ -15,7 +15,6 @@ from .UI import translate
 # system modules
 from PyQt4 import QtCore
 from copy import copy
-import cPickle
 import collections
 import datetime
 import gzip
@@ -23,6 +22,11 @@ import json
 import numpy as np
 import time
 import yaml
+
+try:
+    import cPickle as pickle
+except ImportError:
+    import pickle
 
 
 # basic types
@@ -40,7 +44,7 @@ def _from_type(type_map, value):
     return value
 
 def _to_type(type_map, value):
-    for k, v in type_map.iteritems():
+    for k, v in type_map.items():
         if value == v:
             return k
     return value
@@ -274,7 +278,7 @@ class DrawingRecord(object):
             record._type = Consts.FF_RECORDING
             record._format = Consts.FORMAT_VERSION
             record._version = Consts.APP_VERSION
-            cPickle.dump(record, fd, cPickle.HIGHEST_PROTOCOL)
+            pickle.dump(record, fd, pickle.HIGHEST_PROTOCOL)
 
 
     @classmethod
@@ -365,13 +369,13 @@ class DrawingRecord(object):
         if fast:
             with open(path, "rb") as fd:
                 try:
-                    data = cPickle.load(fd)
+                    data = pickle.load(fd)
                     if data._type != Consts.FF_RECORDING or \
                        data._format != Consts.FORMAT_VERSION or \
                        data._version != Consts.APP_VERSION:
                         raise Exception('Cannot load dump file produced by a different software version)', path)
                     return data
-                except cPickle.UnpicklingError:
+                except pickle.UnpicklingError:
                     pass
 
         # normal (safe) fallback
@@ -608,7 +612,7 @@ class StylusUsageReport(object):
     @classmethod
     def save(cls, data, path):
         fd = Tab.TabWriter(path, ['SID', 'DATE', 'COUNT'])
-        for sid, marks in data.sur.iteritems():
+        for sid, marks in data.sur.items():
             for mark in marks:
                 fd.write({'SID': sid,
                           'DATE': mark.stamp,
