@@ -2,8 +2,8 @@
 """Various ID validation functions"""
 
 # local modules
-import Verhoeff
-from UI import translate
+from . import Verhoeff
+from .UI import translate
 
 # system modules
 from PyQt4 import QtGui

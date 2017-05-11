@@ -307,23 +307,23 @@ class DrawingRecord(object):
                 "drawing": {
                     "id": record.drawing.id,
                     "str": record.drawing.str,
-                    "points": map(list, record.drawing.points),
-                    "cpoints": map(list, record.drawing.cpoints),
+                    "points": list(map(list, record.drawing.points)),
+                    "cpoints": list(map(list, record.drawing.cpoints)),
                     "area_dim": list(record.drawing.area_dim)},
                 "calibration": {
                     "operator": record.calibration.oid,
                     "tablet_id": record.calibration.tablet_id,
                     "stylus_id": record.calibration.stylus_id,
                     "stamp": _ts_dumps(record.calibration.stamp),
-                    "cpoints": map(list, record.calibration.cpoints),
-                    "ctilts": map(list, record.calibration.ctilts)},
+                    "cpoints": list(map(list, record.calibration.cpoints)),
+                    "ctilts": list(map(list, record.calibration.ctilts))},
                 "calibration_age": record.calibration_age,
                 "recording": {
                     "session_start": _ts_dumps(record.recording.session_start),
                     "rect_size": list(record.recording.rect_size),
-                    "rect_drawing": map(list, record.recording.rect_drawing),
-                    "rect_trans": map(list, record.recording.rect_trans),
-                    "events": map(RecordingEvent.serialize, record.recording.events),
+                    "rect_drawing": list(map(list, record.recording.rect_drawing)),
+                    "rect_trans": list(map(list, record.recording.rect_trans)),
+                    "events": list(map(RecordingEvent.serialize, record.recording.events)),
                     "retries": len(record.recording.retries) + 1,
                     "retries_events": [map(RecordingEvent.serialize, el) for el in record.recording.retries],
                     "strokes": record.recording.strokes},
@@ -431,17 +431,17 @@ class DrawingRecord(object):
         # drawing
         drawing = Drawing.Drawing(data['drawing']['id'],
                                   data['drawing']['str'],
-                                  map(tuple, data['drawing']['points']),
-                                  map(tuple, data['drawing']['cpoints']),
+                                  list(map(tuple, data['drawing']['points'])),
+                                  list(map(tuple, data['drawing']['cpoints'])),
                                   area_dim)
 
         # calibration
-        cpoints = map(tuple, data['calibration']['cpoints'])
+        cpoints = list(map(tuple, data['calibration']['cpoints']))
         ctilts = data['calibration'].get('ctilts') # optional (fmt 1.3)
         if ctilts is None:
             ctilts = [(0, 0)] * len(cpoints)
         else:
-            ctilts = map(tuple, ctilts)
+            ctilts = list(map(tuple, ctilts))
 
         calibration = CalibrationData(data['calibration'].get('operator'), # optional (fmt 1.2)
                                       data['calibration']['tablet_id'],
@@ -453,14 +453,14 @@ class DrawingRecord(object):
         if retries_events is None:
             retries_events = [[]] * (data['recording']['retries'] - 1)
         else:
-            retries_events = [map(RecordingEvent.deserialize, el) for el in retries_events]
+            retries_events = [list(map(RecordingEvent.deserialize, el)) for el in retries_events]
 
         # recording
         recording = RecordingData(_ts_loads(data['recording']['session_start']),
                                   tuple(data['recording']['rect_size']),
-                                  map(tuple, data['recording']['rect_drawing']),
-                                  map(tuple, data['recording']['rect_trans']),
-                                  map(RecordingEvent.deserialize, data['recording']['events']),
+                                  list(map(tuple, data['recording']['rect_drawing'])),
+                                  list(map(tuple, data['recording']['rect_trans'])),
+                                  list(map(RecordingEvent.deserialize, data['recording']['events'])),
                                   retries_events, data['recording']['strokes'])
 
         # timestamps (optional, fmt 1.3)
@@ -539,7 +539,7 @@ class StylusProfile(object):
                 "operator": profile.oid,
                 "stylus_id": profile.sid,
                 "tablet_id": profile.tid,
-                "data": list(map(StylusResponseData.serialize, profile.data)),
+                "data": map(StylusResponseData.serialize, profile.data),
                 "fit": profile.fit[0].tolist() if profile.fit is not None else None,
                 "extra_data": profile.extra_data,
                 "tz": profile.tz}

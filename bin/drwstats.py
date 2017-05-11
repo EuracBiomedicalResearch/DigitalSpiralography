@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Drawing statistics generator"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -15,15 +13,11 @@ from DrawingRecorder import Tab
 
 # system modules
 import argparse
-import codecs
 import logging
 import sys
 
 
 def __main__():
-    # enforce output to be UTF-8 (due to file contents)
-    sys.stdout = codecs.getwriter('UTF-8')(sys.stdout)
-
     ap = argparse.ArgumentParser(description='Print drawing statistics in parseable format')
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')

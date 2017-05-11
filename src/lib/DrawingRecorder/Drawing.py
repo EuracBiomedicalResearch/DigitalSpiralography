@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Drawing modules"""
 
+from __future__ import generators
+
 # local modules
 from .UI import translate
 
@@ -46,7 +48,7 @@ class Spiral(Drawing):
 
     def _generate(self, step=1.):
         buf = [(0, 0)]
-        for x in xrange(1, int(self.params.turns * 360. / step) + 1):
+        for x in range(1, int(self.params.turns * 360. / step) + 1):
             d = x * step
             r = 1. / (self.params.turns * 360.) * d
             a = math.radians(d)
@@ -123,14 +125,14 @@ class Spiral(Drawing):
         self._cpoint_origin = len(buf) - 1
 
         # x increasing for all turns
-        for x in xrange(1, int(self.params.turns) + 1):
+        for x in range(1, int(self.params.turns) + 1):
             r = x / self.params.turns
             a = math.radians(0.)
             buf.append((r * math.cos(a), r * math.sin(a)))
         self._cpoint_maxx = len(buf) - 1
 
         # y increasing for all turns
-        for x in xrange(1, int(self.params.turns) + 1):
+        for x in range(1, int(self.params.turns) + 1):
             r = (x * 360. - 90.) / (self.params.turns * 360.)
             a = math.radians(-90.)
             buf.append((r * math.cos(a), r * math.sin(a)))

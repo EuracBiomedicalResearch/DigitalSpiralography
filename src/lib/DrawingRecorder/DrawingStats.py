@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Drawing record basic statistics extraction/application"""
 
-from __future__ import print_function
+from __future__ import generators
 
 # local modules
 from . import Data
