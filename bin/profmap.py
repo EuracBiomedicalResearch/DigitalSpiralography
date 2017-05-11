@@ -108,22 +108,30 @@ def __main__():
         x = [(prof.ts_created - tr[0]).total_seconds()] * len(prof.data)
         y = np.array([x.weight for x in prof.data])
         z = np.array([x.pressure for x in prof.data])
-        plt.scatter(x, y, c=z, cmap='jet')
+        plt.scatter(x, y, c=z, cmap='jet', zorder=10)
+
+    # place extra ticks at the initial/final marks
+    if sm.marks:
+        if args.start is None and sm.marks[0] != sm.times[0]:
+            args.start = sm.marks[0]
+        if args.end is None and sm.marks[-1] != sm.times[-1]:
+            args.end = sm.marks[-1]
 
     # place xticks at the measurement dates
     xlocs = [(t - tr[0]).total_seconds() for t in sm.times]
     if args.start is not None:
         start = (args.start - tr[0]).total_seconds()
-        if abs(start - xlocs[-1]) > 86400:
-            xlocs.append(start)
+        if abs(start - xlocs[0]) > 86400:
+            xlocs = [start] + xlocs
     if args.end is not None:
-        end = (args.end - tr[1]).total_seconds()
+        end = (args.end - tr[0]).total_seconds()
         if abs(end - xlocs[-1]) > 86400:
             xlocs.append(end)
     xlabels = []
     for x in xlocs:
         t = datetime.datetime.fromtimestamp(time.mktime(tr[0].timetuple()) + x)
         xlabels.append(t.strftime("%Y-%m-%d"))
+        plt.axvline(x, alpha=0.1, linewidth=1, color='k')
     plt.xticks(xlocs, xlabels, rotation=45, horizontalalignment='right')
 
     # general parameters
