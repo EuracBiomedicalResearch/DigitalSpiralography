@@ -21,7 +21,18 @@ def get(record, cmts=False):
 
     rec_data_cnt = 0
     for events in [record.recording.events] + record.recording.retries:
-        if len(events):
+        if len(events) < 2:
+            continue
+        # crudely consider data to be present only for drawing stretches
+        # longer than an entire second
+        for ev_start in range(len(events)):
+            if events[ev_start].pressure > 0:
+                break
+        for ev_end in range(len(events)-1, ev_start-1, -1):
+            if events[ev_end].pressure > 0:
+                break
+        if (ev_end - ev_start) > 1 and \
+           (events[ev_end].stamp - events[ev_start].stamp).total_seconds() > 1:
             rec_data_cnt += 1
 
     data = {"PAT_ID": record.aid,
