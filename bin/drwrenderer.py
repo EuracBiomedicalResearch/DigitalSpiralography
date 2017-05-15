@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Drawing batch renderer"""
-
-from __future__ import print_function, generators
 
 # setup path
 import os, sys
@@ -106,10 +104,10 @@ def renderStd(record, cpoints):
     ax.grid(True)
 
     # drawing/calibration points
-    plt.plot(map(lambda x: x[0], record.drawing.points),
-             map(lambda x: -x[1], record.drawing.points), '-')
-    plt.scatter(map(lambda x: x[0], cpoints),
-                map(lambda x: -x[1], cpoints))
+    plt.plot([x[0] for x in record.drawing.points],
+             [-x[1] for x in record.drawing.points], '-')
+    plt.scatter([x[0] for x in cpoints],
+                [-x[1] for x in cpoints])
 
     # track drawing status to recover actual tracing length/time
     codes = [Path.MOVETO, Path.LINETO]
@@ -162,7 +160,7 @@ def renderSpiral(record, output, paper, no_detail, cal_mode):
     if error: raise Exception("calibration error: {error}".format(error=error))
 
     # remap to unit coordinates
-    cpoints = map(lambda x: aff.map(x[0], x[1]), record.calibration.cpoints)
+    cpoints = [aff.map(x[0], x[1]) for x in record.calibration.cpoints]
     for event in record.recording.events:
         event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
 

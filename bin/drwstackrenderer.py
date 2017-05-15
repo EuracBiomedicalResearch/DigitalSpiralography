@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Drawing batch stack renderer"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -88,7 +86,7 @@ def remapSpiral(record, cal_mode):
     if error: raise Exception("calibration error: {error}".format(error=error))
 
     # remap to unit coordinates
-    cpoints = map(lambda x: aff.map(x[0], x[1]), record.calibration.cpoints)
+    cpoints = [aff.map(x[0], x[1]) for x in record.calibration.cpoints]
     for event in record.recording.events:
         event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
 
@@ -133,8 +131,8 @@ def renderSpirals(files, output, fast, pressure, desc, ticks, cal_mode):
         if i == 0:
             # we assume we're comparing identical drawings
             sys.stderr.write("\b" + str(next(step)))
-            s_ax.plot(map(lambda x: x[0], record.drawing.points),
-                      map(lambda x: -x[1], record.drawing.points),
+            s_ax.plot([x[0] for x in record.drawing.points],
+                      [-x[1] for x in record.drawing.points],
                       '-', color='gray', alpha=0.5)
 
         sys.stderr.write("\b" + str(next(step)))
