@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Main Stylus profiler application"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -218,7 +216,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
             for x in range(2):
                 item = self._ui.data.item(y, x)
                 try:
-                    v[x] = float(unicode(item.text()))
+                    v[x] = float(item.text())
                 except ValueError:
                     self.data_ok = False
             if v[0] is not None and v[1] is not None:
@@ -230,7 +228,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
 
     def on_meta_changed(self, var, item):
-        v = unicode(item.text())
+        v = item.text()
         if getattr(self.data, var) != v:
             setattr(self.data, var, v)
             self._update_meta()
@@ -238,7 +236,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
     def on_data_changed(self, item):
         try:
-            float(unicode(item.text()))
+            float(item.text())
             item.setBackground(self._ui.data.viewOptions().palette.base())
             self.on_selected()
         except ValueError:
@@ -254,8 +252,8 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
             row = idx[0].row()
             v = [None, None]
             try:
-                v[0] = float(unicode(self._ui.data.item(row, 0).text()))
-                v[1] = float(unicode(self._ui.data.item(row, 1).text()))
+                v[0] = float(self._ui.data.item(row, 0).text())
+                v[1] = float(self._ui.data.item(row, 1).text())
             except ValueError:
                 pass
             if v[0] is not None and v[1] is not None:
@@ -272,7 +270,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
     def on_add(self, ev):
         press = self._ui.pressure.text()
         try:
-            press = float(unicode(press))
+            press = float(press)
         except ValueError:
             self._ui.pressure.selectAll()
             self._ui.pressure.setFocus()
@@ -280,7 +278,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
         weight = self._ui.weight.text()
         try:
-            weight = float(unicode(weight))
+            weight = float(weight)
         except ValueError:
             self._ui.weight.selectAll()
             self._ui.weight.setFocus()
@@ -291,7 +289,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         else:
             tare = self._ui.tare.text()
             try:
-                tare = float(unicode(tare))
+                tare = float(tare)
             except ValueError:
                 self._ui.tare.selectAll()
                 self._ui.tare.setFocus()
@@ -400,9 +398,9 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         title = translate("profiler", "Load profile")
         ext_name = translate("profiler", "Profiles")
         path = QtGui.QFileDialog.getOpenFileName(
-            self, title, QtCore.QString(), ext_name + " (*.prof.json.gz *.prof.yaml.gz)")
+            self, title, "", ext_name + " (*.prof.json.gz *.prof.yaml.gz)")
         if path:
-            self.load(unicode(path))
+            self.load(path)
 
 
     def on_save(self, ev):
@@ -468,7 +466,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
     def on_weight(self, ev):
         weight = self._ui.weight.text()
         try:
-            weight = float(unicode(weight))
+            weight = float(weight)
         except ValueError:
             self._ui.total.clear()
             return
@@ -478,7 +476,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         else:
             tare = self._ui.tare.text()
             try:
-                tare = float(unicode(tare))
+                tare = float(tare)
             except ValueError:
                 self._ui.total.clear()
                 return
@@ -510,7 +508,7 @@ class Application(QtGui.QApplication):
         # command-line flags
         ap = argparse.ArgumentParser(description='Stylus profiler')
         ap.add_argument('file', nargs='?', help='stylus profile to load')
-        args = ap.parse_args(map(unicode, args[1:]))
+        args = ap.parse_args(args[1:])
 
         # initialize
         device = Tablet.get_tablet_device()

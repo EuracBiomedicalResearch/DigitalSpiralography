@@ -539,7 +539,7 @@ class StylusProfile(object):
                 "operator": profile.oid,
                 "stylus_id": profile.sid,
                 "tablet_id": profile.tid,
-                "data": map(StylusResponseData.serialize, profile.data),
+                "data": list(map(StylusResponseData.serialize, profile.data)),
                 "fit": profile.fit[0].tolist() if profile.fit is not None else None,
                 "extra_data": profile.extra_data,
                 "tz": profile.tz}
