@@ -17,7 +17,7 @@ import time
 def get_tablet_device(device=None, waitfor=True):
     if QExtTabletWindow.get_device_count() <= (device or 0) and waitfor == True:
         pd = QtGui.QProgressDialog(translate("tablet", "Waiting for tablet device ..."),
-                                   QtCore.QString(), 0, 0, None)
+                                   "", 0, 0, None)
         pd.setWindowTitle(Consts.APP_NAME)
         pd.setWindowModality(QtCore.Qt.ApplicationModal)
         pd.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint | \

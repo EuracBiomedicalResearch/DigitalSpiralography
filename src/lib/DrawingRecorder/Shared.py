@@ -26,7 +26,7 @@ def size2qpoly(w, h):
 
 # General QT functions
 def background_op(message, func, parent=None):
-    pd = QtGui.QProgressDialog(message, QtCore.QString(), 0, 0, parent)
+    pd = QtGui.QProgressDialog(message, "", 0, 0, parent)
     pd.setWindowTitle(Consts.APP_NAME)
     pd.setWindowModality(QtCore.Qt.ApplicationModal)
     pd.setWindowFlags(QtCore.Qt.CustomizeWindowHint | QtCore.Qt.WindowTitleHint)

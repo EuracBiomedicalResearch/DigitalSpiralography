@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Main Drawing visualizer application"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -219,9 +217,8 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def _append_prop(self, name, value):
-        name = unicode(name)
         if value is not None:
-            value = unicode(value)
+            value = str(value)
         else:
             value = translate("types", "N/A")
 
@@ -573,9 +570,9 @@ class MainWindow(QtGui.QMainWindow):
         title = translate("visualizer", "Load recording")
         ext_name = translate("visualizer", "Recordings")
         path = QtGui.QFileDialog.getOpenFileName(
-            self, title, QtCore.QString(), ext_name + " (*.rec.json.gz *.yaml.gz)")
+            self, title, "", ext_name + " (*.rec.json.gz *.yaml.gz)")
         if path:
-            self.load(unicode(path))
+            self.load(path)
 
 
     def on_info(self, ev):
@@ -643,7 +640,7 @@ class Application(QtGui.QApplication):
         ap.add_argument('-f', dest='fast', action='store_true',
                         help='Enable fast loading')
         ap.add_argument('file', nargs='?', help='drawing file')
-        args = ap.parse_args(map(unicode, args[1:]))
+        args = ap.parse_args(args[1:])
 
         # initialize
         self.main_window = MainWindow(args.fast)
