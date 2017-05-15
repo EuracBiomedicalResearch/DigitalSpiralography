@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Tablet tester"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -263,7 +261,7 @@ class Application(QtGui.QApplication):
         # command-line flags
         ap = argparse.ArgumentParser(description='Tablet tester')
         ap.add_argument('dir', nargs='?', help='project directory')
-        args = ap.parse_args(map(unicode, args[1:]))
+        args = ap.parse_args(args[1:])
 
         # initialize
         device = Tablet.get_tablet_device()

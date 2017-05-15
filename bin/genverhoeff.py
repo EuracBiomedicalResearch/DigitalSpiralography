@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Simple wrapper over the Verhoeff module"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
