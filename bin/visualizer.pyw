@@ -489,7 +489,7 @@ class MainWindow(QtGui.QMainWindow):
                 if self._showStrokes:
                     if drawing and last_stroke:
                         lift_pen.setWidthF(1.)
-                        drawArrow(self._screen_group, lift_pen, last_stroke, pos)
+                        drawArrow(self._screen_group, lift_pen, last_stroke, old_pos)
                         last_stroke = None
                     elif not drawing and old_drawing and event is not events[-1]:
                         tmp = QtGui.QGraphicsEllipseItem(old_pos[0] - Consts.LIFT_RADIUS / 2,
