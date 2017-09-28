@@ -54,7 +54,7 @@ def __main__():
     wr = list(sm.weight_range())
     tr = list(sm.time_range())
 
-    wrd = (wr[1] - wr[0]) / 10
+    wrd = (wr[1] - wr[0]) / 50
     if args.min is not None:
         wr[0] = args.min
     else:
@@ -65,7 +65,7 @@ def __main__():
     else:
         wr[1] = wr[1] + wrd
 
-    trd = (tr[1] - tr[0]) / 10
+    trd = (tr[1] - tr[0]) / 50
     if args.start is not None:
         tr[0] = args.start
     else:
