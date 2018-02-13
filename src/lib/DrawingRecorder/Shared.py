@@ -9,6 +9,7 @@ import datetime
 import dateutil.parser
 import time
 import threading
+import math
 from PyQt4 import QtCore, QtGui
 
 
@@ -67,9 +68,12 @@ def dtts(dt):
     return int(time.mktime(dt.timetuple()))
 
 def tsdt(ts, tzoffset=None):
-    """UTC timestamp to (localized) datetime"""
-    tzinfo = dateutil.tz.tzoffset(None, tzoffset) if tzoffset is not None else None
-    return datetime.datetime.fromtimestamp(ts, tzinfo)
+    """Parse an UTC timestamp to (localized) datetime"""
+    if tzoffset is not None and math.isfinite(tzoffset):
+        tzinfo = dateutil.tz.tzoffset(None, tzoffset)
+    else:
+        tzinfo = None
+    return datetime.datetime.fromtimestamp(float(ts), tzinfo)
 
 def strdt(s, tzoffset=None):
     """String to (localized) datetime"""

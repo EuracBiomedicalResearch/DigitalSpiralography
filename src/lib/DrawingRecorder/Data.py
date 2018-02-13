@@ -9,7 +9,7 @@ from . import Drawing
 from . import DrawingFactory
 from . import RxUtil
 from . import Tab
-from .Shared import dtts, tsdt, strdt
+from .Shared import tsdt, dtts
 from .UI import translate
 
 # system modules
@@ -616,20 +616,20 @@ class StylusUsageReport(object):
 
     @classmethod
     def save(cls, data, path):
-        fd = Tab.TabWriter(path, ['SID', 'DATE', 'COUNT'])
+        fd = Tab.TabWriter(path, ['SID', 'TS', 'COUNT'])
         for sid, marks in data.sur.items():
             for mark in marks:
                 fd.write({'SID': sid,
-                          'DATE': mark.stamp,
+                          'TS': dtts(mark.stamp),
                           'COUNT': mark.count})
 
     @classmethod
     def load(cls, path):
-        fd = Tab.TabReader(path, ['SID', 'DATE', 'COUNT'],
-                           types={'DATE': strdt, 'COUNT': int})
+        fd = Tab.TabReader(path, ['SID', 'TS', 'COUNT'],
+                           types={'TS': tsdt, 'COUNT': int})
         sur = collections.defaultdict(list)
         for row in fd:
-            mark = StylusUsageMark(row['DATE'], row['COUNT'])
+            mark = StylusUsageMark(row['TS'], row['COUNT'])
             sur[row['SID']].append(mark)
 
         return StylusUsageReport(sur)
