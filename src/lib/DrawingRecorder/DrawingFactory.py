@@ -10,7 +10,9 @@ id_table = {
     "DSPR1": lambda: Drawing.Spiral(
         "DSPR1", Drawing.SpiralParams(radius=65, turns=5., direction="CW")),
     "DSPR2": lambda: Drawing.Spiral(
-        "DSPR2", Drawing.SpiralParams(radius=65, turns=5., direction="CW"))}
+        "DSPR2", Drawing.SpiralParams(radius=65, turns=5., direction="CW")),
+    "DSPR3": lambda: Drawing.Spiral(
+        "DSPR3", Drawing.SpiralParams(radius=65, turns=5., direction="CW"))}
 
 
 # implementation
