@@ -293,6 +293,43 @@ Customize Windows 7 as follows:
 	- Disable "For tablet pen input, show icon next to the text box"
 	- Disable "Use the Input Panel tab"
 
+Customize Windows 10 as follows:
+
+- Control panel:
+
+  + Pen & touch:
+
+    - Pen options:
+
+      * Disable press & hold
+      * Disable visual feedback when touching screen
+
+    - Flicks:
+
+      * Disable flicks
+
+  + Tablet PC settings:
+
+    - Other:
+
+      * Set left/right
+      * Input panel settings:
+
+	- Disable "For tablet pen input, show icon next to the text box"
+	- Disable "Use the Input Panel tab"
+
+  + Settings:
+
+    - Pen & Windows Ink:
+
+      * Disable "Show visual effects"
+
+      * Disable "Show cursor"
+
+      * Enable "Ignore touch input whem I'm using my pen"
+
+      * Disable all "Pen shortcuts"
+
 
 Wacom/Bamboo drivers
 ~~~~~~~~~~~~~~~~~~~~
@@ -385,6 +422,81 @@ Customize the tablet preferences as follows:
 	  - In a single-monitor setup, leave the default.
 	  - In a dual-monitor setup, set the pen to use the whole
 	    area of the screen used for display.
+
+
+Wacom/Intuos Pro 2 drivers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+After performing the common installation/customization procedure, proceed by
+installing in order:
+
+* Wacom drivers (WacomTablet_634-3.exe)
+
+After installing/rebooting, please move the pen *over* the tablet at least once
+so that the Wacom driver shows it into the preferences.
+
+Update the firmware to the latest release and don't upgrade anymore
+during the study.
+
+Disable the touch input using the hardware switch on the left.
+
+Customize the tablet preferences as follows:
+
+* Wacom Desktop Center:
+
+  - Disable AutoStart
+
+* Control panel:
+
+  - Wacom Tablet Properties:
+
+    + Options:
+
+      * Disable "Pressure compatibility" (important!)
+
+      * "Disable All Tablet buttons"
+
+      * Disable "Show wireless tablet battery status"
+
+    + Tablet/Functions/All:
+
+      * Express keys:
+
+	+ Disable all "Express Keys"
+	+ Disable "Show Express View"
+
+      * Touch ring:
+
+	+ Disable all corners
+	+ Disable "Show touch ring setting"
+
+
+    + Tablet/Touch/All:
+
+      * Touch options:
+
+	+ Disable touch input
+
+    + Tablet/Grip pen/All:
+
+      * Pen:
+
+	+ Disable buttons (double/right click)
+
+      * Eraser:
+
+	+ Disable eraser
+
+      * Mapping:
+
+	+ Set orientation (usually "ExpressKeys Left")
+	+ Screen area:
+
+	  - In a single-monitor setup, leave the default.
+	  - In a dual-monitor setup, set the pen to use the whole
+	    area of the screen used for display.
+
+	+ Disable "Use Windows Ink"
 
 
 Technical informations
