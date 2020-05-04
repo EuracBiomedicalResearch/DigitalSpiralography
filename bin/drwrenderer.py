@@ -45,15 +45,17 @@ def remap(vmap, value):
     return vmap[value]
 
 
-def renderPaper(record):
-    fig = plt.figure()
-    fig.set_size_inches((7,7))
+def renderPaper(record, dpi):
+    drawing = DrawingFactory.from_id(record.drawing.id)
+    spc = 1
+    size_in = drawing.params.radius * spc * 2 / 25.4
+    fig = plt.figure(figsize=(size_in,size_in), dpi=dpi)
 
     ax = fig.gca()
     ax.grid(False)
     ax.axis('off')
-    ax.set_xlim(-1.0, 1.2)
-    ax.set_ylim(-1.0, 1.2)
+    ax.set_xlim(-spc, spc)
+    ax.set_ylim(-spc, spc)
 
     # track drawing status to recover actual tracing length/time
     codes = [Path.MOVETO, Path.LINETO]
@@ -92,9 +94,8 @@ def renderPaper(record):
     return fig
 
 
-def renderStd(record, cpoints):
-    fig = plt.figure()
-    fig.set_size_inches((7,9))
+def renderStd(record, cpoints, dpi):
+    fig = plt.figure(figsize=(7,9), dpi=dpi)
     fig.subplots_adjust(top=0.9, hspace=0.1)
 
     gs = GridSpec(2, 1, height_ratios=[3,1])
@@ -151,7 +152,7 @@ def renderStd(record, cpoints):
     return fig
 
 
-def renderSpiral(record, output, paper, no_detail, cal_mode):
+def renderSpiral(record, output, paper, no_detail, cal_mode, dpi):
     # offline recalibration
     drawing = DrawingFactory.from_id(record.drawing.id)
     aff, error = drawing.calibrate(record.calibration.cpoints,
@@ -164,7 +165,7 @@ def renderSpiral(record, output, paper, no_detail, cal_mode):
     for event in record.recording.events:
         event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
 
-    fig = renderPaper(record) if paper else renderStd(record, cpoints)
+    fig = renderPaper(record, dpi) if paper else renderStd(record, cpoints, dpi)
 
     # compose a title
     if not no_detail:
@@ -175,7 +176,7 @@ def renderSpiral(record, output, paper, no_detail, cal_mode):
         fig.suptitle("{} {} ({} hand, {})".format(p_aid, p_type, p_hand, p_hdn),
                      y=0.95, fontsize='x-large')
 
-    fig.savefig(output, bbox_inches='tight')
+    fig.savefig(output, bbox_inches='tight', dpi='figure')
 
 
 def __main__():
@@ -189,14 +190,16 @@ def __main__():
     ap.add_argument('-p', dest='paper', action='store_true',
                     help='paper-like rendering')
     ap.add_argument('-n', dest='no_detail', action='store_true',
-                    help='no details')
+                    help='hide spiral details')
+    ap.add_argument('--dpi', type=float, default=100,
+                    help='output DPI')
     ap.add_argument('file', help='drawing file')
     ap.add_argument('output', help='output file')
     args = ap.parse_args()
 
     record = Data.DrawingRecord.load(args.file, args.fast)
-    renderSpiral(record, args.output, args.paper,
-                 args.no_detail, cal_choices.get(args.cal))
+    renderSpiral(record, args.output, args.paper, args.no_detail,
+                 cal_choices.get(args.cal), args.dpi)
 
 
 if __name__ == '__main__':
