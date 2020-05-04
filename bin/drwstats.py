@@ -18,6 +18,9 @@ import sys
 
 
 def __main__():
+    # enforce output to be UTF-8 (due to file contents)
+    sys.stdout.reconfigure(encoding='utf-8')
+
     ap = argparse.ArgumentParser(description='Print drawing statistics in parseable format')
     ap.add_argument('-f', dest='fast', action='store_true',
                     help='Enable fast loading')
