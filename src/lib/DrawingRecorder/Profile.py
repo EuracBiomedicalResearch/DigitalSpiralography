@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 """Stylus profile correction/interpolators"""
 
-from __future__ import print_function, generators
-
 # local modules
 from . import Data
 
 # system modules
-from functools import reduce
 import collections
 import bisect
 import datetime
@@ -68,8 +65,7 @@ class ProfileMap(object):
     def weight_range(self):
         ws_min = [c(0.) for c in self.curves]
         ws_max = [c(1.) for c in self.curves]
-        return (reduce(min, ws_min, ws_min[0]),
-                reduce(max, ws_max, ws_max[0]))
+        return (np.min(ws_min), np.max(ws_max))
 
 
     def time_range(self):

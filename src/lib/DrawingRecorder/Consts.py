@@ -2,7 +2,7 @@
 """Project-wide constants"""
 
 # imports
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 
 # Basic versioning

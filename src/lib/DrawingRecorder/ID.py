@@ -6,7 +6,7 @@ from . import Verhoeff
 from .UI import translate
 
 # system modules
-from PyQt4 import QtGui
+from PyQt5 import QtWidgets
 
 
 # implementation
@@ -18,7 +18,7 @@ def validate_aid_err(buf):
     if not ret:
         title = translate("ID", "Invalid Patient ID")
         msg = translate("ID", "The specified patient ID is invalid")
-        QtGui.QMessageBox.critical(None, title, msg)
+        QtWidgets.QMessageBox.critical(None, title, msg)
     return ret
 
 def validate_tid(buf):
@@ -32,7 +32,7 @@ def validate_tid_err(buf):
     if not ret:
         title = translate("ID", "Invalid Tablet ID")
         msg = translate("ID", "The specified tablet ID is invalid")
-        QtGui.QMessageBox.critical(None, title, msg)
+        QtWidgets.QMessageBox.critical(None, title, msg)
     return ret
 
 def validate_sid(buf):
@@ -46,5 +46,5 @@ def validate_sid_err(buf):
     if not ret:
         title = translate("ID", "Invalid Pen ID")
         msg = translate("ID", "The specified pen ID is invalid")
-        QtGui.QMessageBox.critical(None, title, msg)
+        QtWidgets.QMessageBox.critical(None, title, msg)
     return ret

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Data structures/serialization support"""
 
-from __future__ import print_function, generators
-
 # local modules
 from . import Consts
 from . import Drawing
@@ -13,7 +11,7 @@ from .Shared import tsdt, dtts
 from .UI import translate
 
 # system modules
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 from copy import copy
 import collections
 import datetime
@@ -23,15 +21,7 @@ import numpy as np
 import sys
 import time
 import yaml
-
-# stubs for python 2.7
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
-if sys.version_info.major >= 3:
-    basestring = str
+import pickle
 
 
 # basic types
@@ -399,7 +389,7 @@ class DrawingRecord(object):
 
         # check version info
         if not data or 'format' not in data or \
-          not isinstance(data['format'], basestring) or \
+          not isinstance(data['format'], str) or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_RECORDING) != Consts.FF_RECORDING:
             msg = translate("data", 'Unsupported file format')
@@ -575,7 +565,7 @@ class StylusProfile(object):
 
         # check version info
         if not data or 'format' not in data or \
-          not isinstance(data['format'], basestring) or \
+          not isinstance(data['format'], str) or \
           int(float(data['format'])) != 1 or \
           data.get('type', Consts.FF_PROFILE) != Consts.FF_PROFILE:
             msg = translate("data", 'Unsupported file format')

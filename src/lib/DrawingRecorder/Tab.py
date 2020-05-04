@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tabular file handling"""
 
-from __future__ import print_function
 import io, sys
-
-if sys.version_info.major >= 3:
-    basestring = str
-    unicode = str
 
 
 class TabException(IOError):
@@ -18,7 +13,7 @@ class TabException(IOError):
 class TabReader(object):
     def __init__(self, fd_or_path, columns=None, types=None):
         self._fd = io.open(fd_or_path, 'r', encoding='utf-8') \
-                   if isinstance(fd_or_path, basestring) else fd_or_path
+                   if isinstance(fd_or_path, str) else fd_or_path
         self._types = types if types is not None else {}
         self._lno = 1
 
@@ -56,8 +51,8 @@ class TabReader(object):
         row = {}
         for i, v in enumerate(cols):
             col = self._cols[i]
-            typ = self._types.get(col, unicode)
-            v = typ(v) if isinstance(typ, basestring) or len(v) != 0 else None
+            typ = self._types.get(col, str)
+            v = typ(v) if isinstance(typ, str) or len(v) != 0 else None
             row[col] = v
 
         return row
@@ -73,13 +68,13 @@ def _check_str(v):
 class TabWriter(object):
     def __init__(self, fd_or_path, columns):
         self._fd = io.open(fd_or_path, 'w', encoding='utf-8') \
-                   if isinstance(fd_or_path, basestring) else fd_or_path
+                   if isinstance(fd_or_path, str) else fd_or_path
         self._cols = columns
 
         # write header
         for col in columns:
             _check_str(col)
-        line = u'\t'.join(columns)
+        line = '\t'.join(columns)
         print(line, file=self._fd)
 
 
@@ -88,9 +83,9 @@ class TabWriter(object):
         for col in self._cols:
             v = row.get(col) if default else row[col]
             if v is None:
-                v = u''
+                v = ''
             else:
-                v = unicode(v)
+                v = str(v)
                 _check_str(v)
             buf.append(v)
-        print(u'\t'.join(buf), file=self._fd)
+        print('\t'.join(buf), file=self._fd)

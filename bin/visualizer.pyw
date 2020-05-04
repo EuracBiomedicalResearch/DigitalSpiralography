@@ -16,12 +16,12 @@ from DrawingRecorder.UI import translate
 # system modules
 import argparse
 import math
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 
 # support functions
 def drawArrow(group, pen, start, end, angle=10., ext=Consts.LIFT_RADIUS):
-    tmp = QtGui.QGraphicsLineItem(start[0], start[1], end[0], end[1])
+    tmp = QtWidgets.QGraphicsLineItem(start[0], start[1], end[0], end[1])
     tmp.setPen(pen)
     tmp.setParentItem(group)
 
@@ -30,15 +30,15 @@ def drawArrow(group, pen, start, end, angle=10., ext=Consts.LIFT_RADIUS):
     a = math.atan2(dx0, dx1)
     angle = angle * (math.pi * 2) / 360.
 
-    tmp = QtGui.QGraphicsLineItem(end[0], end[1],
-                                  end[0] - math.sin(a + angle) * ext,
-                                  end[1] - math.cos(a + angle) * ext)
+    tmp = QtWidgets.QGraphicsLineItem(end[0], end[1],
+                                      end[0] - math.sin(a + angle) * ext,
+                                      end[1] - math.cos(a + angle) * ext)
     tmp.setPen(pen)
     tmp.setParentItem(group)
 
-    tmp = QtGui.QGraphicsLineItem(end[0], end[1],
-                                  end[0] - math.sin(a - angle) * ext,
-                                  end[1] - math.cos(a - angle) * ext)
+    tmp = QtWidgets.QGraphicsLineItem(end[0], end[1],
+                                      end[0] - math.sin(a - angle) * ext,
+                                      end[1] - math.cos(a - angle) * ext)
     tmp.setPen(pen)
     tmp.setParentItem(group)
 
@@ -71,32 +71,32 @@ def ctrb(x, a, b, ctrl, bias):
     return a + (b - a) * max(min(r, b), a)
 
 
-class CtrbWidget(QtGui.QWidget):
+class CtrbWidget(QtWidgets.QWidget):
     valueChanged = QtCore.pyqtSignal(float, float)
 
     def __init__(self, descr):
-        super(QtGui.QWidget, self).__init__()
-        layout = QtGui.QGridLayout()
+        super(QtWidgets.QWidget, self).__init__()
+        layout = QtWidgets.QGridLayout()
         self.setMaximumWidth(300)
-        self._ctrl_s = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self._ctrl_s = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._ctrl_s.setRange(0, 100)
         self._ctrl_s.valueChanged.connect(self._valueChanged)
         self._ctrl_s.setToolTip(translate("visualizer", "{type} Contrast").format(type=descr))
-        self._ctrl_l = QtGui.QLabel()
+        self._ctrl_l = QtWidgets.QLabel()
         layout.addWidget(self._ctrl_l, 0, 0)
         layout.addWidget(self._ctrl_s, 0, 1)
-        self._bias_s = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self._bias_s = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self._bias_s.setRange(0, 100)
         self._bias_s.valueChanged.connect(self._valueChanged)
         self._bias_s.setToolTip(translate("visualizer", "{type} Bias").format(type=descr))
-        self._bias_l = QtGui.QLabel()
+        self._bias_l = QtWidgets.QLabel()
         layout.addWidget(self._bias_l, 1, 0)
         layout.addWidget(self._bias_s, 1, 1)
-        self.auto_btn = QtGui.QPushButton(self.style().standardIcon(QtGui.QStyle.SP_MediaSeekBackward), "")
+        self.auto_btn = QtWidgets.QPushButton(self.style().standardIcon(QtWidgets.QStyle.SP_MediaSeekBackward), "")
         self.auto_btn.setToolTip(translate("visualizer", "Auto {type}").format(type=descr))
         self.auto_btn.clicked.connect(self.auto)
         layout.addWidget(self.auto_btn, 0, 2)
-        self.reset_btn = QtGui.QPushButton(self.style().standardIcon(QtGui.QStyle.SP_DialogCancelButton), "")
+        self.reset_btn = QtWidgets.QPushButton(self.style().standardIcon(QtWidgets.QStyle.SP_DialogCancelButton), "")
         self.reset_btn.setToolTip(translate("visualizer", "Reset {type}").format(type=descr))
         self.reset_btn.clicked.connect(self.reset)
         layout.addWidget(self.reset_btn, 1, 2)
@@ -138,7 +138,7 @@ class blocked_signals(object):
 
 
 # main application
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, fast_load=False):
         super(MainWindow, self).__init__()
         self._ui = UI.load_ui(self, "visualizer.ui")
@@ -176,8 +176,8 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.view.wheelEvent = self.on_wheel
 
         # trial selector
-        ts = self._ui.trialSelector = QtGui.QComboBox()
-        ts.setSizeAdjustPolicy(QtGui.QComboBox.AdjustToContents)
+        ts = self._ui.trialSelector = QtWidgets.QComboBox()
+        ts.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
         ts.currentIndexChanged.connect(self.on_trial)
         self._ui.mainToolBar.insertWidget(self._ui.actionRAWCorr, ts)
 
@@ -190,7 +190,7 @@ class MainWindow(QtGui.QMainWindow):
         self._ui.ctrbToolBar.insertWidget(self._ui.actionInfo, self._ui.colorCtrb)
 
         # scene
-        self._scene = QtGui.QGraphicsScene()
+        self._scene = QtWidgets.QGraphicsScene()
         self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
         self._ui.view.setScene(self._scene)
 
@@ -224,8 +224,8 @@ class MainWindow(QtGui.QMainWindow):
 
         pos = self._ui.props.rowCount()
         self._ui.props.insertRow(pos)
-        self._ui.props.setItem(pos, 0, QtGui.QTableWidgetItem(name))
-        self._ui.props.setItem(pos, 1, QtGui.QTableWidgetItem(value))
+        self._ui.props.setItem(pos, 0, QtWidgets.QTableWidgetItem(name))
+        self._ui.props.setItem(pos, 1, QtWidgets.QTableWidgetItem(value))
 
 
     def _append_prop_map(self, name, type_map, value):
@@ -353,9 +353,9 @@ class MainWindow(QtGui.QMainWindow):
 
     def _load_scene(self, record):
         # projected/support/screen space
-        self._drawing_group = QtGui.QGraphicsItemGroup(scene=self._scene)
-        self._supp_group = QtGui.QGraphicsItemGroup(scene=self._scene)
-        self._screen_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._drawing_group = QtWidgets.QGraphicsItemGroup()
+        self._supp_group = QtWidgets.QGraphicsItemGroup()
+        self._screen_group = QtWidgets.QGraphicsItemGroup()
 
         # setup transforms
         rect_size = record.recording.rect_size
@@ -373,14 +373,14 @@ class MainWindow(QtGui.QMainWindow):
         tmp.moveTo(0., -Consts.BAR_LEN)
         tmp.lineTo(0., 0.)
         tmp.lineTo(Consts.BAR_LEN, 0.)
-        tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
-        tmp.setPen(QtGui.QPen(QtCore.Qt.green))
+        tmp = QtWidgets.QGraphicsPathItem(tmp, self._supp_group)
+        tmp.setPen(QtGui.QPen(QtCore.Qt.green, 0))
 
         tmp = QtGui.QPainterPath()
         tmp.moveTo(-Consts.BAR_LEN, Consts.BAR_LEN)
         tmp.lineTo(Consts.BAR_LEN, -Consts.BAR_LEN)
-        tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
-        tmp.setPen(QtGui.QPen(QtCore.Qt.yellow))
+        tmp = QtWidgets.QGraphicsPathItem(tmp, self._supp_group)
+        tmp.setPen(QtGui.QPen(QtCore.Qt.yellow, 0))
 
         if not self._showRaw:
             # drawing
@@ -388,22 +388,22 @@ class MainWindow(QtGui.QMainWindow):
             tmp.moveTo(*record.drawing.points[0])
             for x, y in record.drawing.points[1:]:
                 tmp.lineTo(x, y)
-            tmp = QtGui.QGraphicsPathItem(tmp)
-            tmp.setPen(QtGui.QPen(Consts.DRAWING_COLOR))
+            tmp = QtWidgets.QGraphicsPathItem(tmp)
+            tmp.setPen(QtGui.QPen(Consts.DRAWING_COLOR, 0))
             tmp.setPos(0., 0.)
             tmp.setParentItem(self._drawing_group)
 
         if self._showRaw:
             # calibration points
-            pen = QtGui.QPen(QtGui.QColor(Consts.CAL_NEXT_COL))
+            pen = QtGui.QPen(QtGui.QColor(Consts.CAL_NEXT_COL), 0)
             col = QtGui.QColor(Consts.CAL_NEXT_COL)
             col.setAlpha(127)
             brush = QtGui.QBrush(col)
             for point in record.calibration.cpoints:
-                tmp = QtGui.QGraphicsEllipseItem(-Consts.CAL_POINT_LEN / 2,
-                                                 -Consts.CAL_POINT_LEN / 2,
-                                                 Consts.CAL_POINT_LEN,
-                                                 Consts.CAL_POINT_LEN)
+                tmp = QtWidgets.QGraphicsEllipseItem(-Consts.CAL_POINT_LEN / 2,
+                                                     -Consts.CAL_POINT_LEN / 2,
+                                                     Consts.CAL_POINT_LEN,
+                                                     Consts.CAL_POINT_LEN)
                 tmp.setPen(pen)
                 tmp.setBrush(brush)
                 tmp.setPos(point[0], point[1])
@@ -472,9 +472,9 @@ class MainWindow(QtGui.QMainWindow):
                     # blend the color
                     sf1 = ctrb(sf1, 0, 1, self._cc[0], self._cc[1])
                     sf0 = 1. - sf1
-                    color = QtGui.QColor(low_color.red() * sf0 + high_color.red() * sf1,
-                                         low_color.green() * sf0 + high_color.green() * sf1,
-                                         low_color.blue() * sf0 + high_color.blue() * sf1)
+                    color = QtGui.QColor(int(low_color.red() * sf0 + high_color.red() * sf1),
+                                         int(low_color.green() * sf0 + high_color.green() * sf1),
+                                         int(low_color.blue() * sf0 + high_color.blue() * sf1))
 
                     # pen parameters
                     p = 1 + ctrb(event.pressure, 0, 1, self._wc[0], self._wc[1]) * (Consts.PEN_MAXWIDTH - 1)
@@ -492,9 +492,9 @@ class MainWindow(QtGui.QMainWindow):
                         drawArrow(self._screen_group, lift_pen, last_stroke, old_pos)
                         last_stroke = None
                     elif not drawing and old_drawing and event is not events[-1]:
-                        tmp = QtGui.QGraphicsEllipseItem(old_pos[0] - Consts.LIFT_RADIUS / 2,
-                                                         old_pos[1] - Consts.LIFT_RADIUS / 2,
-                                                         Consts.LIFT_RADIUS, Consts.LIFT_RADIUS)
+                        tmp = QtWidgets.QGraphicsEllipseItem(old_pos[0] - Consts.LIFT_RADIUS / 2,
+                                                             old_pos[1] - Consts.LIFT_RADIUS / 2,
+                                                             Consts.LIFT_RADIUS, Consts.LIFT_RADIUS)
                         lift_pen.setWidthF(Consts.LIFT_PEN_WIDTH)
                         tmp.setPen(lift_pen)
                         tmp.setParentItem(self._screen_group)
@@ -502,7 +502,7 @@ class MainWindow(QtGui.QMainWindow):
 
                 if pos and (drawing or self._showTraces):
                     # the line itself
-                    tmp = QtGui.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
+                    tmp = QtWidgets.QGraphicsLineItem(old_pos[0], old_pos[1], pos[0], pos[1])
                     tmp.setPen(pen)
                     tmp.setParentItem(self._screen_group)
 
@@ -514,9 +514,9 @@ class MainWindow(QtGui.QMainWindow):
                             tilt = event.tilt_drawing
 
                         # the vector itself
-                        tmp = QtGui.QGraphicsLineItem(pos[0], pos[1],
-                                                      pos[0] + tilt[0] * Consts.TILT_MAXLEN,
-                                                      pos[1] + tilt[1] * Consts.TILT_MAXLEN)
+                        tmp = QtWidgets.QGraphicsLineItem(pos[0], pos[1],
+                                                          pos[0] + tilt[0] * Consts.TILT_MAXLEN,
+                                                          pos[1] + tilt[1] * Consts.TILT_MAXLEN)
                         tmp.setPen(tilt_pen)
                         tmp.setParentItem(self._screen_group)
 
@@ -524,6 +524,12 @@ class MainWindow(QtGui.QMainWindow):
             old_drawing = drawing
             old_pos = pos
             old_stamp = stamp
+
+        # add groups to the scene
+        self._scene.addItem(self._drawing_group)
+        self._scene.addItem(self._supp_group)
+        self._scene.addItem(self._screen_group)
+
 
 
     def _fit_view(self):
@@ -542,7 +548,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
     def on_wheel(self, ev):
-        delta = ev.delta() / 100.
+        delta = ev.angleDelta().y() / 100.
         if delta < 0:
             delta = 1. / -delta
         self._ui.view.scale(delta, delta)
@@ -559,7 +565,7 @@ class MainWindow(QtGui.QMainWindow):
                             "Cannot load recording {path}: {reason}")
             msg = msg.format(path=path, reason=e)
             title = translate("visualizer", "Load failure")
-            QtGui.QMessageBox.critical(self, title, msg)
+            QtWidgets.QMessageBox.critical(self, title, msg)
             return
 
         # only update the view on success
@@ -569,7 +575,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_load(self, ev):
         title = translate("visualizer", "Load recording")
         ext_name = translate("visualizer", "Recordings")
-        path = QtGui.QFileDialog.getOpenFileName(
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, title, "", ext_name + " (*.rec.json.gz *.yaml.gz)")
         if path:
             self.load(path)
@@ -578,7 +584,7 @@ class MainWindow(QtGui.QMainWindow):
     def on_info(self, ev):
         ver = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
         title = translate("visualizer", "About DrawingVisualizer")
-        QtGui.QMessageBox.about(self, title, ver)
+        QtWidgets.QMessageBox.about(self, title, ver)
 
 
     def _redraw_scene(self):
@@ -594,7 +600,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def on_trial(self, ev):
         self._curTrial = self._ui.trialSelector.itemData(
-            self._ui.trialSelector.currentIndex()).toPyObject()
+            self._ui.trialSelector.currentIndex())
         self._redraw_scene()
 
 
@@ -630,7 +636,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
 # main application
-class Application(QtGui.QApplication):
+class Application(QtWidgets.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
         UI.init_intl("visualizer")

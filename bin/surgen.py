@@ -42,7 +42,7 @@ def __main__():
         group = group.resample(args.freq).count()
         rep = []
         acc = 0
-        for i, cnt in group['TS'].iteritems():
+        for i, cnt in group['TS'].items():
             if cnt:
                 rep.append(Data.StylusUsageMark(i.to_pydatetime(), int(acc)))
                 acc += int(cnt)

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Drawing record basic statistics extraction/application"""
 
-from __future__ import generators
-
 # local modules
 from . import Data
 from . import ID
@@ -94,7 +92,7 @@ def set(record, data, ignore_unknown=True, force=False):
             if not ignore_unknown:
                 raise ValueError('Unknown key {}'.format(k))
             continue
-        if unicode(data[k]) == unicode(old_data[k]):
+        if str(data[k]) == str(old_data[k]):
             continue
 
         # original copy

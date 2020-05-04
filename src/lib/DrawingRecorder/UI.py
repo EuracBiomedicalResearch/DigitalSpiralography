@@ -6,21 +6,18 @@ from . import Paths
 
 # system modules
 import os, sys
-from PyQt4 import QtCore, QtGui, uic
-
-if sys.version_info.major >= 3:
-    unicode = str
+from PyQt5 import QtCore, QtWidgets, uic
 
 
 # implementation
 def translate(ctx, msg, cmt=None):
-    return unicode(QtGui.QApplication.translate(ctx, msg, cmt))
+    return QtWidgets.QApplication.translate(ctx, msg, cmt)
 
 def init_intl(file):
     path = os.path.join(Paths.INTL, file)
-    translator = QtCore.QTranslator(QtGui.QApplication.instance())
+    translator = QtCore.QTranslator(QtWidgets.QApplication.instance())
     if translator.load(QtCore.QLocale.system(), path, "."):
-        QtGui.QApplication.installTranslator(translator)
+        QtWidgets.QApplication.installTranslator(translator)
 
 def load_ui(obj, file):
     cwd = os.getcwd()

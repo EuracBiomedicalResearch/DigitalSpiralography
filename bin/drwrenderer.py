@@ -12,7 +12,7 @@ from DrawingRecorder import Drawing
 from DrawingRecorder import DrawingFactory
 
 # Qt
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 # system modules
 import argparse

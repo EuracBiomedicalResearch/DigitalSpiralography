@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 """Drawing modules"""
 
-from __future__ import generators
-
 # local modules
 from .UI import translate
 
 # system modules
 import math
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 
 
 # implementation
