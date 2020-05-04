@@ -382,9 +382,7 @@ class DrawingRecord(object):
             fd.seek(0)
             buf = fd.read().decode('utf-8')
             data = json.loads(buf) if hdr == '{' else yaml.safe_load(buf)
-        except IOError:
-            raise
-        except:
+        except (gzip.BadGzipFile, yaml.parser.ParserError):
             pass
 
         # check version info
@@ -558,9 +556,7 @@ class StylusProfile(object):
             fd.seek(0)
             buf = fd.read().decode('utf-8')
             data = json.loads(buf) if hdr == '{' else yaml.safe_load(buf)
-        except IOError:
-            raise
-        except:
+        except (gzip.BadGzipFile, yaml.parser.ParserError):
             pass
 
         # check version info

@@ -45,9 +45,11 @@ def __main__():
             # data
             fd.write(stats)
 
-        except:
-            logging.critical('uncaught exception while analyzing {fn}'.format(fn=fn))
-            raise
+        except Exception as e:
+            if len(args.files) == 1:
+                raise e
+            else:
+                print('{fn}: uncaught exception {e}'.format(fn=fn, e=str(e)), file=sys.stderr)
 
 
 if __name__ == '__main__':
