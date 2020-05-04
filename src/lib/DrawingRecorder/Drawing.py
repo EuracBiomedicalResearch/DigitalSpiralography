@@ -82,7 +82,7 @@ class Spiral(Drawing):
         pr = (math.hypot(self.cpoints[self._cpoint_maxx][0], self.cpoints[self._cpoint_maxx][1]) /
               math.hypot(self.cpoints[self._cpoint_maxy][0], self.cpoints[self._cpoint_maxy][1]))
         pr_ = math.hypot(dx0, dx1) / math.hypot(dy0, dy1)
-        if abs(pr - pr_) > 0.25:
+        if abs(pr - pr_) > 0.3:
             return None, translate("drawing", "excessive deformation")
 
         if mode == CalibrationMode.Full:
