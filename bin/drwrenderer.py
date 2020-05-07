@@ -16,8 +16,8 @@ from PyQt5 import QtCore
 
 # system modules
 import argparse
-import random
-import math
+from random import random
+from math import pow
 
 # matplotlib
 import matplotlib as mpl
@@ -31,7 +31,15 @@ from matplotlib.gridspec import GridSpec
 MIN_LW = 0.1
 SHA_LW = 0.5
 MAX_LW = 4
-PAP_LW = 1
+
+PAP_LW_B = 0.5  # minimal line width
+PAP_LW_R = 0.1  # random width component
+PAP_LW_V = 0.7  # real width component
+
+PAP_LC_B = 0.7  # base black level
+PAP_LC_R = 0.1  # random black component
+PAP_LC_V = 0.5  # real black component
+
 EXP_LEVEL = 2
 
 
@@ -48,7 +56,8 @@ def remap(vmap, value):
 def renderPaper(record, dpi):
     drawing = DrawingFactory.from_id(record.drawing.id)
     spc = 1
-    size_in = drawing.params.radius * spc * 2 / 25.4
+    scale = drawing.params.radius * spc
+    size_in = scale * 2 / 25.4
     fig = plt.figure(figsize=(size_in,size_in), dpi=dpi)
 
     ax = fig.gca()
@@ -57,11 +66,22 @@ def renderPaper(record, dpi):
     ax.set_xlim(-spc, spc)
     ax.set_ylim(-spc, spc)
 
+    # scale ruler
+    ll = [-drawing.params.radius * 0.5, -drawing.params.radius * 0.5]
+    mfunc = lambda v: (v[0] / scale - spc, v[1] / scale - spc)
+    whl = (100, 5, 0.3)
+    ax.add_patch(PathPatch(Path(list(map(mfunc, [[0, 0], [whl[0], 0]]))),
+                           lw=whl[2], color='k', fill=False, clip_on=False))
+    ax.add_patch(PathPatch(Path(list(map(mfunc, [[0, -whl[1]/2], [0, whl[1]/2]]))),
+                           lw=whl[2], color='k', fill=False, clip_on=False))
+    ax.add_patch(PathPatch(Path(list(map(mfunc, [[whl[0], -whl[1]/2], [whl[0], whl[1]/2]]))),
+                           lw=whl[2], color='k', fill=False, clip_on=False))
+    ax.add_artist(plt.Text(*mfunc([whl[0] + whl[1]/2, -whl[1]/2]), '10cm',
+                           va='bottom', ha='left', clip_on=False))
+
     # track drawing status to recover actual tracing length/time
     codes = [Path.MOVETO, Path.LINETO]
     old_pos = None
-    lw = PAP_LW
-    c = 0.3
     drawing = False
     for event in record.recording.events:
         stamp = event.stamp
@@ -80,12 +100,13 @@ def renderPaper(record, dpi):
         if old_pos:
             if drawing and pos:
                 verts = [old_pos, pos]
-                nlw = PAP_LW * 0.5 + random.random() * PAP_LW * 0.5
-                lw = lw * 0.7 + nlw * 0.3
-                nc = 0.05 + random.random() * 0.3
-                c = c * 0.9 + nc * 0.1
+                lw = (PAP_LW_B + (PAP_LW_R * random() - PAP_LW_R/2)
+                      + (PAP_LW_V * event.pressure - PAP_LW_V/2))
+                lc = (PAP_LC_B + (PAP_LC_R * random() - PAP_LC_R/2)
+                      + (PAP_LC_V * event.pressure - PAP_LW_V/2))
+                lc = 1 - min(1, max(0, lc))
                 patch = PathPatch(Path(verts, codes), lw=lw,
-                                  color=(c / 3, c / 2, c), capstyle='round')
+                                  color=(lc, lc, lc), capstyle='round')
                 ax.add_patch(patch)
 
         # save old status
@@ -131,7 +152,7 @@ def renderStd(record, cpoints, dpi):
         if old_pos and pos and old_pos != pos:
             if drawing:
                 verts = [old_pos, pos]
-                p = MIN_LW + math.pow(event.pressure, EXP_LEVEL) * MAX_LW
+                p = MIN_LW + pow(event.pressure, EXP_LEVEL) * MAX_LW
                 patch = PathPatch(Path(verts, codes), lw=p, color='black', capstyle='round')
                 ax.add_patch(patch)
             else:
