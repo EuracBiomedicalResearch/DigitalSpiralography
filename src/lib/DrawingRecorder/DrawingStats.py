@@ -82,6 +82,17 @@ def get(record, cmts=False):
     return data
 
 
+def _to_type(type_map, value, force):
+    if value is None:
+        return None
+    for k, v in type_map.items():
+        if v == value:
+            return k
+    if force:
+        return value
+    raise ValueError
+
+
 # apply/override existing fields to the requested record
 def set(record, data, ignore_unknown=True, force=False):
     old_data = get(record, True)
@@ -128,14 +139,14 @@ def set(record, data, ignore_unknown=True, force=False):
             else:
                 raise ValueError('{} in not a valid hand count'.format(v))
         elif k == 'REC_HAND':
-            if force or (v in Data.PAT_HAND.values()):
-                record.pat_hand = Data.PAT_HAND.keys()[Data.PAT_HAND.values().index(v)]
-            else:
+            try:
+                record.pat_hand = _to_type(Data.PAT_HAND, v, force)
+            except ValueError:
                 raise ValueError('{} in not a valid hand'.format(v))
         elif k == 'PAT_HANDEDNESS':
-            if force or (v in Data.PAT_HANDEDNESS.values()):
-                record.pat_handedness = Data.PAT_HANDEDNESS.keys()[Data.PAT_HANDEDNESS.values().index(v)]
-            else:
+            try:
+                record.pat_handedness = _to_type(Data.PAT_HANDEDNESS, v, force)
+            except ValueError:
                 raise ValueError('{} in not a valid handedness'.format(v))
         elif k == 'PROJ_ID':
             record.config.project_id = v
