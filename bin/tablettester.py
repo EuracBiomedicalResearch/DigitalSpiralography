@@ -16,7 +16,7 @@ import QExtTabletWindow
 import argparse
 import datetime
 import os
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 
 class MainWindow(QExtTabletWindow.QExtTabletWindow):
@@ -24,20 +24,22 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         super(MainWindow, self).__init__(device)
 
         # scene setup
-        self._scene = QtGui.QGraphicsScene(self)
+        self._scene = QtWidgets.QGraphicsScene()
         self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
-        self._view = QtGui.QGraphicsView(self._scene)
+        self._view = QtWidgets.QGraphicsView()
         self._view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
         self._view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self._view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self._view.setCacheMode(QtGui.QGraphicsView.CacheNone)
-        self._view.setOptimizationFlag(QtGui.QGraphicsView.DontSavePainterState)
+        self._view.setCacheMode(QtWidgets.QGraphicsView.CacheNone)
+        self._view.setOptimizationFlag(QtWidgets.QGraphicsView.DontSavePainterState)
         self._view.setInteractive(False)
         self._view.setFrameStyle(0)
+        self._view.setScene(self._scene)
         self.setCursor(QtCore.Qt.BlankCursor)
         self.setCentralWidget(self._view)
         self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self._screen_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._screen_group = QtWidgets.QGraphicsItemGroup()
+        self._scene.addItem(self._screen_group)
 
         # cursor
         tmp = QtGui.QPainterPath()
@@ -49,10 +51,10 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         tmp.lineTo(Consts.CURSOR_LEN / 4, Consts.CURSOR_LEN / 4)
         tmp.moveTo(Consts.CURSOR_LEN / 4, -Consts.CURSOR_LEN / 4)
         tmp.lineTo(-Consts.CURSOR_LEN / 4, Consts.CURSOR_LEN / 4)
-        self._cursor = QtGui.QGraphicsPathItem(tmp, self._screen_group)
+        self._cursor = QtWidgets.QGraphicsPathItem(tmp, self._screen_group)
 
         # main text
-        self._main_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._main_text = QtWidgets.QGraphicsSimpleTextItem(self._screen_group)
         self._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         self._main_text.setText("TABLET TESTER")
         font = self._main_text.font()
@@ -61,7 +63,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         self._main_text.setFont(font)
 
         # sub text
-        self._sub_text = QtGui.QGraphicsTextItem(self._screen_group)
+        self._sub_text = QtWidgets.QGraphicsTextItem(self._screen_group)
         self._sub_text.setDefaultTextColor(QtCore.Qt.gray)
         font = self._sub_text.font()
         font.setFamily("Consolas")
@@ -73,7 +75,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         self._drawing_state = False
         self._tracking_state = False
         self._cursor.hide()
-        self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
+        self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE, 0))
         self.showFullScreen()
         self.startTimer(Consts.REFRESH_DELAY)
 
@@ -131,11 +133,11 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
         # update drawing state
         if ev.subtype == QtCore.QEvent.TabletPress:
-            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE))
+            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE, 0))
             self._tracking_state = True
             self._drawing_state = True
         elif ev.subtype == QtCore.QEvent.TabletRelease:
-            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
+            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE, 0))
             self._tracking_state = True
             self._drawing_state = False
         elif ev.subtype == QtCore.QEvent.TabletEnterProximity:
@@ -254,7 +256,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
 
 # main application
-class Application(QtGui.QApplication):
+class Application(QtWidgets.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
 

@@ -6,7 +6,7 @@ from . import Consts
 from .UI import translate
 
 # Qt
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui
 import QExtTabletWindow
 
 # system modules

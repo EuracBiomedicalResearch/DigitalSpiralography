@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets
 
 import HiResTime
 from .core import QExtTabletEvent
@@ -11,12 +11,13 @@ class QExtTabletManager(QtCore.QObject):
     _app = None
     _events = set([QtCore.QEvent.TabletEnterProximity,
                    QtCore.QEvent.TabletLeaveProximity,
+                   #QtCore.QEvent.TabletTrackingChange,
                    QtCore.QEvent.TabletMove,
                    QtCore.QEvent.TabletPress,
                    QtCore.QEvent.TabletRelease])
 
     def __init__(self):
-        super(QExtTabletManager, self).__init__()
+        super().__init__()
         self._windows = set()
         self._app = QtCore.QCoreApplication.instance()
         self._app.installEventFilter(self)
@@ -31,8 +32,9 @@ class QExtTabletManager(QtCore.QObject):
     def handleEvent(self, receiver, event):
         win = self._app.activeWindow()
         if win and win in self._windows:
-            ev = QExtTabletEvent(event.type(), HiResTime.now(), None, None, event.pressure(),
-                                 event.hiResGlobalPos(), (event.xTilt(), event.yTilt()))
+            ev = QExtTabletEvent(event.type(), HiResTime.now(), None, None,
+                                 event.pressure(), event.globalPosF(),
+                                 (event.xTilt(), event.yTilt()))
             win.event(ev)
 
     @classmethod
@@ -46,7 +48,7 @@ class QExtTabletManager(QtCore.QObject):
 
     @classmethod
     def unregister(cls, window):
-        del cls._instance._windows[window]
+        cls._instance._windows.remove(window)
 
 
 def get_device_count():
@@ -56,11 +58,12 @@ def get_device(device_n=0):
     return device_n
 
 
-class QExtTabletWindow(QtGui.QMainWindow):
+class QExtTabletWindow(QtWidgets.QMainWindow):
     def __init__(self, device):
-        super(QExtTabletWindow, self).__init__()
+        super().__init__()
         QExtTabletManager.register(self)
 
     def __del__(self):
         QExtTabletManager.unregister(self)
-        super(QExtTabletWindow, self).__del__()
+        if hasattr(super(), '__del__'):
+            super().__del__()

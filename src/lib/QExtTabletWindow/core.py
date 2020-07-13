@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
-from PyQt4 import QtCore
+from PyQt5 import QtCore
 
 EVENT_TYPE = QtCore.QEvent.registerEventType()
 
@@ -16,7 +16,8 @@ class QExtTabletException(Exception):
         super(QExtTabletException, self).__init__(*args, **kwargs)
 
 class QExtTabletEvent(QtCore.QEvent):
-    def __init__(self, subtype, os_stamp, dev_stamp, dev_serial, pressure, position, tilt):
+    def __init__(self, subtype, os_stamp, dev_stamp, dev_serial,
+                 pressure, position, tilt):
         super(QExtTabletEvent, self).__init__(EVENT_TYPE)
         self.subtype = subtype
         self.os_stamp = os_stamp
