@@ -1,40 +1,97 @@
-
 import re
+from six import string_types # for 2-3 compatibility
 import types
+from numbers import Number
+
 
 core_types = [ ]
 
-class Error(Exception):
+class SchemaError(Exception):
   pass
+
+class SchemaMismatch(Exception):
+  pass
+
+class SchemaTypeMismatch(SchemaMismatch):
+  def __init__(self, name, desired_type):
+    SchemaMismatch.__init__(self, '{0} must be {1}'.format(name, desired_type))
+
+class SchemaValueMismatch(SchemaMismatch):
+  def __init__(self, name, value):
+    SchemaMismatch.__init__(self, '{0} must equal {1}'.format(name, value))
+
+class SchemaRangeMismatch(SchemaMismatch):
+  pass
+
+def indent(text, level=1, whitespace='  '):
+    return '\n'.join(whitespace*level+line for line in text.split('\n'))
 
 class Util(object):
   @staticmethod
   def make_range_check(opt):
-    range = { }
-    for entry in opt.keys():
-      if entry not in ('min', 'max', 'min-ex', 'max-ex'):
-        raise ValueError("illegal argument to make_range_check")
 
-      range[entry] = opt[entry]
+    if not {'min', 'max', 'min-ex', 'max-ex'}.issuperset(opt):
+      raise ValueError("illegal argument to make_range_check")
+    if {'min', 'min-ex'}.issubset(opt):
+      raise ValueError("Cannot define both exclusive and inclusive min")
+    if {'max', 'max-ex'}.issubset(opt):
+      raise ValueError("Cannot define both exclusive and inclusive max")      
+
+    r = opt.copy()
+    inf = float('inf')
 
     def check_range(value):
-      if range.get('min'   ) != None and value <  range['min'   ]: return False
-      if range.get('min-ex') != None and value <= range['min-ex']: return False
-      if range.get('max-ex') != None and value >= range['max-ex']: return False
-      if range.get('max'   ) != None and value >  range['max'   ]: return False
-      return True
+      return(
+        r.get('min',    -inf) <= value and \
+        r.get('max',     inf) >= value and \
+        r.get('min-ex', -inf) <  value and \
+        r.get('max-ex',  inf) >  value
+        )
 
     return check_range
 
+  @staticmethod
+  def make_range_validator(opt):
+    check_range = Util.make_range_check(opt)
+
+    r = opt.copy()
+    nan = float('nan')
+
+    def validate_range(value, name='value'):
+      if not check_range(value):
+        if r.get('min', nan) == r.get('max', nan):
+          msg = '{0} must equal {1}'.format(name, r['min'])
+          raise SchemaRangeMismatch(msg)
+        
+        range_str = ''
+        if 'min' in r:
+          range_str = '[{0}, '.format(r['min'])
+        elif 'min-ex' in r:
+          range_str = '({0}, '.format(r['min-ex'])
+        else:
+          range_str = '(-inf, '
+
+        if 'max' in r:
+          range_str += '{0}]'.format(r['max'])
+        elif 'max-ex' in r:
+          range_str += '{0})'.format(r['max-ex'])
+        else:
+          range_str += 'inf)'
+
+        raise SchemaRangeMismatch(name+' must be in range '+range_str)
+
+    return validate_range
+
+
 class Factory(object):
-  def __init__(self, opt={}):
+  def __init__(self, register_core_types=True):
     self.prefix_registry = {
       '':      'tag:codesimply.com,2008:rx/core/',
       '.meta': 'tag:codesimply.com,2008:rx/meta/',
     }
 
     self.type_registry = {}
-    if opt.get("register_core_types", False):
+    if register_core_types:
       for t in core_types: self.register_type(t)
 
   @staticmethod
@@ -46,56 +103,58 @@ class Factory(object):
     m = re.match('^/([-._a-z0-9]*)/([-._a-z0-9]+)$', type_name)
 
     if not m:
-      raise ValueError("couldn't understand type name '%s'" % type_name)
+      raise ValueError("couldn't understand type name '{0}'".format(type_name))
 
-    if not self.prefix_registry.get(m.group(1)):
-      raise ValueError(
-        "unknown prefix '%s' in type name '%s'" % (m.group(1), type_name)
+    prefix, suffix = m.groups()
+
+    if prefix not in self.prefix_registry:
+      raise KeyError(
+        "unknown prefix '{0}' in type name '{1}'".format(prefix, type_name)
       )
 
-    return '%s%s' % (self.prefix_registry[ m.group(1) ], m.group(2))
+    return self.prefix_registry[ prefix ] + suffix
 
   def add_prefix(self, name, base):
-    if self.prefix_registry.get(name, None):
-      raise Error("the prefix '%s' is already registered" % name)
+    if self.prefix_registry.get(name):
+      raise SchemaError("the prefix '{0}' is already registered".format(name))
 
     self.prefix_registry[name] = base;
 
   def register_type(self, t):
     t_uri = t.uri()
 
-    if self.type_registry.get(t_uri, None):
-      raise ValueError("type already registered for %s" % t_uri)
+    if t_uri in self.type_registry:
+      raise ValueError("type already registered for {0}".format(t_uri))
 
     self.type_registry[t_uri] = t
 
   def learn_type(self, uri, schema):
-    if self.type_registry.get(uri, None):
-      raise Error("tried to learn type for already-registered uri %s" % uri)
+    if self.type_registry.get(uri):
+      raise SchemaError("tried to learn type for already-registered uri {0}".format(uri))
 
     # make sure schema is valid
     # should this be in a try/except?
     self.make_schema(schema)
 
-    self.type_registry[uri] = { "schema": schema }
+    self.type_registry[uri] = { 'schema': schema }
 
   def make_schema(self, schema):
-    if type(schema) in (str, unicode):
-      schema = { "type": schema }
+    if isinstance(schema, string_types):
+      schema = { 'type': schema }
 
-    if not type(schema) is dict:
-      raise Error('invalid schema argument to make_schema')
+    if not isinstance(schema, dict):
+      raise SchemaError('invalid schema argument to make_schema')
 
-    uri = self.expand_uri(schema["type"])
+    uri = self.expand_uri(schema['type'])
 
-    if not self.type_registry.get(uri): raise Error("unknown type %s" % uri)
+    if not self.type_registry.get(uri): raise SchemaError("unknown type {0}".format(uri))
 
-    type_class = self.type_registry[ uri ]
+    type_class = self.type_registry[uri]
 
-    if type(type_class) is dict:
-      if not set(schema.keys()).issubset(set(['type'])):
-        raise Error('composed type does not take check arguments');
-      return self.make_schema(type_class["schema"])
+    if isinstance(type_class, dict):
+      if not {'type'}.issuperset(schema):
+        raise SchemaError('composed type does not take check arguments');
+      return self.make_schema(type_class['schema'])
     else:
       return type_class(schema, self)
 
@@ -105,28 +164,47 @@ class _CoreType(object):
     return 'tag:codesimply.com,2008:rx/core/' + self.subname()
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(['type'])):
-      raise Error('unknown parameter for //%s' % self.subname())
+    if not {'type'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //{0}'.format(self.subname()))
 
-  def check(self, value): return False
+  def check(self, value):
+    try:
+      self.validate(value)
+    except SchemaMismatch:
+      return False
+    return True
+
+  def validate(self, value, name='value'):
+    raise SchemaMismatch('Tried to validate abstract base schema class')
 
 class AllType(_CoreType):
   @staticmethod
   def subname(): return 'all'
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(('type', 'of'))):
-      raise Error('unknown parameter for //all')
+    if not {'type', 'of'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //all')
     
     if not(schema.get('of') and len(schema.get('of'))):
-      raise Error('no alternatives given in //all of')
+      raise SchemaError('no alternatives given in //all of')
 
-    self.alts = [ rx.make_schema(s) for s in schema['of'] ]
+    self.alts = [rx.make_schema(s) for s in schema['of']]
 
-  def check(self, value):
+  def validate(self, value, name='value'):
+    error_messages = []
     for schema in self.alts:
-      if (not schema.check(value)): return False
-    return True
+      try:
+        schema.validate(value, name)
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
+
+    if len(error_messages) > 1:
+      messages = indent('\n'.join(error_messages))
+      message = '{0} failed to meet all schema requirements:\n{1}'
+      message = message.format(name, messages)
+      raise SchemaMismatch(message)
+    elif len(error_messages) == 1:
+      raise SchemaMismatch(error_messages[0])
 
 class AnyType(_CoreType):
   @staticmethod
@@ -135,20 +213,29 @@ class AnyType(_CoreType):
   def __init__(self, schema, rx):
     self.alts = None
 
-    if not set(schema.keys()).issubset(set(('type', 'of'))):
-      raise Error('unknown parameter for //any')
+    if not {'type', 'of'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //any')
     
-    if schema.get('of') != None:
-      if not schema['of']: raise Error('no alternatives given in //any of')
+    if 'of' in schema:
+      if not schema['of']: raise SchemaError('no alternatives given in //any of')
       self.alts = [ rx.make_schema(alt) for alt in schema['of'] ]
 
-  def check(self, value):
-    if self.alts is None: return True
+  def validate(self, value, name='value'):
+    if self.alts is None:
+      return
+    error_messages = []
+    for schema in self.alts:
+      try:
+        schema.validate(value, name)
+        break
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
 
-    for alt in self.alts:
-      if alt.check(value): return True
-
-    return False
+    if len(error_messages) == len(self.alts):
+      messages = indent('\n'.join(error_messages))
+      message = '{0} failed to meet any schema requirements:\n{1}'
+      message = message.format(name, messages)
+      raise SchemaMismatch(message)
 
 class ArrType(_CoreType):
   @staticmethod
@@ -157,39 +244,56 @@ class ArrType(_CoreType):
   def __init__(self, schema, rx):
     self.length = None
 
-    if not set(schema.keys()).issubset(set(('type', 'contents', 'length'))):
-      raise Error('unknown parameter for //arr')
+    if not {'type', 'contents', 'length'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //arr')
 
     if not schema.get('contents'):
-      raise Error('no contents provided for //arr')
+      raise SchemaError('no contents provided for //arr')
 
     self.content_schema = rx.make_schema(schema['contents'])
 
     if schema.get('length'):
-      self.length = Util.make_range_check( schema["length"] )
+      self.length = Util.make_range_validator(schema['length'])
 
-  def check(self, value):
-    if not(type(value) in [ type([]), type(()) ]): return False
-    if self.length and not self.length(len(value)): return False
+  def validate(self, value, name='value'):
+    if not isinstance(value, (list, tuple)):
+      raise SchemaTypeMismatch(name, 'array')
 
-    for item in value:
-      if not self.content_schema.check(item): return False
+    if self.length:
+      self.length(len(value), name+' length')
 
-    return True;
+    error_messages = []
+
+    for i, item in enumerate(value):
+      try:
+        self.content_schema.validate(item, 'item '+str(i))
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
+
+    if len(error_messages) > 1:
+      messages = indent('\n'.join(error_messages))
+      message = '{0} sequence contains invalid elements:\n{1}'
+      message = message.format(name, messages)
+      raise SchemaMismatch(message)
+    elif len(error_messages) == 1:
+      raise SchemaMismatch(name+': '+error_messages[0])
 
 class BoolType(_CoreType):
   @staticmethod
   def subname(): return 'bool'
 
-  def check(self, value):
-    if value is True or value is False: return True
-    return False
+  def validate(self, value, name='value'):
+    if not isinstance(value, bool):
+      raise SchemaTypeMismatch(name, 'boolean')
 
 class DefType(_CoreType):
   @staticmethod
   def subname(): return 'def'
 
-  def check(self, value): return not(value is None)
+
+  def validate(self, value, name='value'):
+    if value is None:
+      raise SchemaMismatch(name+' must be non-null')
 
 class FailType(_CoreType):
   @staticmethod
@@ -197,32 +301,36 @@ class FailType(_CoreType):
 
   def check(self, value): return False
 
+  def validate(self, value, name='value'):
+    raise SchemaMismatch(name+' is of fail type, automatically invalid.')
+
 class IntType(_CoreType):
   @staticmethod
   def subname(): return 'int'
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(('type', 'range', 'value'))):
-      raise Error('unknown parameter for //int')
+    if not {'type', 'range', 'value'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //int')
 
     self.value = None
-    if schema.has_key('value'):
-      if not type(schema['value']) in (float, int, long):
-        raise Error('invalid value parameter for //int')
-      if schema['value'] % 1 != 0:
-        raise Error('invalid value parameter for //int')
+    if 'value' in schema:
+      if not isinstance(schema['value'], Number) or schema['value'] % 1 != 0:
+        raise SchemaError('invalid value parameter for //int')
       self.value = schema['value']
 
     self.range = None
-    if schema.has_key('range'):
-      self.range = Util.make_range_check( schema["range"] )
+    if 'range' in schema:
+      self.range = Util.make_range_validator(schema['range'])
 
-  def check(self, value):
-    if not(type(value) in (float, int, long)): return False
-    if value % 1 != 0: return False
-    if self.range and not self.range(value): return False
-    if (not self.value is None) and value != self.value: return False
-    return True
+  def validate(self, value, name='value'):
+    if not isinstance(value, Number) or isinstance(value, bool) or value%1:
+      raise SchemaTypeMismatch(name,'integer')
+
+    if self.range:
+      self.range(value, name)
+
+    if self.value is not None and value != self.value:
+      raise SchemaValueMismatch(name, self.value)
 
 class MapType(_CoreType):
   @staticmethod
@@ -231,21 +339,33 @@ class MapType(_CoreType):
   def __init__(self, schema, rx):
     self.allowed = set()
 
-    if not set(schema.keys()).issubset(set(('type', 'values'))):
-      raise Error('unknown parameter for //map')
+    if not {'type', 'values'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //map')
 
     if not schema.get('values'):
-      raise Error('no values given for //map')
+      raise SchemaError('no values given for //map')
 
     self.value_schema = rx.make_schema(schema['values'])
 
-  def check(self, value):
-    if not(type(value) is type({})): return False
+  def validate(self, value, name='value'):
+    if not isinstance(value, dict):
+      raise SchemaTypeMismatch(name, 'map')
 
-    for v in value.values():
-      if not self.value_schema.check(v): return False
+    error_messages = []
 
-    return True;
+    for key, val in value.items():
+      try:
+        self.value_schema.validate(val, key)
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
+
+    if len(error_messages) > 1:
+      messages = indent('\n'.join(error_messages))
+      message = '{0} map contains invalid entries:\n{1}'
+      message = message.format(name, messages)
+      raise SchemaMismatch(message)
+    elif len(error_messages) == 1:
+      raise SchemaMismatch(name+': '+error_messages[0])
 
 class NilType(_CoreType):
   @staticmethod
@@ -253,57 +373,64 @@ class NilType(_CoreType):
 
   def check(self, value): return value is None
 
+  def validate(self, value, name='value'):
+    if value is not None:
+      raise SchemaTypeMismatch(name, 'null')
+
 class NumType(_CoreType):
   @staticmethod
   def subname(): return 'num'
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(('type', 'range', 'value'))):
-      raise Error('unknown parameter for //num')
+    if not {'type', 'range', 'value'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //num')
 
     self.value = None
-    if schema.has_key('value'):
-      if not type(schema['value']) in (float, int, long):
-        raise Error('invalid value parameter for //num')
+    if 'value' in schema:
+      if not isinstance(schema['value'], Number):
+        raise SchemaError('invalid value parameter for //num')
       self.value = schema['value']
 
     self.range = None
 
     if schema.get('range'):
-      self.range = Util.make_range_check( schema["range"] )
+      self.range = Util.make_range_validator(schema['range'])
 
-  def check(self, value):
-    if not(type(value) in (float, int, long)): return False
-    if self.range and not self.range(value): return False
-    if (not self.value is None) and value != self.value: return False
-    return True
+  def validate(self, value, name='value'):
+    if not isinstance(value, Number) or isinstance(value, bool):
+      raise SchemaTypeMismatch(name, 'number')
+
+    if self.range:
+      self.range(value, name)
+
+    if self.value is not None and value != self.value:
+      raise SchemaValueMismatch(name, self.value)
 
 class OneType(_CoreType):
   @staticmethod
   def subname(): return 'one'
 
-  def check(self, value):
-    if type(value) in (int, float, long, bool, str, unicode): return True
-
-    return False
+  def validate(self, value, name='value'):
+    if not isinstance(value, (Number, string_types)):
+      raise SchemaTypeMismatch(name, 'number or string')
 
 class RecType(_CoreType):
   @staticmethod
   def subname(): return 'rec'
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(('type', 'rest', 'required', 'optional'))):
-      raise Error('unknown parameter for //rec')
+    if not {'type', 'rest', 'required', 'optional'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //rec')
 
     self.known = set()
     self.rest_schema = None
     if schema.get('rest'): self.rest_schema = rx.make_schema(schema['rest'])
 
     for which in ('required', 'optional'):
-      self.__setattr__(which, { })
+      setattr(self, which, {})
       for field in schema.get(which, {}).keys():
         if field in self.known:
-          raise Error('%s appears in both required and optional' % field)
+          raise SchemaError('%s appears in both required and optional' % field)
 
         self.known.add(field)
 
@@ -311,88 +438,120 @@ class RecType(_CoreType):
           schema[which][field]
         )
 
-  def check(self, value):
-    if not(type(value) is type({})): return False
+  def validate(self, value, name='value'):
+    if not isinstance(value, dict):
+      raise SchemaTypeMismatch(name, 'record')
 
-    unknown = [ ]
-    for field in value.keys():
-      if not field in self.known: unknown.append(field)
+    unknown = [k for k in value.keys() if k not in self.known]
 
-    if len(unknown) and not self.rest_schema: return False
+    if unknown and not self.rest_schema:
+      fields = indent('\n'.join(unknown))
+      raise SchemaMismatch(name+' contains unknown fields:\n'+fields)
 
-    for field in self.required.keys():
-      if not value.has_key(field): return False
-      if not self.required[field].check( value[field] ): return False
+    error_messages = []
 
-    for field in self.optional.keys():
-      if not value.has_key(field): continue
-      if not self.optional[field].check( value[field] ): return False
+    for field in self.required:
+      try:
+        if field not in value:
+          raise SchemaMismatch('missing required field: '+field)
+        self.required[field].validate(value[field], field)
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
 
-    if len(unknown):
-      rest = { }
-      for field in unknown: rest[field] = value[field]
-      if not self.rest_schema.check(rest): return False
+    for field in self.optional:
+      if field not in value: continue
+      try:
+        self.optional[field].validate(value[field], field) 
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
 
-    return True;
+    if unknown:
+      rest = {key: value[key] for key in unknown}
+      try:
+        self.rest_schema.validate(rest, name)
+      except SchemaMismatch as e:
+        error_messages.append(str(e))
+
+    if len(error_messages) > 1:
+      messages = indent('\n'.join(error_messages))
+      message = '{0} record is invalid:\n{1}'
+      message = message.format(name, messages)
+      raise SchemaMismatch(message)
+    elif len(error_messages) == 1:
+      raise SchemaMismatch(name+': '+error_messages[0])
+
 
 class SeqType(_CoreType):
   @staticmethod
   def subname(): return 'seq'
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(('type', 'contents', 'tail'))):
-      raise Error('unknown parameter for //seq')
+    if not {'type', 'contents', 'tail'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //seq')
 
     if not schema.get('contents'):
-      raise Error('no contents provided for //seq')
+      raise SchemaError('no contents provided for //seq')
 
-    self.content_schema = [ rx.make_schema(s) for s in schema["contents"] ]
+    self.content_schema = [ rx.make_schema(s) for s in schema['contents'] ]
 
     self.tail_schema = None
     if (schema.get('tail')):
       self.tail_schema = rx.make_schema(schema['tail'])
 
-  def check(self, value):
-    if not(type(value) in [ type([]), type(()) ]): return False
+  def validate(self, value, name='value'):
+    if not isinstance(value, (list, tuple)):
+      raise SchemaTypeMismatch(name, 'sequence')
 
     if len(value) < len(self.content_schema):
-      return False
+      raise SchemaMismatch(name+' is less than expected length')
 
-    for i in range(0, len(self.content_schema)):
-      if not self.content_schema[i].check(value[i]):
-        return False
+    if len(value) > len(self.content_schema) and not self.tail_schema:
+      raise SchemaMismatch(name+' exceeds expected length')
+
+    error_messages = []
+
+    for i, (schema, item) in enumerate(zip(self.content_schema, value)):
+      try:
+        schema.validate(item, 'item '+str(i))
+      except SchemaMismatch as e:
+        error_messages.append(str(e))   
+
+    if len(error_messages) > 1:
+      messages = indent('\n'.join(error_messages))
+      message = '{0} sequence is invalid:\n{1}'
+      message = message.format(name, messages)
+      raise SchemaMismatch(message)
+    elif len(error_messages) == 1:
+      raise SchemaMismatch(name+': '+error_messages[0])
 
     if len(value) > len(self.content_schema):
-      if not self.tail_schema: return False
-
-      if not self.tail_schema.check(value[ len(self.content_schema) :  ]):
-        return False
-
-    return True;
+      self.tail_schema.validate(value[len(self.content_schema):], name)
 
 class StrType(_CoreType):
   @staticmethod
   def subname(): return 'str'
 
   def __init__(self, schema, rx):
-    if not set(schema.keys()).issubset(set(('type', 'value', 'length'))):
-      raise Error('unknown parameter for //str')
+    if not {'type', 'value', 'length'}.issuperset(schema):
+      raise SchemaError('unknown parameter for //str')
 
     self.value = None
-    if schema.has_key('value'):
-      if not type(schema['value']) in (str, unicode):
-        raise Error('invalid value parameter for //str')
+    if 'value' in schema:
+      if not isinstance(schema['value'], string_types):
+        raise SchemaError('invalid value parameter for //str')
       self.value = schema['value']
 
     self.length = None
-    if schema.has_key('length'):
-      self.length = Util.make_range_check( schema["length"] )
+    if 'length' in schema:
+      self.length = Util.make_range_validator(schema['length'])
 
-  def check(self, value):
-    if not type(value) in (str, unicode): return False
-    if (not self.value is None) and value != self.value: return False
-    if self.length and not self.length(len(value)): return False
-    return True
+  def validate(self, value, name='value'):
+    if not isinstance(value, string_types):
+      raise SchemaTypeMismatch(name, 'string')
+    if self.value is not None and value != self.value:
+      raise SchemaValueMismatch(name, '"{0}"'.format(self.value))
+    if self.length:
+      self.length(len(value), name+' length')
 
 core_types = [
   AllType,  AnyType, ArrType, BoolType, DefType,
