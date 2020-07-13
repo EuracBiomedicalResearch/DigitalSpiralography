@@ -67,7 +67,6 @@ def renderPaper(record, dpi):
     ax.set_ylim(-spc, spc)
 
     # scale ruler
-    ll = [-drawing.params.radius * 0.5, -drawing.params.radius * 0.5]
     mfunc = lambda v: (v[0] / scale - spc, v[1] / scale - spc)
     whl = (100, 5, 0.3)
     ax.add_patch(PathPatch(Path(list(map(mfunc, [[0, 0], [whl[0], 0]]))),
@@ -84,7 +83,6 @@ def renderPaper(record, dpi):
     old_pos = None
     drawing = False
     for event in record.recording.events:
-        stamp = event.stamp
         pos = flip_y(event.coords_unit)
 
         # set drawing status
@@ -136,7 +134,6 @@ def renderStd(record, cpoints, dpi):
     old_pos = None
     drawing = False
     for event in record.recording.events:
-        stamp = event.stamp
         pos = flip_y(event.coords_unit)
 
         # set drawing status

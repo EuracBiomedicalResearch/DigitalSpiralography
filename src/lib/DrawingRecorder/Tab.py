@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tabular file handling"""
 
-import io, sys
+import io
 
 
 class TabException(IOError):

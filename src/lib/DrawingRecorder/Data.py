@@ -18,7 +18,6 @@ import datetime
 import gzip
 import json
 import numpy as np
-import sys
 import time
 import yaml
 import pickle

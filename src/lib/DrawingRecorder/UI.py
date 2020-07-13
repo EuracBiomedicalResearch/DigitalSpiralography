@@ -5,7 +5,7 @@
 from . import Paths
 
 # system modules
-import os, sys
+import os
 from PyQt5 import QtCore, QtWidgets, uic
 
 

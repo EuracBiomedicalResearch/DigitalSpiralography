@@ -50,10 +50,8 @@ def renderPatch(record, ax, c, pressure):
 
     # track drawing status to recover actual tracing length/time
     old_pos = None
-    old_stamp = None
     drawing = False
     for event in record.recording.events:
-        stamp = event.stamp
         pos = flip_y(event.coords_unit)
 
         # set drawing status
@@ -74,7 +72,6 @@ def renderPatch(record, ax, c, pressure):
 
         # save old status
         old_pos = pos
-        old_stamp = stamp
 
 
 def remapSpiral(record, cal_mode):
@@ -86,7 +83,6 @@ def remapSpiral(record, cal_mode):
     if error: raise Exception("calibration error: {error}".format(error=error))
 
     # remap to unit coordinates
-    cpoints = [aff.map(x[0], x[1]) for x in record.calibration.cpoints]
     for event in record.recording.events:
         event.coords_unit = aff.map(event.coords_drawing[0], event.coords_drawing[1])
 
