@@ -219,7 +219,7 @@ def _remap(res, record, pmap, idx):
             trace_s.append(segment)
 
     # flatten all data into a DF
-    cpoints = zip(*map(lambda x: res.aff.map(x[0], x[1]), record.calibration.cpoints))
+    cpoints = list(zip(*map(lambda x: res.aff.map(x[0], x[1]), record.calibration.cpoints)))
     res.cpoints = pd.DataFrame({'X': cpoints[0], 'Y': cpoints[1]})
     res.trace = pd.DataFrame({'X': trace_x, 'Y': trace_y,
                               'P': trace_p, 'W': trace_w,
@@ -513,8 +513,8 @@ def _analyze_test(res, record, cfg):
     # weight tremor frequency
     trace_v = res.trace.W[int(res.freq_fit):-int(res.freq_fit)]
     if len(trace_v) > int(res.freq_fit * 2):
-        trace_fft = sp.fft(trace_v * np.blackman(len(trace_v)))
-        trace_freqs = sp.fftpack.fftfreq(len(trace_v), d=1./res.freq_fit)
+        trace_fft = sp.fft.fft(trace_v * np.blackman(len(trace_v)))
+        trace_freqs = sp.fft.fftfreq(len(trace_v), d=1./res.freq_fit)
         fta(trace_v, trace_fft, trace_freqs, 'x_buck', 'x_freq')
 
     # xy tremor frequency
@@ -522,8 +522,8 @@ def _analyze_test(res, record, cfg):
         trace_v = [complex(max_drw_trace[0].iloc[i], max_drw_trace[1].iloc[i]) for i in range(len(max_drw_trace[0]))]
         trace_v = trace_v[int(res.freq_fit):-int(res.freq_fit)]
         if len(trace_v) > int(res.freq_fit * 2):
-            trace_fft = sp.fft(trace_v * np.blackman(len(trace_v)))
-            trace_freqs = sp.fftpack.fftfreq(len(trace_v), d=1./res.freq_fit)
+            trace_fft = sp.fft.fft(trace_v * np.blackman(len(trace_v)))
+            trace_freqs = sp.fft.fftfreq(len(trace_v), d=1./res.freq_fit)
             fta(trace_v, trace_fft, trace_freqs, 'xy_buck', 'xy_freq')
 
 

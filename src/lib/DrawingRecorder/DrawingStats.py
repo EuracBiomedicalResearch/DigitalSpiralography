@@ -86,7 +86,7 @@ def get(record, cmts=False):
 def set(record, data, ignore_unknown=True, force=False):
     old_data = get(record, True)
 
-    for k, v in data.iteritems():
+    for k, v in data.items():
         # check for changes
         if k not in old_data:
             if not ignore_unknown:

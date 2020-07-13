@@ -21,6 +21,8 @@ import numpy as np
 import time
 import yaml
 import pickle
+import os
+import glob
 
 
 # basic types
@@ -618,3 +620,58 @@ class StylusUsageReport(object):
             sur[row['SID']].append(mark)
 
         return StylusUsageReport(sur)
+
+
+
+# Analysis configuration
+class AnalysisCfg(object):
+    def __init__(self, analysis_id, analysis_name, stats, profiles, sur, freq_map,
+                 clean_cut_mm, clean_cut_ms, analysis_ms_min, pw_win_ms,
+                 press_clip_warn, speed_win_ms):
+        self.analysis_id = analysis_id
+        self.analysis_name = analysis_name
+        self.stats = stats
+        self.profiles = profiles
+        self.sur = sur
+        self.freq_map = freq_map
+        self.clean_cut_mm = clean_cut_mm
+        self.clean_cut_ms = clean_cut_ms
+        self.analysis_ms_min = analysis_ms_min
+        self.pw_win_ms = pw_win_ms
+        self.press_clip_warn = press_clip_warn
+        self.speed_win_ms = speed_win_ms
+
+
+    @classmethod
+    def load(cls, path, root=None):
+        data = RxUtil.load_yaml('analysis', path)
+        if data is None:
+            msg = translate('data', 'Malformed configuration file')
+            raise Exception(msg, path)
+
+        # expand relative path names
+        root = root if root else os.path.dirname(path)
+        if not data.get('OVERRIDE_STATS'):
+            stats = None
+        else:
+            stats = os.path.join(root, data['OVERRIDE_STATS'])
+        if not data.get('PROFILES', {}).get('SUR'):
+            sur = None
+        else:
+            sur = os.path.join(root, data['PROFILES']['SUR'])
+
+        # list profiles
+        if not data.get('PROFILES', {}).get('LOAD_DIR'):
+            profiles = []
+        else:
+            profiles_dir = os.path.join(root, data['PROFILES']['LOAD_DIR'])
+            if not os.path.isdir(profiles_dir):
+                raise IOError('{} is not a directory'.format(profiles_dir))
+            profiles = glob.glob(os.path.join(profiles_dir, '*.prof.yaml.gz'))
+
+        return AnalysisCfg(data['ANALYSIS_ID'], data['ANALYSIS_NAME'],
+                           stats, profiles, sur, data['FREQ_MAP'],
+                           (data['CLEAN_CUT']['BEG_MM'], data['CLEAN_CUT']['END_MM']),
+                           (data['CLEAN_CUT']['BEG_MS'], data['CLEAN_CUT']['END_MS']),
+                           data['ANALYSIS_MIN_MS'], data['PW_WIN_MS'],
+                           data['PRESS_CLIP_WARN'], data['SPEED_WIN_MS'])

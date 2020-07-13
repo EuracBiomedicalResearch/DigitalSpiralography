@@ -85,7 +85,7 @@ def __main__():
 
             # merge with overrides
             if args.ovr_merge and ovr_stats:
-                for k, v in ovr_stats.iteritems():
+                for k, v in ovr_stats.items():
                     while k in res:
                         k += "_"
                     res[k] = v
