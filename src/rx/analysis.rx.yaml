@@ -1,0 +1,40 @@
+type: //rec
+rest: //any
+required:
+  ANALYSIS_ID: //str
+  ANALYSIS_NAME: //str
+  CLEAN_CUT:
+    type: //rec
+    rest: //any
+    required:
+      BEG_MM: //num
+      END_MM: //num
+      BEG_MS: //num
+      END_MS: //num
+  ANALYSIS_MIN_MS: //num
+  ANALYSIS_MIN_MM: //num
+  PW_WIN_MS:
+    type: //arr
+    contents: //num
+  PW_WIN_MM:
+    type: //arr
+    contents: //num
+  PRESS_CLIP_WARN: //num
+  SPEED_WIN_MS:
+    type: //arr
+    contents: //num
+  SPEED_WIN_MM:
+    type: //arr
+    contents: //num
+  FREQ_MAP:
+    type: //map
+    values: //num
+optional:
+  OVERRIDE_STATS: //str
+  PROFILES:
+    type: //rec
+    rest: //any
+    required:
+      LOAD_DIR: //str
+    optional:
+      SUR_PATH: //str

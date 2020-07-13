@@ -1,0 +1,48 @@
+# Sample analysis configuration file for DrawingRecorder >= 1.5.
+
+# ANALYSIS_ID is a generic ID (alphanumeric) for the analysis setup.
+ANALYSIS_ID: A0
+
+# ANALYSIS_NAME is a descriptive name of the current analysis
+ANALYSIS_NAME: Generic spiralography analysis
+
+# OVERRIDE_STATS: `drwstats` output to override original values.
+OVERRIDE_STATS: stats-full.tsv
+
+PROFILES:
+  # LOAD_DIR: directory containing stylus profiles to load (*.prof.yaml.gz)
+  LOAD_DIR: src/PROF/
+
+  # SUR: stylus usage report to load for usage-directed interpolation (use
+  # `surgen` to generate such reports, or leave empty for time-based
+  # compensation)
+  SUR: sur.tsv
+
+# FREQ_MAP: tablet/event frequency map
+FREQ_MAP:
+  T0010018: 130.320
+  T0010025: 130.320
+
+# CLEAN_CUT: initial distance (MM) *and* time (MS) to remove from the
+# beginning/end of the drawing after initial/last pen contact
+CLEAN_CUT:
+  BEG_MM: 10
+  END_MM: 10
+  BEG_MS: 250
+  END_MS: 250
+
+# ANALYSIS_MIN_MS: ms/mm of clean recording required for analysis
+# (normally 5x the maximal window size)
+ANALYSIS_MIN_MS: 5000
+ANALYSIS_MIN_MM: 250
+
+# PW_WIN_MS: moving window sizes (in ms/mm) for pressure/weight estimation
+PW_WIN_MS: [1000, 500, 250, 200, 150, 100, 50]
+PW_WIN_MM: [50, 25, 20, 15, 10, 5, 2]
+
+# PRESS_CLIP_WARN: threshold (in ms) for trigger the pressure clip warning
+PRESS_CLIP_WARN: 250
+
+# SPEED_WINDOWS: moving window sizes (in ms/mm) for speed estimation
+SPEED_WIN_MS: [1000, 500, 250, 200, 150, 100, 50]
+SPEED_WIN_MM: [50, 25, 20, 15, 10, 5, 2]
