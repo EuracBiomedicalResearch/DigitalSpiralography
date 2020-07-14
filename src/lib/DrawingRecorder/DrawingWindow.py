@@ -13,7 +13,7 @@ import HiResTime
 # system modules
 import math
 import datetime
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 
 # implementation
@@ -56,7 +56,7 @@ class CalibrationHandler(Handler):
         # storage for graphical items
         if self.items is not None:
             self.dw._scene.removeItem(self.items)
-        self.items = QtGui.QGraphicsItemGroup(self.dw._supp_group)
+        self.items = QtWidgets.QGraphicsItemGroup(self.dw._supp_group)
 
         # initial state
         self.cpoints = []
@@ -90,7 +90,7 @@ class CalibrationHandler(Handler):
         if self.point:
             self.dw._warning.setText("")
             col = QtGui.QColor(Consts.CAL_DONE_COL)
-            self.point.setPen(QtGui.QPen(col))
+            self.point.setPen(QtGui.QPen(col, 0))
             col.setAlpha(127)
             self.point.setBrush(QtGui.QBrush(col))
 
@@ -102,11 +102,11 @@ class CalibrationHandler(Handler):
 
         # prepare the next point
         next_point = self.dw.drawing.cpoints[pos]
-        self.point = QtGui.QGraphicsEllipseItem(-Consts.CAL_POINT_LEN / 2,
-                                                -Consts.CAL_POINT_LEN / 2,
-                                                Consts.CAL_POINT_LEN,
-                                                Consts.CAL_POINT_LEN)
-        self.point.setPen(QtGui.QPen(Consts.CAL_NEXT_COL))
+        self.point = QtWidgets.QGraphicsEllipseItem(-Consts.CAL_POINT_LEN / 2,
+                                                    -Consts.CAL_POINT_LEN / 2,
+                                                    Consts.CAL_POINT_LEN,
+                                                    Consts.CAL_POINT_LEN)
+        self.point.setPen(QtGui.QPen(Consts.CAL_NEXT_COL, 0))
         self.point.setPos(next_point[0], next_point[1])
         self.point.setParentItem(self.items)
 
@@ -185,9 +185,9 @@ class RecordingHandler(Handler):
         self.dw._warning.setText("")
 
         # drawing support
-        self.item = QtGui.QGraphicsPixmapItem()
+        self.item = QtWidgets.QGraphicsPixmapItem()
         self.item.setParentItem(self.dw._back_group)
-        self.item.setShapeMode(QtGui.QGraphicsPixmapItem.BoundingRectShape)
+        self.item.setShapeMode(QtWidgets.QGraphicsPixmapItem.BoundingRectShape)
         self.buffer = QtGui.QPixmap(self.dw.size())
         self.painter = QtGui.QPainter(self.buffer)
         self.painter.setRenderHints(self.dw._view.renderHints())
@@ -303,14 +303,14 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
         super(DrawingWindow, self).__init__(device)
 
         # scene setup
-        self._scene = QtGui.QGraphicsScene(self)
+        self._scene = QtWidgets.QGraphicsScene(self)
         self._scene.setBackgroundBrush(QtGui.QBrush(Consts.FILL_COLOR))
-        self._view = QtGui.QGraphicsView(self._scene)
+        self._view = QtWidgets.QGraphicsView(self._scene)
         self._view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.TextAntialiasing)
         self._view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self._view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self._view.setCacheMode(QtGui.QGraphicsView.CacheNone)
-        self._view.setOptimizationFlag(QtGui.QGraphicsView.DontSavePainterState)
+        self._view.setCacheMode(QtWidgets.QGraphicsView.CacheNone)
+        self._view.setOptimizationFlag(QtWidgets.QGraphicsView.DontSavePainterState)
         self._view.setInteractive(False)
         self._view.setFrameStyle(0)
         self.setCursor(QtCore.Qt.BlankCursor)
@@ -318,25 +318,30 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
         self.setWindowModality(QtCore.Qt.ApplicationModal)
 
         # back/projected/support/transposed/screen space
-        self._back_group = QtGui.QGraphicsItemGroup(scene=self._scene)
-        self._drawing_group = QtGui.QGraphicsItemGroup(scene=self._scene)
-        self._supp_group = QtGui.QGraphicsItemGroup(scene=self._scene)
-        self._trans_group = QtGui.QGraphicsItemGroup(scene=self._scene)
-        self._screen_group = QtGui.QGraphicsItemGroup(scene=self._scene)
+        self._back_group = QtWidgets.QGraphicsItemGroup()
+        self._scene.addItem(self._back_group)
+        self._drawing_group = QtWidgets.QGraphicsItemGroup()
+        self._scene.addItem(self._drawing_group)
+        self._supp_group = QtWidgets.QGraphicsItemGroup()
+        self._scene.addItem(self._supp_group)
+        self._trans_group = QtWidgets.QGraphicsItemGroup()
+        self._scene.addItem(self._trans_group)
+        self._screen_group = QtWidgets.QGraphicsItemGroup()
+        self._scene.addItem(self._screen_group)
 
         # bars
         tmp = QtGui.QPainterPath()
         tmp.moveTo(0., -Consts.BAR_LEN)
         tmp.lineTo(0., 0.)
         tmp.lineTo(Consts.BAR_LEN, 0.)
-        tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
-        tmp.setPen(QtGui.QPen(QtCore.Qt.green))
+        tmp = QtWidgets.QGraphicsPathItem(tmp, self._supp_group)
+        tmp.setPen(QtGui.QPen(QtCore.Qt.green, 0))
 
         tmp = QtGui.QPainterPath()
         tmp.moveTo(-Consts.BAR_LEN, Consts.BAR_LEN)
         tmp.lineTo(Consts.BAR_LEN, -Consts.BAR_LEN)
-        tmp = QtGui.QGraphicsPathItem(tmp, self._supp_group)
-        tmp.setPen(QtGui.QPen(QtCore.Qt.yellow))
+        tmp = QtWidgets.QGraphicsPathItem(tmp, self._supp_group)
+        tmp.setPen(QtGui.QPen(QtCore.Qt.yellow, 0))
 
         # cursor
         tmp = QtGui.QPainterPath()
@@ -348,10 +353,10 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
         tmp.lineTo(Consts.CURSOR_LEN / 4, Consts.CURSOR_LEN / 4)
         tmp.moveTo(Consts.CURSOR_LEN / 4, -Consts.CURSOR_LEN / 4)
         tmp.lineTo(-Consts.CURSOR_LEN / 4, Consts.CURSOR_LEN / 4)
-        self._cursor = QtGui.QGraphicsPathItem(tmp, self._screen_group)
+        self._cursor = QtWidgets.QGraphicsPathItem(tmp, self._screen_group)
 
         # main text
-        self._main_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._main_text = QtWidgets.QGraphicsSimpleTextItem(self._screen_group)
         self._main_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         font = self._main_text.font()
         font.setPointSize(Consts.MAIN_TEXT_SIZE)
@@ -359,21 +364,21 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
         self._main_text.setFont(font)
 
         # sub text
-        self._sub_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._sub_text = QtWidgets.QGraphicsSimpleTextItem(self._screen_group)
         self._sub_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         font = self._sub_text.font()
         font.setPointSize(Consts.NORM_TEXT_SIZE)
         self._sub_text.setFont(font)
 
         # bt text
-        self._bt_text = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._bt_text = QtWidgets.QGraphicsSimpleTextItem(self._screen_group)
         self._bt_text.setBrush(QtGui.QBrush(QtCore.Qt.gray))
         font = self._bt_text.font()
         font.setPointSize(Consts.NORM_TEXT_SIZE)
         self._bt_text.setFont(font)
 
         # warning
-        self._warning = QtGui.QGraphicsSimpleTextItem(self._screen_group)
+        self._warning = QtWidgets.QGraphicsSimpleTextItem(self._screen_group)
         self._warning.setBrush(QtGui.QBrush(QtCore.Qt.yellow))
         font = self._warning.font()
         font.setPointSize(Consts.WARN_TEXT_SIZE)
@@ -462,11 +467,11 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
 
         # update drawing state
         if ev.subtype == QtCore.QEvent.TabletPress:
-            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE))
+            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_ACTIVE, 0))
             self._tracking_state = True
             self._drawing_state = True
         elif ev.subtype == QtCore.QEvent.TabletRelease:
-            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
+            self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE, 0))
             self._tracking_state = True
             self._drawing_state = False
         elif ev.subtype == QtCore.QEvent.TabletEnterProximity:
@@ -540,12 +545,12 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
         self._drawing_state = False
         self._tracking_state = False
         self._cursor.hide()
-        self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE))
+        self._cursor.setPen(QtGui.QPen(Consts.CURSOR_INACTIVE, 0))
 
         self.showFullScreen()
         tid = self.startTimer(Consts.REFRESH_DELAY)
         while self.isVisible():
-            QtGui.QApplication.processEvents()
+            QtWidgets.QApplication.processEvents()
         self.killTimer(tid)
         return self.result
 
@@ -565,7 +570,7 @@ class DrawingWindow(QExtTabletWindow.QExtTabletWindow):
         # create the graphical item
         self.drawing = drawing
         self._drawing_item = self.drawing.generate()
-        self._drawing_item.setPen(QtGui.QPen(Consts.DRAWING_COLOR))
+        self._drawing_item.setPen(QtGui.QPen(Consts.DRAWING_COLOR, 0))
         self._drawing_item.setPos(0., 0.)
         self._drawing_item.setParentItem(self._drawing_group)
 

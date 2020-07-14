@@ -6,7 +6,7 @@ from .UI import translate
 
 # system modules
 import math
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtWidgets, QtCore
 
 
 # implementation
@@ -59,7 +59,7 @@ class Spiral(Drawing):
         buf.moveTo(0, 0)
         for x, y in self.points[1:]:
             buf.lineTo(x, y)
-        return QtGui.QGraphicsPathItem(buf)
+        return QtWidgets.QGraphicsPathItem(buf)
 
 
     def calibrate(self, cpoints, rect_drawing=None, mode=CalibrationMode.Full):

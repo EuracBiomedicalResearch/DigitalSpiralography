@@ -1,8 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Main Drawing recorder application"""
-
-from __future__ import print_function
 
 # setup path
 import os, sys
@@ -26,16 +24,12 @@ import datetime
 import gc
 import os
 import uuid
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtWidgets, QtGui
 
 
 # helpers
 def _to_type(cb):
-    val = cb.itemData(cb.currentIndex()).toPyObject()
-    if type(val) is QtCore.QString:
-        val = unicode(val)
-    return val
-
+    return cb.itemData(cb.currentIndex())
 
 def _set_type(cb, val):
     if val is None:
@@ -63,7 +57,7 @@ class Params(object):
 
 
 
-class NewCalibration(QtGui.QDialog):
+class NewCalibration(QtWidgets.QDialog):
     def __init__(self):
         super(NewCalibration, self).__init__()
         self._ui = UI.load_ui(self, "newcalibration.ui")
@@ -87,7 +81,7 @@ class NewCalibration(QtGui.QDialog):
         if not self.oid:
             title = translate("recorder", "Invalid operator")
             msg = translate("recorder", "The specified operator is invalid")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return self.reset()
 
         # ... tablet id
@@ -105,14 +99,14 @@ class NewCalibration(QtGui.QDialog):
         if not self.drawing:
             title = translate("recorder", "Invalid drawing ID")
             msg = translate("recorder", "The specified drawing ID is invalid")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return self.reset()
 
-        self.done(QtGui.QDialog.Accepted)
+        self.done(QtWidgets.QDialog.Accepted)
 
 
 
-class NewRecording(QtGui.QDialog):
+class NewRecording(QtWidgets.QDialog):
     def __init__(self):
         super(NewRecording, self).__init__()
         self._ui = UI.load_ui(self, "newrecording.ui")
@@ -134,29 +128,29 @@ class NewRecording(QtGui.QDialog):
         if not self.oid:
             title = translate("recorder", "Invalid operator")
             msg = translate("recorder", "The specified operator is invalid")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return self.reset()
 
         # validate the AID
         if not ID.validate_aid_err(self.aid):
             return self.reset()
-        self.done(QtGui.QDialog.Accepted)
+        self.done(QtWidgets.QDialog.Accepted)
 
 
 
-class EndRecording(QtGui.QDialog):
+class EndRecording(QtWidgets.QDialog):
     def __init__(self):
         super(EndRecording, self).__init__()
         self._ui = UI.load_ui(self, "endrecording.ui")
         self._ui.save_path_btn.clicked.connect(self.on_save_path)
         self._ui.next_hand_btn.clicked.connect(self.on_next_hand)
 
-        self._file_browser = QtGui.QFileDialog(self)
-        self._file_browser.setFileMode(QtGui.QFileDialog.AnyFile)
-        self._file_browser.setOption(QtGui.QFileDialog.DontConfirmOverwrite)
-        self._file_browser.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+        self._file_browser = QtWidgets.QFileDialog(self)
+        self._file_browser.setFileMode(QtWidgets.QFileDialog.AnyFile)
+        self._file_browser.setOption(QtWidgets.QFileDialog.DontConfirmOverwrite)
+        self._file_browser.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
         ext_name = translate("recorder", "Recordings")
-        self._file_browser.setFilter(ext_name + " (*.rec.json.gz)")
+        self._file_browser.setNameFilter(ext_name + " (*.rec.json.gz)")
 
         pal = self._ui.preview.palette()
         pal.setColor(self._ui.preview.backgroundRole(), Consts.FILL_COLOR)
@@ -168,7 +162,7 @@ class EndRecording(QtGui.QDialog):
         cb = self._ui.pat_type
         cb.clear()
         cb.addItem(translate("types", "N/A"))
-        for k, v in config.pat_types.iteritems():
+        for k, v in config.pat_types.items():
             cb.addItem(v, k)
 
         self.oid = record.oid
@@ -269,11 +263,11 @@ class EndRecording(QtGui.QDialog):
 
 
     def on_save_path(self):
-        (dir, name) = os.path.split(unicode(self._ui.save_path.text()))
+        (dir, name) = os.path.split(self._ui.save_path.text())
         self._file_browser.setDirectory(dir)
         self._file_browser.selectFile(name)
         if self._file_browser.exec_():
-            save_path = os.path.relpath(unicode(self._file_browser.selectedFiles()[0]))
+            save_path = os.path.relpath(self._file_browser.selectedFiles()[0])
             self._ui.save_path.setText(save_path)
 
 
@@ -284,11 +278,11 @@ class EndRecording(QtGui.QDialog):
     def reject(self):
         title = translate("recorder", "Discard recording")
         msg = translate("recorder", "Are you sure you want to discard the acquired drawing?")
-        ret = QtGui.QMessageBox.warning(self, title, msg,
-                                        translate("recorder", "No"),
-                                        translate("recorder", "Yes, discard"))
-        if ret:
-            self.done(QtGui.QDialog.Rejected)
+        box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Warning, title, msg)
+        box.addButton(translate("recorder", "No"), QtWidgets.QMessageBox.NoRole)
+        box.addButton(translate("recorder", "Yes, discard"), QtWidgets.QMessageBox.YesRole)
+        if box.exec_():
+            self.done(QtWidgets.QDialog.Rejected)
 
 
     def accept(self, next_hand=False):
@@ -313,8 +307,8 @@ class EndRecording(QtGui.QDialog):
           False if self._ui.blood_not_drawn.isChecked() else \
           None
 
-        self.comments = unicode(self._ui.comments.toPlainText())
-        self.save_path = unicode(self._ui.save_path.text())
+        self.comments = self._ui.comments.toPlainText()
+        self.save_path = self._ui.save_path.text()
 
         # validate AID
         if not ID.validate_aid_err(self.aid):
@@ -324,37 +318,37 @@ class EndRecording(QtGui.QDialog):
         if not self.oid:
             title = translate("recorder", "Invalid operator")
             msg = translate("recorder", "The specified operator is invalid")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         if self.pat_type is None and not self.config.allow_no_pat_type:
             title = translate("recorder", "Patient type not set")
             msg = translate("recorder", "Patient type must be specified")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         if self.pat_hand_cnt is None:
             title = translate("recorder", "Hand count not set")
             msg = translate("recorder", "Patient hand count must be specified")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         if self.pat_handedness is None:
             title = translate("recorder", "Handedness not set")
             msg = translate("recorder", "Patient handedness must be specified")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         if self.pat_hand is None:
             title = translate("recorder", "Hand not set")
             msg = translate("recorder", "Drawing hand must be specified")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         if self.blood_drawn is None:
             title = translate("recorder", "Blood drawn not set")
             msg = translate("recorder", "Blood drawn state must be specified")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         # check if the file already exists
@@ -364,7 +358,7 @@ class EndRecording(QtGui.QDialog):
                             "The file {path} already exists. "
                             "Try with a different file name!")
             msg = msg.format(path=self.save_path)
-            QtGui.QMessageBox.critical(self, title, msg)
+            QtWidgets.QMessageBox.critical(self, title, msg)
             return
 
         # sanity checking
@@ -389,7 +383,7 @@ class EndRecording(QtGui.QDialog):
                                     "Please write a reason in the comments!",
                                     "param_changed")
                     msg = msg.format(parameter=broken_param)
-                    QtGui.QMessageBox.warning(self, title, msg)
+                    QtWidgets.QMessageBox.warning(self, title, msg)
                     return
 
             # .. ensure we really want to stop cycling
@@ -398,15 +392,15 @@ class EndRecording(QtGui.QDialog):
                 msg = translate("recorder", "Not all required drawings were collected "
                                 "and no reason is given in the comments!\n\n"
                                 "Please write a reason in the comments!")
-                QtGui.QMessageBox.warning(self, title, msg)
+                QtWidgets.QMessageBox.warning(self, title, msg)
                 return
 
         self.next_hand = next_hand
-        self.done(QtGui.QDialog.Accepted)
+        self.done(QtWidgets.QDialog.Accepted)
 
 
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self, params, device):
         super(MainWindow, self).__init__()
         self._ui = UI.load_ui(self, "main.ui")
@@ -423,9 +417,9 @@ class MainWindow(QtGui.QMainWindow):
         self._new_recording_dialog = NewRecording()
         self._end_recording_dialog = EndRecording()
         self._drawing_window = DrawingWindow.DrawingWindow(device)
-        self._dir_browser = QtGui.QFileDialog(self)
-        self._dir_browser.setFileMode(QtGui.QFileDialog.Directory)
-        self._dir_browser.setOption(QtGui.QFileDialog.ShowDirsOnly)
+        self._dir_browser = QtWidgets.QFileDialog(self)
+        self._dir_browser.setFileMode(QtWidgets.QFileDialog.Directory)
+        self._dir_browser.setOption(QtWidgets.QFileDialog.ShowDirsOnly)
 
         # parameters/initial state
         self.calibration_age = 0
@@ -485,24 +479,24 @@ class MainWindow(QtGui.QMainWindow):
         about = about.format(total=str(self.params.total_recordings),
                              uuid=self.params.installation_uuid,
                              date=self.params.installation_stamp)
-        QtGui.QMessageBox.about(self, title, ver + "\n" + about)
+        QtWidgets.QMessageBox.about(self, title, ver + "\n" + about)
 
 
     def on_proj_path(self):
         self._dir_browser.setDirectory(self.params.proj_path)
         if self._dir_browser.exec_():
-            proj_path = os.path.relpath(unicode(self._dir_browser.selectedFiles()[0]))
+            proj_path = os.path.relpath(self._dir_browser.selectedFiles()[0])
             self._ui.proj_path.setText(proj_path)
             self.on_proj_path_changed()
 
 
     def on_proj_path_changed(self):
-        proj_path = unicode(self._ui.proj_path.text())
+        proj_path = self._ui.proj_path.text()
         if self.params.proj_path == proj_path:
             # do not re-validate when losing focus without changes
             return
 
-        self.params.proj_path = unicode(self._ui.proj_path.text())
+        self.params.proj_path = self._ui.proj_path.text()
         conf_path = os.path.join(self.params.proj_path, Consts.PROJ_CONFIG)
 
         # show errors when configuring the recorder interactively
@@ -514,7 +508,7 @@ class MainWindow(QtGui.QMainWindow):
                             "Invalid project directory {path}: {reason}")
             msg = msg.format(path=self.params.proj_path, reason=e)
             title = translate("recorder", "Project directory")
-            QtGui.QMessageBox.critical(self, title, msg)
+            QtWidgets.QMessageBox.critical(self, title, msg)
 
         self.on_data_changed()
 
@@ -608,7 +602,7 @@ class MainWindow(QtGui.QMainWindow):
                                 "Try with a different file name!")
                 msg = msg.format(path=save_path, reason=e.strerror)
                 title = translate("recorder", "Save failure")
-                QtGui.QMessageBox.critical(self, title, msg)
+                QtWidgets.QMessageBox.critical(self, title, msg)
             else:
                 return record
 
@@ -671,7 +665,7 @@ class MainWindow(QtGui.QMainWindow):
 
 
 # main application
-class Application(QtGui.QApplication):
+class Application(QtWidgets.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
         UI.init_intl("recorder")
@@ -679,15 +673,15 @@ class Application(QtGui.QApplication):
         # command-line flags
         ap = argparse.ArgumentParser(description='Drawing recorder')
         ap.add_argument('dir', nargs='?', help='project directory')
-        args = ap.parse_args(map(unicode, args[1:]))
+        args = ap.parse_args(args[1:])
 
         # initialize the default settings
         self.settings = QtCore.QSettings(Consts.APP_ORG, Consts.APP_NAME)
         proj_path = args.dir if args.dir else \
-          unicode(self.settings.value("proj_path", "recordings").toString())
-        params = Params(proj_path, self.settings.value("total_recordings", 0).toInt()[0],
-                        str(self.settings.value("installation_uuid", uuid.getnode()).toString()),
-                        str(self.settings.value("installation_stamp", str(datetime.datetime.now())).toString()))
+            self.settings.value("proj_path", "recordings")
+        params = Params(proj_path, int(self.settings.value("total_recordings", 0)),
+                        self.settings.value("installation_uuid", uuid.getnode()),
+                        self.settings.value("installation_stamp", str(datetime.datetime.now())))
 
         # initialize
         device = Tablet.get_tablet_device()

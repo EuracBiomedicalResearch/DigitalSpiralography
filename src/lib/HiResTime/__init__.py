@@ -14,6 +14,7 @@ if sys.platform == 'win32':
     __ts_init = time.time() - time.clock()
 
     def resync():
+        global __ts_init
         __ts_init = time.time() - time.clock()
 
     def now():
@@ -46,6 +47,7 @@ elif sys.platform == 'linux2':
     __ts_init = time.time() - clock_gettime()
 
     def resync():
+        global __ts_init
         __ts_init = time.time() - clock_gettime()
 
     def now():
