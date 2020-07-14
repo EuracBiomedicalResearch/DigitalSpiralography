@@ -825,3 +825,13 @@ Future improvements
 * Implement a batch analysis module.
 * Record the actual tablet serial/details in the file instead of relying on the
   user scanning a barcode.
+
+
+Issues
+~~~~~~
+
+* At least on Linux with the Wacom driver, the Intuos Pro 5L tablet
+  produces a variable event rate which combines both event filtering
+  (reducing the event rate while tracking), but also having burst rates
+  higher than the 130.320Hz of the previous model (measured up to
+  ~200Hz). This requires rethinking the filtering/processing code.
