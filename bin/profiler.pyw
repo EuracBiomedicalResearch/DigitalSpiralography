@@ -20,7 +20,7 @@ import argparse
 import datetime
 import numpy as np
 import pyqtgraph as pg
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 # helpers
@@ -365,10 +365,10 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         title = translate("profiler", "Discard profile")
         msg = translate("profiler", "The current profile has been edited.\n"
                         "Are you sure you want to discard the profile?")
-        ret = QtGui.QMessageBox.warning(self, title, msg,
-                                        translate("profiler", "No"),
-                                        translate("profiler", "Yes, discard"))
-        return ret
+        box = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Warning, title, msg)
+        box.addButton(translate("profiler", "No"), QtWidgets.QMessageBox.NoRole)
+        box.addButton(translate("profiler", "Yes, discard"), QtWidgets.QMessageBox.YesRole)
+        return box.exec_()
 
 
     def on_new(self, ev):
@@ -384,7 +384,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
                             "Cannot load profile {path}: {reason}")
             msg = msg.format(path=path, reason=e)
             title = translate("profiler", "Load failure")
-            QtGui.QMessageBox.critical(self, title, msg)
+            QtWidgets.QMessageBox.critical(self, title, msg)
             return
 
         # only update the view on success
@@ -397,7 +397,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
         title = translate("profiler", "Load profile")
         ext_name = translate("profiler", "Profiles")
-        path = QtGui.QFileDialog.getOpenFileName(
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self, title, "", ext_name + " (*.prof.json.gz *.prof.yaml.gz)")
         if path:
             self.load(path)
@@ -405,17 +405,23 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
 
     def on_save(self, ev):
         # check data
-        if not self.data_ok or len(self.data.data) < 2:
+        if len(self.data.data) < 2:
+            title = translate("profiler", "Invalid data")
+            msg = translate("profiler", "The current curve is too short")
+            QtWidgets.QMessageBox.critical(None, title, msg)
+            return
+
+        if not self.data_ok:
             title = translate("profiler", "Invalid data")
             msg = translate("profiler", "The current curve data contains invalid values")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             return
 
         # validate the operator
         if not self.data.oid:
             title = translate("profiler", "Invalid operator")
             msg = translate("profiler", "The specified operator is invalid")
-            QtGui.QMessageBox.critical(None, title, msg)
+            QtWidgets.QMessageBox.critical(None, title, msg)
             self._ui.operator_id.selectAll()
             self._ui.operator_id.setFocus()
             return
@@ -435,7 +441,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
         ext_name = translate("profiler", "Profiles")
         path = u"{}_{}_{}.prof.json.gz".format(self.data.sid, self.data.tid,
                                                self.data.ts_updated.strftime("%Y%m%d"))
-        path = QtGui.QFileDialog.getSaveFileName(
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(
             self, title, path, ext_name + " (*.prof.json.gz)")
         if not path:
             return
@@ -447,7 +453,7 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
                             "Cannot save profile to {path}: {reason}!")
             msg = msg.format(path=path, reason=e.strerror)
             title = translate("profiler", "Save failure")
-            QtGui.QMessageBox.critical(self, title, msg)
+            QtWidgets.QMessageBox.critical(self, title, msg)
         self.changed = False
 
 
@@ -495,12 +501,12 @@ class MainWindow(QExtTabletWindow.QExtTabletWindow):
     def on_info(self, ev):
         ver = "{} {} {}".format(Consts.APP_ORG, Consts.APP_NAME, Consts.APP_VERSION)
         title = translate("profiler", "About StylusProfiler")
-        QtGui.QMessageBox.about(self, title, ver)
+        QtWidgets.QMessageBox.about(self, title, ver)
 
 
 
 # main application
-class Application(QtGui.QApplication):
+class Application(QtWidgets.QApplication):
     def __init__(self, args):
         super(Application, self).__init__(args)
         UI.init_intl("profiler")
